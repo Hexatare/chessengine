@@ -1,68 +1,151 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Drawing;
+using System.Security;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
+using System.Windows.Media.Imaging;
+using Brushes = System.Windows.Media.Brushes;
 
 namespace ChessEngineClassLibrary
 {
-    public class Cell : INotifyPropertyChanged
+    /// <summary>
+    /// Class Cell. Represents one Cell on the Board
+    /// </summary>
+    public class Cell
     {
-        // Property for the color of the cell
-        private SolidColorBrush cellColor;
-        public SolidColorBrush CellColor
+        // Color of the Cell 
+        public enum CellColor
         {
-            get { return cellColor; }
-            set
-            {
-                if (cellColor != value)
-                {
-                    cellColor = value;
-                    OnPropertyChanged(nameof(CellColor));
-                }
-            }
+            White,
+            Black
         }
-
-        // The Grid that is shown on the frontend
-        public Grid CellGrid { get; set; }
 
         // Property for the index of the cell
-        public int CellIndex { get; set; }
+        public int Index { get; set; }
+
+        // Actual Color or the Cell 
+        public CellColor Color { get; set; }
 
         // Property to hold the piece type on the cell
-        public Piece PieceOnCell { get; set; }
+        public int PieceOnCell { get; set; }
 
-        // Boolean property indicating whether the cell is currently occupied
-        public bool CurrentlyOccupied { get; set; }
+        // Chess Piece or null if cell is empty
+        public Piece PieceOnTheCell;
 
-        // Event to notify subscribers of property changes
-        public event PropertyChangedEventHandler? PropertyChanged;
+        // Status if cell is occupied with a piece
+        public bool IsCellEmpty { get; set; }
+      
+        // Graphical Element, that is placed in the Board
+        public Grid Grid { get; }
 
-        protected virtual void OnPropertyChanged(string propertyName)
+        // Status if cell is selected
+        private bool IsSelected = false;
+
+        // Reference to the Board
+        private readonly Board Board;
+        
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="chessBoard"></param>
+        /// <param name="cellColor"></param>
+        /// <param name="cellIndex"></param>
+        public Cell(Board chessBoard, CellColor cellColor, int cellIndex)
         {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
+            Board = chessBoard;
+            Index = cellIndex;
+            Color = cellColor;
+            IsCellEmpty = true;
 
-        // Constructor
-        public Cell(SolidColorBrush cellColor, int cellIndex, string? pieceColor, Grid cellGrid, Grid chessGrid, string? pieceType = null)
-        {
-            CellGrid = cellGrid;
-            CellIndex = cellIndex;
-            CellColor = cellColor;
+            // Generate the Grid
+            Grid = new Grid();
+            Grid.AllowDrop = true;
+            Grid.Drop += Grid_Drop;
 
-            if (pieceColor != null)
+            // Action, when Mouse Button is pushed
+            Grid.MouseLeftButtonDown += Grid_MouseLeftButtonDown;
+            Grid.MouseLeftButtonUp += Grid_MouseLeftButtonUp;
+            
+
+            // Set the color of the Cell
+            if (cellColor == CellColor.White)
             {
-                
+                Grid.Background = new SolidColorBrush(Colors.Beige);
             }
             else
             {
-                PieceOnCell = null;
-                CurrentlyOccupied = false;
+                Grid.Background = new SolidColorBrush(Colors.Brown);
+            }             
+        }
+
+        private void Grid_MouseLeftButtonUp(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            // Grid has bee clicked, set the Boarder Yellow
+            // Create a Border
+            //var border = new Border();
+
+            //// Set the border properties
+            //border.BorderBrush = Brushes.Yellow;
+            //border.BorderThickness = new Thickness(1);
+
+            if (!IsCellEmpty)
+            {
+                if (!IsSelected)
+                {
+                    IsSelected = true;
+
+                    // Notify the Board, a occupied Cell is selected
+                    Board.SetSelectedCell(Index, IsCellEmpty);
+                }
+                else
+                {
+                    IsSelected = false;
+                    Board.SetSelectedCell(-1, IsCellEmpty);
+                }
             }
+            else
+            { 
+                // Selection of a empty cell for possible movement of a Piece
+                Board.SetSelectedCell(this.Index, IsCellEmpty);
+            }
+        }
+
+        public void SetPiece<T>(T piece) where T : Piece
+        {
+            PieceOnTheCell = piece;
+            Grid.Children.Add(piece.Image);
+            IsCellEmpty = false;
+        }
+
+        public Piece GetPiece()
+        { 
+            return PieceOnTheCell; 
+        }
+
+
+        public void RemovePiece()
+        {
+            Grid.Children.Clear();
+            IsSelected = false;
+            IsCellEmpty = true;
+        }
+
+
+
+        private void Grid_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            Debug.WriteLine("Mouse pressed, Cell-Id: " + Index + " Empty: " + IsCellEmpty);
+
+            // Set a Frame around the Grid
+
+        }
+
+        private void Grid_Drop(object sender, System.Windows.DragEventArgs e)
+        {
+            Debug.WriteLine("Mouse pressed, Cell-Id: " + Index + " Empty: " + IsCellEmpty);
+            
         }
     }
 }
