@@ -1,16 +1,9 @@
 ﻿using ChessEngineClassLibrary.Resources;
-using System;
-using System.Collections.Generic;
-using System.Drawing;
 using System.IO;
 using System.Reflection;
-using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media.Imaging;
-using System.Windows.Media.Media3D;
-using static ChessEngineClassLibrary.Piece;
-using static System.Net.Mime.MediaTypeNames;
-using Image = System.Windows.Controls.Image;
+using System.Windows.Controls;
 
 namespace ChessEngineClassLibrary
 {
@@ -48,26 +41,9 @@ namespace ChessEngineClassLibrary
         // Piece Color
         public PColor PieceColor { get; set; }
 
-        //// Create constant ints to define the piece
-        //public const int Empty = 0;
-        //public const int King = 1;
-        //public const int Pawn = 2;
-        //public const int Knight = 3;
-        //public const int Bishop = 4;
-        //public const int Rook = 5;
-        //public const int Queen = 6;
-
-        //// Create two more constant ints to define the color of the piece
-        //public const int White = 8;
-        //public const int Black = 16;
-
-
-        // Property to hold the int of the piece
-        //public int PieceInt { get; set; }
-
 
         /// <summary>
-        /// 
+        /// Constructor
         /// </summary>
         /// <param name="pType"></param>
         /// <param name="imgName"></param>

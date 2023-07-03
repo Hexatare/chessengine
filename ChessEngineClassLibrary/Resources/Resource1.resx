@@ -136,10 +136,10 @@
     <value>blackRook.png</value>
   </data>
   <data name="PieceHeight" xml:space="preserve">
-    <value>70</value>
+    <value>65</value>
   </data>
   <data name="PieceWidth" xml:space="preserve">
-    <value>70</value>
+    <value>65</value>
   </data>
   <data name="ResourcePath" xml:space="preserve">
     <value>Resources.Pictures</value>

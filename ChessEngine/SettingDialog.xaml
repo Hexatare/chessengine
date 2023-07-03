@@ -8,7 +8,7 @@
         Title="Setting Dialog" Height="300" Width="500" ResizeMode="NoResize">
     <Grid>
         <DockPanel LastChildFill="True">
-            <Image x:Name="ChessLogo" DockPanel.Dock="Left" Width="150" Source="/ChessLogo.jpg" />
+            <Image x:Name="ChessLogo" DockPanel.Dock="Left" Width="150" Source="Resources/ChessLogo.jpg" />
             
             <!-- Grid für die Buttons -->
             <Grid DockPanel.Dock="Bottom" Margin="10">
