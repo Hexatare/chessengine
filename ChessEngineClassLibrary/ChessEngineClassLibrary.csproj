@@ -1,0 +1,54 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net7.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <UseWPF>true</UseWPF>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="Resources\Pictures\blackBishop.png" />
+    <None Remove="Resources\Pictures\blackKing.png" />
+    <None Remove="Resources\Pictures\blackKnight.png" />
+    <None Remove="Resources\Pictures\blackPawn.png" />
+    <None Remove="Resources\Pictures\blackQueen.png" />
+    <None Remove="Resources\Pictures\blackRook.png" />
+    <None Remove="Resources\Pictures\whiteBishop.png" />
+    <None Remove="Resources\Pictures\whiteKing.png" />
+    <None Remove="Resources\Pictures\whiteKnight.png" />
+    <None Remove="Resources\Pictures\whitePawn.png" />
+    <None Remove="Resources\Pictures\whiteQueen.png" />
+    <None Remove="Resources\Pictures\whiteRook.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\Pictures\blackBishop.png" />
+    <EmbeddedResource Include="Resources\Pictures\blackKing.png" />
+    <EmbeddedResource Include="Resources\Pictures\blackKnight.png" />
+    <EmbeddedResource Include="Resources\Pictures\blackPawn.png" />
+    <EmbeddedResource Include="Resources\Pictures\blackQueen.png" />
+    <EmbeddedResource Include="Resources\Pictures\blackRook.png" />
+    <EmbeddedResource Include="Resources\Pictures\whiteBishop.png" />
+    <EmbeddedResource Include="Resources\Pictures\whiteKing.png" />
+    <EmbeddedResource Include="Resources\Pictures\whiteKnight.png" />
+    <EmbeddedResource Include="Resources\Pictures\whitePawn.png" />
+    <EmbeddedResource Include="Resources\Pictures\whiteQueen.png" />
+    <EmbeddedResource Include="Resources\Pictures\whiteRook.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Resources\Resource1.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resource1.resx</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Update="Resources\Resource1.resx">
+      <Generator>PublicResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resource1.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+
+</Project>
