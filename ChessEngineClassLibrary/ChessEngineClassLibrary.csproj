@@ -22,18 +22,42 @@
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="Resources\Pictures\blackBishop.png" />
-    <EmbeddedResource Include="Resources\Pictures\blackKing.png" />
-    <EmbeddedResource Include="Resources\Pictures\blackKnight.png" />
-    <EmbeddedResource Include="Resources\Pictures\blackPawn.png" />
-    <EmbeddedResource Include="Resources\Pictures\blackQueen.png" />
-    <EmbeddedResource Include="Resources\Pictures\blackRook.png" />
-    <EmbeddedResource Include="Resources\Pictures\whiteBishop.png" />
-    <EmbeddedResource Include="Resources\Pictures\whiteKing.png" />
-    <EmbeddedResource Include="Resources\Pictures\whiteKnight.png" />
-    <EmbeddedResource Include="Resources\Pictures\whitePawn.png" />
-    <EmbeddedResource Include="Resources\Pictures\whiteQueen.png" />
-    <EmbeddedResource Include="Resources\Pictures\whiteRook.png" />
+    <EmbeddedResource Include="Resources\Pictures\blackBishop.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\Pictures\blackKing.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\Pictures\blackKnight.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\Pictures\blackPawn.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\Pictures\blackQueen.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\Pictures\blackRook.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\Pictures\whiteBishop.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\Pictures\whiteKing.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\Pictures\whiteKnight.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\Pictures\whitePawn.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\Pictures\whiteQueen.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\Pictures\whiteRook.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </EmbeddedResource>
   </ItemGroup>
 
   <ItemGroup>

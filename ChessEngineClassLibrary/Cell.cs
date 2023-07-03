@@ -112,7 +112,7 @@ namespace ChessEngineClassLibrary
             }
         }
 
-        public void SetPiece<T>(T piece) where T : Piece
+        public void SetPiece(Piece piece) //where T : Piece
         {
             PieceOnTheCell = piece;
             Grid.Children.Add(piece.Image);
@@ -120,8 +120,8 @@ namespace ChessEngineClassLibrary
         }
 
         public Piece GetPiece()
-        { 
-            return PieceOnTheCell; 
+        {
+            return PieceOnTheCell;
         }
 
 

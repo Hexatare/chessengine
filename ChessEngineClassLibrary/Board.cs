@@ -296,7 +296,7 @@ namespace ChessEngineClassLibrary
                 if (droppedPiece != null)
                 {
                     // Access the properties of the dropped Piece instance
-                    Debug.WriteLine($"Dropped Piece Type: {droppedPiece.PieceInt}");
+                    //Debug.WriteLine($"Dropped Piece Type: {droppedPiece.PieceInt}");
 
                     System.Windows.Controls.Image image = new System.Windows.Controls.Image();
                     image.MouseMove += droppedPiece.Image_MouseMove;

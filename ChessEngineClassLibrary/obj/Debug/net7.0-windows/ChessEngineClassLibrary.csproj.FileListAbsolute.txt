@@ -1,0 +1,14 @@
+C:\Users\rolfm\Source\Repos\chessengine\ChessEngineClassLibrary\bin\Debug\net7.0-windows\ChessEngineClassLibrary.deps.json
+C:\Users\rolfm\Source\Repos\chessengine\ChessEngineClassLibrary\bin\Debug\net7.0-windows\ChessEngineClassLibrary.dll
+C:\Users\rolfm\Source\Repos\chessengine\ChessEngineClassLibrary\bin\Debug\net7.0-windows\ChessEngineClassLibrary.pdb
+C:\Users\rolfm\Source\Repos\chessengine\ChessEngineClassLibrary\obj\Debug\net7.0-windows\ChessEngineClassLibrary.csproj.AssemblyReference.cache
+C:\Users\rolfm\Source\Repos\chessengine\ChessEngineClassLibrary\obj\Debug\net7.0-windows\ChessEngineClassLibrary.Resources.Resource1.resources
+C:\Users\rolfm\Source\Repos\chessengine\ChessEngineClassLibrary\obj\Debug\net7.0-windows\ChessEngineClassLibrary.csproj.GenerateResource.cache
+C:\Users\rolfm\Source\Repos\chessengine\ChessEngineClassLibrary\obj\Debug\net7.0-windows\ChessEngineClassLibrary.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\rolfm\Source\Repos\chessengine\ChessEngineClassLibrary\obj\Debug\net7.0-windows\ChessEngineClassLibrary.AssemblyInfoInputs.cache
+C:\Users\rolfm\Source\Repos\chessengine\ChessEngineClassLibrary\obj\Debug\net7.0-windows\ChessEngineClassLibrary.AssemblyInfo.cs
+C:\Users\rolfm\Source\Repos\chessengine\ChessEngineClassLibrary\obj\Debug\net7.0-windows\ChessEngineClassLibrary.csproj.CoreCompileInputs.cache
+C:\Users\rolfm\Source\Repos\chessengine\ChessEngineClassLibrary\obj\Debug\net7.0-windows\ChessEngineClassLibrary.dll
+C:\Users\rolfm\Source\Repos\chessengine\ChessEngineClassLibrary\obj\Debug\net7.0-windows\refint\ChessEngineClassLibrary.dll
+C:\Users\rolfm\Source\Repos\chessengine\ChessEngineClassLibrary\obj\Debug\net7.0-windows\ChessEngineClassLibrary.pdb
+C:\Users\rolfm\Source\Repos\chessengine\ChessEngineClassLibrary\obj\Debug\net7.0-windows\ref\ChessEngineClassLibrary.dll
