@@ -135,6 +135,9 @@
   <data name="bRook" xml:space="preserve">
     <value>blackRook.png</value>
   </data>
+  <data name="DefaultFEN" xml:space="preserve">
+    <value>rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1</value>
+  </data>
   <data name="PieceHeight" xml:space="preserve">
     <value>65</value>
   </data>

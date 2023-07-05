@@ -9,6 +9,7 @@ using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Shapes;
 using ChessEngineClassLibrary;
+using ChessEngineClassLibrary.Resources;
 using Microsoft.Win32;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
@@ -20,15 +21,32 @@ namespace ChessEngine
     /// </summary>
     public partial class MainWindow : Window
     {
+
+        #region Properties and private Members
+
+        /// <summary>
+        /// Reference to the board
+        /// </summary>
+        private Board board;
+
+
+        /// <summary>
+        /// Reference to the Game
+        /// </summary>
+        private Game game;
+
+        #endregion
+
         public MainWindow()
         {
             InitializeComponent();
 
             // Create Board
-            Board ChessBoard = new Board(ChessGrid);
+            board = new Board(ChessGrid);
 
+            // Create the Game Class
+            game = new Game(board);
 
-            //ChessBoard.InitChessBoard(ChessGrid);
         }
 
 
@@ -99,6 +117,7 @@ namespace ChessEngine
         private void MenuItemNewGame_Click(object sender, RoutedEventArgs e)
         {
             // Command to the Board, to start a new Game
+            game.SetNewGame(Resource1.DefaultFEN);
         }
 
         /// <summary>
@@ -112,9 +131,15 @@ namespace ChessEngine
         }
 
 
+        /// <summary>
+        /// Menu Command to undo the last move on the board
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void MenuItemUndo_Click(object sender, RoutedEventArgs e)
         {
-
+            // Undo the last move of the player
+            game.UndoLastMove();
         }
 
         #endregion
@@ -122,7 +147,7 @@ namespace ChessEngine
 
         #region Private Methods
 
-        private static void ShowOpenFileDialog()
+        private void ShowOpenFileDialog()
         {
             // Create an instance of the OpenFileDialog
             OpenFileDialog openFileDialog = new OpenFileDialog();
@@ -143,10 +168,9 @@ namespace ChessEngine
                     using StreamReader sr = new StreamReader(selectedFilePath);
                     string line;
 
-                    while ((line = sr.ReadLine()) != null)
-                    {
-                        // Process each line of the file
-                        Debug.WriteLine(line);
+                    if ( (line = sr.ReadLine()) != null)
+                    { 
+                        game.SetNewGame(line);
                     }
                 }
                 catch (IOException e)
@@ -156,7 +180,7 @@ namespace ChessEngine
             }
         }
     
-        private static void ShowSaveFileDialog()
+        private void ShowSaveFileDialog()
         {
             // Create an instance of the SaveFileDialog
             SaveFileDialog saveFileDialog = new SaveFileDialog();

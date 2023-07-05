@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ChessEngineClassLibrary.Pieces;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -10,7 +11,7 @@ namespace ChessEngineClassLibrary
     /// <summary>
     /// Class that represents an Chess Move
     /// </summary>
-    internal class Move
+    public class Move
     {
         // Reference to the Player  
         private Player Player;

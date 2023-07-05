@@ -115,6 +115,15 @@ namespace ChessEngineClassLibrary.Resources {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1 ähnelt.
+        /// </summary>
+        public static string DefaultFEN {
+            get {
+                return ResourceManager.GetString("DefaultFEN", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die 65 ähnelt.
         /// </summary>
         public static string PieceHeight {
