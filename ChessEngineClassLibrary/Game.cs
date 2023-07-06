@@ -3,7 +3,9 @@ using ChessEngineClassLibrary.Pieces;
 using ChessEngineClassLibrary.Resources;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace ChessEngineClassLibrary
 {
@@ -74,9 +76,12 @@ namespace ChessEngineClassLibrary
         /// </summary>
         public bool FirstMoveDone { get; set; } = false;
 
+        private Cell SourceCell;
+
+
         #endregion
 
-
+        #region Contructors
 
         /// <summary>
         /// Constructor
@@ -101,8 +106,90 @@ namespace ChessEngineClassLibrary
             // List with all Pieces for each Color
             BlackPieces = new List<Piece>();
             WhitePieces = new List<Piece>();
+
+            // Register Eventhandler for Cell selection
+            foreach (Cell cell in ChessBoard.GetCells())
+            {
+                cell.CellSelected += Cell_CellSelected;
+            }
+
         }
 
+        #endregion
+        
+        #region Eventhandler
+
+        /// <summary>
+        /// Eventhandler for cell selection
+        /// </summary>
+        /// <param name="sender">Selected cell</param>
+        /// <param name="e"></param>
+        private void Cell_CellSelected(object? sender, EventArgs e)
+        {
+            // Convert sender to Cell
+            Cell cell = (Cell)sender;
+            
+            // Make sure, cell is not empty 
+            if (cell == null)
+                return;
+
+            // if no cell is selected and the cell is empty, exit
+            if( SourceCell == null && cell.IsEmpty)
+                return;
+
+            // Set the source cell
+            if (SourceCell == null && ((int)cell.GetPiece().PieceColor == (int)CurrentPlayer) && !cell.IsEmpty)
+            {
+                SourceCell = cell;
+
+                // Set the Cell as selected
+                cell.SetSelected(true);
+            }
+            // same cell is clicked again
+            else if (SourceCell != null && SourceCell.Index == cell.Index)
+            {
+                SourceCell = null;
+
+                // deselect the cell
+                cell.SetSelected(false);
+            }
+            // Check for a possible new position
+            else if (SourceCell != null) 
+            {
+                // Check if its a generic valid move
+                if ( !CanMoveToDest(cell) )
+                    return;
+
+                // Check if its a valid move for the specific piece
+
+
+                // If the move is valid, move the piece
+                Move move = new Move(SourceCell, cell);
+                GetPlayer(CurrentPlayer).AddMove(move);
+
+                // if target Cell was not empty, the a kill was performed
+                if (!cell.IsEmpty)
+                    move.PieceKilled = cell.GetPiece();
+
+                // Change current player
+                if( (int)CurrentPlayer == (int)Piece.PColor.White )
+                    CurrentPlayer = Piece.PColor.Black;
+                else
+                    CurrentPlayer = Piece.PColor.White;
+
+                // If first move, set flag
+                if (!FirstMoveDone)
+                    FirstMoveDone = true;
+
+                // Start Timer of the new player, stop Timer of old Player
+                foreach(Player player in PlayerList)
+                    player.SetCurrentPlayer(CurrentPlayer);
+            }
+        }
+
+        #endregion
+
+        #region Methods
 
         /// <summary>
         /// Starts a new Game, Settings to default
@@ -122,6 +209,7 @@ namespace ChessEngineClassLibrary
             // Initalize the board
             ChessBoard.RemoveAllPieces();
         }
+
 
         /// <summary>
         /// Sets up the board according to a FEN String
@@ -241,6 +329,7 @@ namespace ChessEngineClassLibrary
             throw new NotImplementedException();    
         }
 
+        #endregion
 
         #region Helper Methods
 
@@ -260,248 +349,290 @@ namespace ChessEngineClassLibrary
 
         #endregion
 
+        #region GameLogic for movements on the board
+
+        /// <summary>
+        /// Helper function that checks whether it is possible,
+        /// for a chess piece to move to a spot.
+        /// </summary>
+        /// <param name="destCell"></param>
+        /// <returns>true if possible</returns>
+        public bool CanMoveToDest(Cell destCell)
+        {
+            Piece location = destCell.GetPiece();
+
+            if (location == null)
+                return true;
+
+            if ( (int)location.PieceColor != (int)CurrentPlayer)
+                return true;
+
+            return false;
+        }
 
 
+        /// <summary>
+        /// Movement logic of the Pawn
+        /// </summary>
+        /// <param name="startCell">actual position of the Pawn</param>
+        /// <param name="destCell">destination postion of the Pawn</param>
+        /// <returns>True, if movement is possible</returns>
+        private bool PawnMovement(Cell startCell, Cell destCell)
+        {
+            int one_step;
+            int two_step;
 
-        //            System.out.print("Which piece to move? X-loc: ");
-        //            int nextX = userInput.nextInt();
-        //            System.out.print("Y-loc: ");
-        //            int nextY = userInput.nextInt();
+            if (startCell.GetPiece().PieceColor == Piece.PColor.Black)
+            {
+                one_step = 1;
+                two_step = 2;
+            }
+            else
+            {
+                one_step = -1;
+                two_step = -2;
+            }
 
-        //            Piece target = chessBoard.pieceAt(nextX, nextY);
-        //            if (target == null)
-        //            {
-        //                System.out.println("That location is invalid");
-        //                continueGame = false;
-        //            }
-        //            else if (target.getColor() != currentPlayer)
-        //            {
-        //                System.out.println("That is not your piece");
-        //                continueGame = false;
-        //            }
-        //            else
-        //            {
-        //                System.out.print("Where to move this piece? x-loc: ");
-        //                nextX = userInput.nextInt();
-        //                System.out.print("Y-loc: ");
-        //                nextY = userInput.nextInt();
+            // Moving one step forward
+            if (destCell.Location[1] - startCell.Location[1] == one_step)
+            {
+                // Straight
+                if ( (startCell.Location[1] == destCell.Location[1]) && destCell.IsEmpty)
+                {
+                    return true;
+                }
+                // Diagonally
+                if (Math.Abs(startCell.Location[1] - destCell.Location[1]) == 1 && !destCell.IsEmpty)
+                {
+                    return true;
+                }
+            }
+            // Two spaces
+            else if (!startCell.GetPiece().HasMoved)
+            {
+                if (destCell.Location[1] - startCell.Location[1] == two_step)
+                {
+                    if (startCell.Location[1] == destCell.Location[1] && destCell.IsEmpty)
+                    {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
 
-        //                if (target.canMoveTo(nextX, nextY))
-        //                {
-        //                    target.moveTo(nextX, nextY);
-        //                }
-        //                else
-        //                {
-        //                    System.out.println("Cannot move there");
-        //                }
-        //            }
-        //        }
-        //    }
 
-        //    /**
-        //     * Checks to see if game-ending situation has occurred
-        //     * 
-        //     * NOTE: few more game-ending situations should be added,
-        //     * like 50 move rule, threefold repetition.
-        //     * 
-        //     * Added 'no legal move' draw
-        //     * Added 'checkmate' end
-        //     * @return - True if game is over
-        //     */
-        //    public boolean isGameOver()
-        //    {
-        //        if (isCheckmate(BLACK) || isCheckmate(WHITE))
-        //        {
-        //            System.out.println("CHECKMATE");
-        //            return true;
-        //        }
-        //        else if (!canMove(currentPlayer))
-        //        {
-        //            System.out.println("STALEMATE");
-        //            return true;
-        //        }
-        //        return false;
-        //    }
+        /// <summary>
+        /// Movement logic of the Rook
+        /// </summary>
+        /// <param name="startCell">actual position of the Pawn</param>
+        /// <param name="destCell">destination postion of the Pawn</param>
+        /// <returns></returns>
+        private bool RookMovement(Cell startCell, Cell destCell)
+        {
+            return this.CanMoveStraight(startCell, destCell);
+        }
 
-        //    /**
-        //     * Check to see if the given player
-        //     * is in a checkmate situation
-        //     * @param color - color of the player who may be in checkmate
-        //     * @return - True if player is indeed in checkmate
-        //     */
-        //    public boolean isCheckmate(int color)
-        //    {
-        //        if (isKingInCheck(color))
-        //        {
-        //            if (!canMove(color))
-        //                return true;
-        //        }
 
-        //        return false;
-        //    }
+        /// <summary>
+        /// Movement logic of the Bishop
+        /// </summary>
+        /// <param name="startCell">actual position of the Pawn</param>
+        /// <param name="destCell">destination postion of the Pawn</param>
+        /// <returns></returns>
+        private bool BishopMovement(Cell startCell, Cell destCell)
+        { 
+            return this.CanMoveDiagonal(startCell, destCell);
+        }
 
-        //    /**
-        //     * Determines whether the given player has any valid
-        //     * moves left to play
-        //     * @param player - Player who's moves are being checked
-        //     * @return - True if the player still has valid moves
-        //     */
-        //    public boolean canMove(int player)
-        //    {
-        //        int oldX, oldY;
-        //        Piece target;
-        //        LinkedList<Piece> checkPieces;
 
-        //        if (player == BLACK)
-        //            checkPieces = blackPieces;
-        //        else
-        //            checkPieces = whitePieces;
+        /// <summary>
+        /// Movement logic of the Knight
+        /// </summary>
+        /// <param name="startCell">actual position of the Pawn</param>
+        /// <param name="destCell">destination postion of the Pawn</param>
+        /// <returns></returns>
+        private bool KnightMovement(Cell startCell, Cell destCell)
+        { 
+      		if (   Math.Abs(startCell.Location[0] - destCell.Location[0]) == 2 
+                && Math.Abs(startCell.Location[1] - destCell.Location[1]) == 1)
+			    return true;
+		
+            if (   Math.Abs(startCell.Location[0] - destCell.Location[0]) == 1 
+                && Math.Abs(startCell.Location[1] - destCell.Location[1]) == 2)
+			    return true;
+		
+            return false;
+        }
 
-        //        for (int x = 0; x < chessBoard.getXDimension(); x++)
-        //        {
-        //            for (int y = 0; y < chessBoard.getYDimension(); y++)
-        //            {
-        //                // If any piece can move to this spot, move here
-        //                // If king is still in check, then go to next location.
-        //                for (Piece currentPiece : checkPieces)
-        //                {
-        //                    if (currentPiece.canMoveTo(x, y))
-        //                    {
-        //                        //System.out.println(x + ", " + y);
-        //                        target = chessBoard.pieceAt(x, y);
-        //                        oldX = currentPiece.getXLocation();
-        //                        oldY = currentPiece.getYLocation();
 
-        //                        currentPiece.moveTo(x, y);
+        /// <summary>
+        /// Movement logic of the Queen
+        /// </summary>
+        /// <param name="startCell">actual position of the Pawn</param>
+        /// <param name="destCell">destination postion of the Pawn</param>
+        /// <returns></returns>
+        private bool QueenMovement(Cell startCell, Cell destCell)
+        {
+            if (   this.CanMoveStraight(startCell, destCell)
+                || this.CanMoveDiagonal(startCell, destCell))
+                return true;
+            return false;
+        }
 
-        //                        if (!isKingInCheck(player))
-        //                        {
-        //                            currentPiece.moveTo(oldX, oldY);
-        //                            if (target != null)
-        //                                target.moveTo(x, y);
-        //                            return true;
-        //                        }
-        //                        else
-        //                        {
-        //                            currentPiece.moveTo(oldX, oldY);
-        //                            if (target != null)
-        //                                target.moveTo(x, y);
-        //                        }
-        //                    }
-        //                }
-        //            }
-        //        }
-        //        return false;
-        //    }
 
-        //    /**
-        //     * Checks if a given player's king is in check
-        //     * @param color - the color of the player's king being checked
-        //     * @return - True if the specified king is in check.
-        //     */
-        //    public boolean isKingInCheck(int color)
-        //    {
-        //        boolean result = false;
+        /// <summary>
+        /// Movement logic of the King
+        /// </summary>
+        /// <param name="startCell">actual position of the Pawn</param>
+        /// <param name="destCell">destination postion of the Pawn</param>
+        /// <returns></returns>
+        private bool KingMovement(Cell startCell, Cell destCell)
+        {
+            int absoluteX = Math.Abs(destCell.Location[0] - startCell.Location[0]);
+            int absoluteY = Math.Abs(destCell.Location[1] - startCell.Location[1]);
 
-        //        LinkedList<Piece> originalList;
-        //        King kingInQuestion;
+            if (absoluteX <= 1 && absoluteY <= 1)
+            {
+                if (absoluteX == 0 && absoluteY == 0)
+                {
+                    return false;
+                }
+                return true;
+            }
+            return false;
+        }
 
-        //        if (color == BLACK)
-        //        {
-        //            originalList = whitePieces;
-        //            kingInQuestion = blackKing;
-        //        }
-        //        else
-        //        {
-        //            originalList = blackPieces;
-        //            kingInQuestion = whiteKing;
-        //        }
 
-        //        int xKingLoc = kingInQuestion.getXLocation();
-        //        int yKingLoc = kingInQuestion.getYLocation();
+        /// <summary>
+        /// Helper Class the determin, if a Piece can move in a straight line
+        /// <param name="sourceCell"></param>
+        /// <param name="destCell"></param>
+        /// <returns>true if possible</returns>
+        public bool CanMoveStraight(Cell sourceCell, Cell destCell)
+        {
+            int[] destIndex = destCell.Location;
+            int[] sourceIndex = sourceCell.Location;
 
-        //        for (Piece currentPiece : originalList)
-        //        {
-        //            if (currentPiece.canMoveTo(xKingLoc, yKingLoc))
-        //            {
-        //                result = true;
-        //            }
-        //        }
+            int currX = sourceIndex[0];
+            int currY = sourceIndex[1];
 
-        //        return result;
-        //    }
+            int startIndex;
+            int endIndex;
 
-        //    /**
-        //     * Removes this piece from the game
-        //     * 
-        //     * ASSERT that the removed piece is already in game.
-        //     * @param removeThisPiece the piece to remove.
-        //     */
-        //    public void removePiece(Piece removeThisPiece)
-        //    {
-        //        removeThisPiece.removePiece();
-        //        int color = removeThisPiece.getColor();
+            // X position remains the same
+            if (currX == destIndex[0])
+            {
+                if (currY > destIndex[1])
+                {
+                    startIndex = destIndex[1];
+                    endIndex = currY;
+                }
+                else if (currY < destIndex[1])
+                {
+                    startIndex = currY;
+                    endIndex = destIndex[1];
+                }
+                else return false;
 
-        //        if (color == BLACK)
-        //            blackPieces.remove(removeThisPiece);
-        //        else
-        //            whitePieces.remove(removeThisPiece);
-        //    }
+                // Loop from start to end position and check if no pieces is in between
+                for (startIndex++; startIndex < endIndex; startIndex++)
+                {
+                    if (!ChessBoard.GetCell(currX, startIndex).IsEmpty)
+                        return false;
+                }
+                return true;
+            }
 
-        //    public void switchPlayerTurn()
-        //    {
-        //        if (currentPlayer == WHITE)
-        //            currentPlayer = BLACK;
-        //        else currentPlayer = WHITE;
-        //    }
+            // Y position remains the same
+            if (currY == destIndex[1])
+            {
+                if (currX > destIndex[0])
+                {
+                    startIndex = destIndex[0];
+                    endIndex = currX;
+                }
+                else if (currX < destIndex[0])
+                {
+                    startIndex = currX;
+                    endIndex = destIndex[0];
+                }
+                else return false;
 
-        //    public Queen addQueen(int color, int xloc, int yloc)
-        //    {
-        //        Queen queen = new Queen(chessBoard, color, xloc, yloc);
-        //        pieceToColorHelper(queen, color);
+                // Loop from start to end position and check if no pieces is in between
+                for (startIndex++; startIndex < endIndex; startIndex++)
+                {
+                    if (!ChessBoard.GetCell(startIndex, currY).IsEmpty)
+                        return false;
+                }
+                return true;
+            }
+            return false;
+        }
 
-        //        return queen;
-        //    }
 
-        //    public Knight addKnight(int color, int xloc, int yloc)
-        //    {
-        //        Knight knight = new Knight(chessBoard, color, xloc, yloc);
-        //        pieceToColorHelper(knight, color);
+        /// <summary>
+        /// Helper function for determining whether a piece can move in a diagonal line.
+        /// </summary>
+        /// <param name="sourceCell"></param>
+        /// <param name="destCell"></param>
+        /// <returns></returns>
+        public bool CanMoveDiagonal(Cell sourceCell, Cell destCell)
+        {
+            int startIndex = 0;
+            int endIndex = 0;
+            int cellInc = 0;
 
-        //        return knight;
-        //    }
+            // Check for a diagonal move
+            int cellMove = Math.Abs(sourceCell.Index - destCell.Index);
 
-        //    public Rook addRook(int color, int xloc, int yloc)
-        //    {
-        //        Rook rook = new Rook(chessBoard, color, xloc, yloc);
-        //        pieceToColorHelper(rook, color);
+            if ((cellMove % 7) == 0)
+            {
+                if (sourceCell.Index < destCell.Index)
+                {
+                    startIndex = sourceCell.Index;
+                    endIndex = destCell.Index;
+                }
+                else if (sourceCell.Index > destCell.Index)
+                {
+                    startIndex = destCell.Index;
+                    endIndex = sourceCell.Index;
+                }
+                else
+                    return false;
+                cellInc = 7;
+            }
+            else if ((cellMove % 9) == 0)
+            {
+                if (sourceCell.Index < destCell.Index)
+                {
+                    startIndex = sourceCell.Index;
+                    endIndex = destCell.Index;
+                }
+                else if (sourceCell.Index > destCell.Index)
+                {
+                    startIndex = destCell.Index;
+                    endIndex = sourceCell.Index;
+                }
+                else
+                    return false;
+                cellInc = 9;
+            }
 
-        //        return rook;
-        //    }
+            // Loop to see if any piece is in between
+            for (startIndex += cellInc; startIndex < endIndex; startIndex += cellInc)
+            {
+                if (!ChessBoard.GetCell(startIndex).IsEmpty)
+                {
+                    return false;
+                }
+                return true;
+            }
+            return false;
+        }
 
-        //    public Bishop addBishop(int color, int xloc, int yloc)
-        //    {
-        //        Bishop bishop = new Bishop(chessBoard, color, xloc, yloc);
-        //        pieceToColorHelper(bishop, color);
-
-        //        return bishop;
-        //    }
-
-        //    public Pawn addPawn(int color, int xloc, int yloc)
-        //    {
-        //        Pawn pawn = new Pawn(chessBoard, color, xloc, yloc);
-        //        pieceToColorHelper(pawn, color);
-
-        //        return pawn;
-        //    }
-
-        //    private void pieceToColorHelper(Piece piece, int color)
-        //    {
-        //        if (color == BLACK)
-        //            blackPieces.add(piece);
-        //        else
-        //            whitePieces.add(piece);
-        //    }
 
     }
+
+    #endregion
 }

@@ -24,7 +24,6 @@ namespace ChessEngineClassLibrary.Pieces
         // Code von Isi Enumeration of Pieces
         public enum PType
         {
-            Empty,
             Pawn,
             Knight,
             Bishop,
@@ -44,10 +43,7 @@ namespace ChessEngineClassLibrary.Pieces
         public PColor PieceColor { get; set; }
 
         // Piece has been moved from start position
-        protected bool HasMoved { get; set; }
-
-        // Location of the piece on the board, [0] = x, [1] = y; 
-        protected int[] Location { get; set; }
+        public bool HasMoved { get; set; }
 
 
         /// <summary>
@@ -62,7 +58,7 @@ namespace ChessEngineClassLibrary.Pieces
 
             // Initialize local information
             HasMoved = false;
-            Location = new int[] { -1, -1};
+            //Location = new int[] { -1, -1};
 
             // Get the assembly containing the resource
             Assembly assembly = Assembly.GetExecutingAssembly();
@@ -91,6 +87,35 @@ namespace ChessEngineClassLibrary.Pieces
                 stream.Dispose();
             }
         }
+
+
+        ///// <summary>
+        ///// Sets an new Position of the Piece on the Board
+        ///// </summary>
+        ///// <param name="cellIndex">Index of the Cell on the Board</param>
+        //public void SetNewPosition(int cellIndex)
+        //{
+        //    // calculate the x and y coordinates
+        //    Location = new int[] { (CellIndex % 8), (7 - (CellIndex / 8)) };
+
+        //    CellIndex = cellIndex;
+        //}
+
+
+
+        ///// <summary>
+        ///// Sets an new Position of the Piece on the Board
+        ///// </summary>
+        ///// <param name="xIndex">x-Coordinate</param>
+        ///// <param name="yIndex">y-Coordinate</param>
+        ///// <returns></returns>
+        //public void SetNewPosition(int xIndex, int yIndex)
+        //{
+        //    // Index on the chess board, from 0 (a8) to 63 (h7)
+        //    CellIndex = xIndex + ((yIndex % 7) * 8);
+
+        //    Location = new int[] { xIndex, yIndex };
+        //}
 
 
         // Method to handle the Drag of the Image

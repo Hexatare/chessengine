@@ -13,8 +13,5 @@ namespace ChessEngineClassLibrary.Pieces
         {
             PieceType = PType.Pawn;
         }
-
-
-
     }
 }

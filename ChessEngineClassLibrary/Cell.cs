@@ -1,4 +1,5 @@
 ﻿using ChessEngineClassLibrary.Pieces;
+using System;
 using System.Diagnostics;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -28,14 +29,20 @@ namespace ChessEngineClassLibrary
         // Property for the index of the cell
         public int Index { get; set; }
 
+        // Location of the piece on the board, [0] = x, [1] = y; 
+        public int[] Location { get; set; }
+
         // Actual Color or the Cell 
         public CellColor Color { get; set; }
 
         // Status if cell is occupied with a piece
-        public bool IsCellEmpty { get; set; }
+        public bool IsEmpty { get; set; }
       
         // Graphical Element, that is placed in the Board
         public Grid Grid { get; }
+
+        // A public Eventdelegate for a Cell that is selected
+        public event EventHandler CellSelected;
 
         // Status if cell is selected
         private bool IsSelected = false;
@@ -64,7 +71,8 @@ namespace ChessEngineClassLibrary
             Board = chessBoard;
             Index = cellIndex;
             Color = cellColor;
-            IsCellEmpty = true;
+            IsEmpty = true;
+            Location = new int[] { (cellIndex % 8), (7 - (cellIndex / 8)) };
 
             // Generate the Grid
             Grid = new Grid();
@@ -97,7 +105,9 @@ namespace ChessEngineClassLibrary
         {
             PieceOnTheCell = piece;
             Grid.Children.Add(piece.Image);
-            IsCellEmpty = false;
+            IsEmpty = false;
+
+            //piece.SetNewPosition(this.Index);
         }
 
         /// <summary>
@@ -115,13 +125,39 @@ namespace ChessEngineClassLibrary
         /// </summary>
         public void RemovePiece()
         {
+
             // Empty the Cell and set internal state
             Grid.Children.Clear();
             IsSelected = false;
-            IsCellEmpty = true;
+            IsEmpty = true;
 
             // Set the Background of the Cell
             Grid.Background = new SolidColorBrush(CellBackgroundColor);
+        }
+
+
+        public void SetSelected(bool isSelected)
+        {   
+            if(isSelected)
+            {
+                IsSelected = true;
+
+                // Set the Background of the Cell
+                Grid.Background = new SolidColorBrush(Colors.Yellow);
+            }
+            else
+            { 
+                IsSelected = false; 
+
+                // Set the Background of the Cell
+                Grid.Background = new SolidColorBrush(CellBackgroundColor);
+            }
+        }
+
+
+        public virtual void OnCellSelected(EventArgs e)
+        {
+            CellSelected?.Invoke(this, e);
         }
 
         /// <summary>
@@ -131,34 +167,9 @@ namespace ChessEngineClassLibrary
         /// <param name="e"></param>
         private void Grid_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
-            // Test if Cell is not empty and not already selected
-            if (!IsCellEmpty)
-            {
-                if (!IsSelected)
-                {
-                    IsSelected = true;
+            // Notify all Eventhandler on the Cell
+            this.OnCellSelected(e);
 
-                    // Set the Background of the Cell
-                    Grid.Background = new SolidColorBrush(Colors.Yellow);
-
-                    // Notify the Board, a occupied Cell is selected
-                    Board.CellSelected(Index, IsCellEmpty);
-                }
-                else
-                {
-                    IsSelected = false;
-                    
-                    // Set the Background of the Cell
-                    Grid.Background = new SolidColorBrush(CellBackgroundColor);
-
-                    Board.CellSelected(-1, IsCellEmpty);
-                }
-            }
-            else
-            { 
-                // Selection of a empty cell for possible movement of a Piece
-                Board.CellSelected(this.Index, IsCellEmpty);
-            }
         }
 
 
@@ -169,7 +180,7 @@ namespace ChessEngineClassLibrary
         /// <param name="e"></param>
         private void Grid_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
-            Debug.WriteLine("Mouse pressed, Cell-Id: " + Index + " Empty: " + IsCellEmpty);
+            Debug.WriteLine("Mouse pressed, Cell-Id: " + Index + " Empty: " + IsEmpty);
 
             // Set a Frame around the Grid
 
@@ -182,7 +193,7 @@ namespace ChessEngineClassLibrary
         /// <param name="e"></param>
         private void Grid_Drop(object sender, System.Windows.DragEventArgs e)
         {
-            Debug.WriteLine("Mouse pressed, Cell-Id: " + Index + " Empty: " + IsCellEmpty);
+            Debug.WriteLine("Mouse pressed, Cell-Id: " + Index + " Empty: " + IsEmpty);
             
         }
 

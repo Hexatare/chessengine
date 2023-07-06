@@ -13,9 +13,6 @@ namespace ChessEngineClassLibrary
     /// </summary>
     public class Move
     {
-        // Reference to the Player  
-        private Player Player;
-
         // Starting Cell of the Move
         private Cell Start;
 
@@ -26,21 +23,19 @@ namespace ChessEngineClassLibrary
         private Piece PieceMoved; 
 
         // A Piece that was killed
-        private Piece PieceKilled { set; get; }
+        public Piece PieceKilled { set; get; }
 
         // Castling Move
-        private bool CastlingMove { set; get; }
+        public bool CastlingMove { set; get; }
 
 
         /// <summary>
         /// Contructor of the Class
         /// </summary>
-        /// <param name="player">Refernz to the Player</param>
         /// <param name="start">Start Cell of the Move</param>
         /// <param name="end">Destination Cell of the Move</param>
-        public Move(Player player, Cell start, Cell end)
+        public Move(Cell start, Cell end)
         { 
-            Player = player;
             Start = start;
             End = end;
             PieceMoved = Start.GetPiece();
