@@ -3,9 +3,7 @@ using ChessEngineClassLibrary.Pieces;
 using ChessEngineClassLibrary.Resources;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace ChessEngineClassLibrary
 {
@@ -631,6 +629,79 @@ namespace ChessEngineClassLibrary
             return false;
         }
 
+
+        //public bool IsKingInCheck(Piece.PColor color)
+        //{
+        //    bool result = false;
+
+        //    List<Piece> originalList;
+        //    King kingInQuestion;
+
+        //    if (color == Piece.PColor.Black)
+        //    {
+        //        originalList = this.WhitePieces;
+        //        kingInQuestion = this.BlackPieces.Find(obj => obj.PieceType == Piece.PType.King);
+        //    }
+        //    else
+        //    {
+        //        originalList = this.BlackPieces;
+        //        kingInQuestion = whiteKing;
+        //    }
+
+        //    int xKingLoc = kingInQuestion.getXLocation();
+        //    int yKingLoc = kingInQuestion.getYLocation();
+
+        //    for (Piece currentPiece : originalList)
+        //    {
+        //        if (currentPiece.canMoveTo(xKingLoc, yKingLoc))
+        //        {
+        //            result = true;
+        //        }
+        //    }
+
+        //    return result;
+        //}
+
+
+        //public Queen addQueen(int color, int xloc, int yloc)
+        //{
+        //    Queen queen = new Queen(chessBoard, color, xloc, yloc);
+        //    pieceToColorHelper(queen, color);
+
+        //    return queen;
+        //}
+
+        //public Knight addKnight(int color, int xloc, int yloc)
+        //{
+        //    Knight knight = new Knight(chessBoard, color, xloc, yloc);
+        //    pieceToColorHelper(knight, color);
+
+        //    return knight;
+        //}
+
+        //public Rook addRook(int color, int xloc, int yloc)
+        //{
+        //    Rook rook = new Rook(chessBoard, color, xloc, yloc);
+        //    pieceToColorHelper(rook, color);
+
+        //    return rook;
+        //}
+
+        //public Bishop addBishop(int color, int xloc, int yloc)
+        //{
+        //    Bishop bishop = new Bishop(chessBoard, color, xloc, yloc);
+        //    pieceToColorHelper(bishop, color);
+
+        //    return bishop;
+        //}
+
+        //public Pawn addPawn(int color, int xloc, int yloc)
+        //{
+        //    Pawn pawn = new Pawn(chessBoard, color, xloc, yloc);
+        //    pieceToColorHelper(pawn, color);
+
+        //    return pawn;
+        //}
 
     }
 
