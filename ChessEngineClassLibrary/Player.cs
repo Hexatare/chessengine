@@ -5,6 +5,9 @@ using System.Linq;
 
 namespace ChessEngineClassLibrary
 {
+    /// <summary>
+    /// Class Player implements the Functionality of one Player
+    /// </summary>
     public class Player
     {
         #region Properties and Members        
@@ -46,6 +49,8 @@ namespace ChessEngineClassLibrary
 
         #endregion
 
+        #region Constructor
+
         /// <summary>
         /// Constructor
         /// </summary>
@@ -62,6 +67,9 @@ namespace ChessEngineClassLibrary
             Stopwatch = new Stopwatch();
         }
 
+        #endregion
+
+        #region Methods
 
         /// <summary>
         /// Start a new Game
@@ -130,5 +138,7 @@ namespace ChessEngineClassLibrary
         {
             return string.Format("{0:hh\\:mm\\:ss}", Stopwatch.Elapsed);
         }
+
+        #endregion
     }
 }

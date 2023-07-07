@@ -1,10 +1,5 @@
 ﻿using ChessEngineClassLibrary.Pieces;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using static System.Runtime.InteropServices.JavaScript.JSType;
+using Microsoft.Win32;
 
 namespace ChessEngineClassLibrary
 {
@@ -13,6 +8,8 @@ namespace ChessEngineClassLibrary
     /// </summary>
     public class Move
     {
+        #region Properties and Members
+
         // Starting Cell of the Move
         private Cell Start;
 
@@ -28,6 +25,9 @@ namespace ChessEngineClassLibrary
         // Castling Move
         public bool CastlingMove { set; get; }
 
+        #endregion
+
+        #region Constructor
 
         /// <summary>
         /// Contructor of the Class
@@ -40,5 +40,7 @@ namespace ChessEngineClassLibrary
             End = end;
             PieceMoved = Start.GetPiece();
         }
+
+        #endregion
     }
 }

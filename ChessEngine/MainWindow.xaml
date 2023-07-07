@@ -50,10 +50,10 @@
                 <TextBlock Grid.Column="2" Text="b" HorizontalAlignment="Center" FontWeight="Bold"/>
                 <TextBlock Grid.Column="3" Text="c" HorizontalAlignment="Center" FontWeight="Bold"/>
                 <TextBlock Grid.Column="4" Text="d" HorizontalAlignment="Center" FontWeight="Bold"/>
-                <TextBlock Grid.Column="5" Text="d" HorizontalAlignment="Center" FontWeight="Bold"/>
-                <TextBlock Grid.Column="6" Text="e" HorizontalAlignment="Center" FontWeight="Bold"/>
-                <TextBlock Grid.Column="7" Text="f" HorizontalAlignment="Center" FontWeight="Bold"/>
-                <TextBlock Grid.Column="8" Text="g" HorizontalAlignment="Center" FontWeight="Bold"/>
+                <TextBlock Grid.Column="5" Text="e" HorizontalAlignment="Center" FontWeight="Bold"/>
+                <TextBlock Grid.Column="6" Text="f" HorizontalAlignment="Center" FontWeight="Bold"/>
+                <TextBlock Grid.Column="7" Text="g" HorizontalAlignment="Center" FontWeight="Bold"/>
+                <TextBlock Grid.Column="8" Text="h" HorizontalAlignment="Center" FontWeight="Bold"/>
             </Grid>
 
             <Grid Name="BottomMarker" DockPanel.Dock="Bottom" Height="20">
@@ -74,10 +74,10 @@
                 <TextBlock Grid.Column="2" Text="b" HorizontalAlignment="Center" FontWeight="Bold"/>
                 <TextBlock Grid.Column="3" Text="c" HorizontalAlignment="Center" FontWeight="Bold"/>
                 <TextBlock Grid.Column="4" Text="d" HorizontalAlignment="Center" FontWeight="Bold"/>
-                <TextBlock Grid.Column="5" Text="d" HorizontalAlignment="Center" FontWeight="Bold"/>
-                <TextBlock Grid.Column="6" Text="e" HorizontalAlignment="Center" FontWeight="Bold"/>
-                <TextBlock Grid.Column="7" Text="f" HorizontalAlignment="Center" FontWeight="Bold"/>
-                <TextBlock Grid.Column="8" Text="g" HorizontalAlignment="Center" FontWeight="Bold"/>
+                <TextBlock Grid.Column="5" Text="e" HorizontalAlignment="Center" FontWeight="Bold"/>
+                <TextBlock Grid.Column="6" Text="f" HorizontalAlignment="Center" FontWeight="Bold"/>
+                <TextBlock Grid.Column="7" Text="g" HorizontalAlignment="Center" FontWeight="Bold"/>
+                <TextBlock Grid.Column="8" Text="h" HorizontalAlignment="Center" FontWeight="Bold"/>
             </Grid>
 
             <Grid Name="LeftMarker" DockPanel.Dock="Left" Width="20">

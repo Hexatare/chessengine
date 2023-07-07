@@ -48,10 +48,7 @@ namespace ChessEngineClassLibrary
         private bool IsSelected = false;
 
         // Chess Piece or null if cell is empty
-        private Piece PieceOnTheCell;
-
-        // Reference to the Board
-        private readonly Board Board;
+        private Piece? PieceOnTheCell;
 
         // Background Color for this Cell
         private Color CellBackgroundColor;
@@ -68,7 +65,6 @@ namespace ChessEngineClassLibrary
         /// <param name="cellIndex"></param>
         public Cell(Board chessBoard, CellColor cellColor, int cellIndex)
         {
-            Board = chessBoard;
             Index = cellIndex;
             Color = cellColor;
             IsEmpty = true;
@@ -107,14 +103,14 @@ namespace ChessEngineClassLibrary
             Grid.Children.Add(piece.Image);
             IsEmpty = false;
 
-            //piece.SetNewPosition(this.Index);
+            piece.SetNewPosition(Index);
         }
 
         /// <summary>
         /// Returns the piece on this cell
         /// </summary>
         /// <returns>The piece on this cell</returns>
-        public Piece GetPiece()
+        public Piece? GetPiece()
         {
             return PieceOnTheCell;
         }
@@ -130,6 +126,7 @@ namespace ChessEngineClassLibrary
             Grid.Children.Clear();
             IsSelected = false;
             IsEmpty = true;
+            PieceOnTheCell = null;
 
             // Set the Background of the Cell
             Grid.Background = new SolidColorBrush(CellBackgroundColor);
