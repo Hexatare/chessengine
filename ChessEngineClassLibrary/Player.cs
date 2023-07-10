@@ -47,6 +47,11 @@ namespace ChessEngineClassLibrary
         /// </summary>
         public bool CanQueensideCastle { get; set; }
 
+        /// <summary>
+        /// Actual Counter of Halfmoves of the Player
+        /// </summary>
+        public int NbrOfHalfMoves { get; set; }
+
         #endregion
 
         #region Constructor
@@ -85,6 +90,7 @@ namespace ChessEngineClassLibrary
 
             // Castling possible
             CanKingsideCastle = CanQueensideCastle = true;
+ 
         }
 
 
@@ -101,11 +107,18 @@ namespace ChessEngineClassLibrary
         /// <summary>
         /// Returns the last Move from this Player and removes this Move from the History
         /// </summary>
+        /// <param name="remove">if TRUE, the move is deleted from the History</param>
         /// <returns>Last Move</returns>
-        public Move GetLastMove()
+        public Move GetLastMove(bool remove)
         {
+            if (Moves.Count == 0)
+                return null;
+
             Move lastMove = Moves.Last();
-            Moves.RemoveAt(Moves.Count - 1);
+
+            if(remove)
+                Moves.RemoveAt(Moves.Count - 1);
+            
             return lastMove;
         }
 

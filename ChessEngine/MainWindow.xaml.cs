@@ -1,17 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Diagnostics;
-using System.IO;
-using System.Reflection.Metadata;
-using System.Windows;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Shapes;
-using ChessEngineClassLibrary;
+﻿using ChessEngineClassLibrary;
 using ChessEngineClassLibrary.Resources;
 using Microsoft.Win32;
-using static System.Runtime.InteropServices.JavaScript.JSType;
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
+using System.Windows;
+using System.Windows.Input;
 
 
 namespace ChessEngine
@@ -79,6 +74,12 @@ namespace ChessEngine
 
         private void CommandBindingOpen_Executed(object sender, ExecutedRoutedEventArgs e)
         {
+            // Ask for the End of the Game first
+            this.MenuItemEndGame_Click(sender, e);
+
+            if (game.gameState != Game.GameState.None)
+                return;
+
             ShowOpenFileDialog();
         }
 
@@ -92,22 +93,28 @@ namespace ChessEngine
             ShowSaveFileDialog();
         }
 
+        private void ChessMainWindow_Loaded(object sender, RoutedEventArgs e)
+        {
+            this.MenuItemNewGame.IsEnabled = true;
+            this.MenuItemSave.IsEnabled = false;
+            this.MenuItemEndGame.IsEnabled = false;
+            this.MenuItemUndo.IsEnabled = false;
+        }
+
+
+        private void ChessMainWindow_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            MessageBoxResult Result = MessageBox.Show("Wollen Sie das Programm beenden", "Chess", MessageBoxButton.YesNo, MessageBoxImage.Question);
+    
+            if (Result == MessageBoxResult.No)
+                e.Cancel = true;
+        }
+
+
         #endregion
 
 
         #region Menu Commands
-
-        /// <summary>
-        /// Menu Command to quit the Application, to be confirmed by the user
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void MenuItemQuit_Click(object sender, RoutedEventArgs e)
-        {
-            MessageBoxResult Result = MessageBox.Show("Wollen Sie das Spiel beenden", "Chess", MessageBoxButton.YesNo);
-            if (Result == MessageBoxResult.Yes) { Application.Current.Shutdown(); }
-
-        }
 
         /// <summary>
         /// Menu Commnand NewGame
@@ -116,9 +123,53 @@ namespace ChessEngine
         /// <param name="e"></param>
         private void MenuItemNewGame_Click(object sender, RoutedEventArgs e)
         {
+            // Ask for the End of the Game first
+            this.MenuItemEndGame_Click(sender, e);
+
+            if (game.gameState != Game.GameState.None)
+                return;
+
             // Command to the Board, to start a new Game
             game.SetNewGame(Resource1.DefaultFEN);
+            this.MenuItemSave.IsEnabled = true;
+            this.MenuItemUndo.IsEnabled = true;
+            this.MenuItemEndGame.IsEnabled = true;
         }
+
+
+        /// <summary>
+        /// Ends the current Game, ask the User for Confirmation
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void MenuItemEndGame_Click(object sender, RoutedEventArgs e)
+        {
+            if(game.gameState != Game.GameState.None)
+            {
+                MessageBoxResult Result = MessageBox.Show("Wollen Sie das laufende Spiel beenden", "Chess", 
+                    MessageBoxButton.YesNo, MessageBoxImage.Warning);
+                
+                if (Result == MessageBoxResult.Yes)
+                {
+                    game.EndGame();
+                    this.MenuItemEndGame.IsEnabled = false;
+                    this.MenuItemSave.IsEnabled=false;
+                }
+            }
+        }
+
+
+        /// <summary>
+        /// Menu Command to quit the Application, to be confirmed by the user
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void MenuItemQuit_Click(object sender, RoutedEventArgs e)
+        {
+            this.Close();
+        }
+
+
 
         /// <summary>
         /// Shows Information about the Game
@@ -127,7 +178,11 @@ namespace ChessEngine
         /// <param name="e"></param>
         private void MenuItemAbout_Click(object sender, RoutedEventArgs e)
         {
-            MessageBox.Show("Chess Version 0.1", "About Chess", MessageBoxButton.OK);
+            MessageBoxImage icon = MessageBoxImage.Information;
+            MessageBoxButton button = MessageBoxButton.OK;
+
+            MessageBox.Show("Chess Play, Current Version 0.1\nDeveloped by Noël, written by Amir.",
+                "About Chess", button, icon);
         }
 
 
@@ -149,6 +204,7 @@ namespace ChessEngine
 
         private void ShowOpenFileDialog()
         {
+
             // Create an instance of the OpenFileDialog
             OpenFileDialog openFileDialog = new OpenFileDialog();
 
@@ -165,21 +221,24 @@ namespace ChessEngine
 
                 try
                 {
-                    using StreamReader sr = new StreamReader(selectedFilePath);
+                    using StreamReader? sr = new StreamReader(selectedFilePath);
                     string line;
 
-                    if ( (line = sr.ReadLine()) != null)
-                    { 
+                    if ((line = sr.ReadLine()) != null)
+                    {
                         game.SetNewGame(line);
+                        this.MenuItemSave.IsEnabled = true;
+                        this.MenuItemUndo.IsEnabled = true;
+                        this.MenuItemEndGame.IsEnabled = true;
                     }
                 }
-                catch (IOException e)
+                catch (Exception e)
                 {
                     Debug.WriteLine("An error occurred while reading the file: " + e.Message);
                 }
             }
         }
-    
+
         private void ShowSaveFileDialog()
         {
             // Create an instance of the SaveFileDialog
@@ -208,7 +267,7 @@ namespace ChessEngine
             SettingDialog settingDialog = new SettingDialog();
             settingDialog.Owner = this;
             settingDialog.WindowStartupLocation = WindowStartupLocation.CenterOwner;
-            
+
             // Setting the Properties of the Window
             settingDialog.SetValues(new List<string> { "Human", "Computer" },
                                     new List<string> { "White", "Black" },

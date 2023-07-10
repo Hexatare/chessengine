@@ -1,6 +1,7 @@
 ﻿using ChessEngineClassLibrary.Pieces;
 using System;
 using System.Diagnostics;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
@@ -53,6 +54,9 @@ namespace ChessEngineClassLibrary
         // Background Color for this Cell
         private Color CellBackgroundColor;
 
+        // The Border of the Cell
+        public Border CellBorder { get; set; }
+
         #endregion
 
         #region Constructors
@@ -70,13 +74,16 @@ namespace ChessEngineClassLibrary
             IsEmpty = true;
             Location = new int[] { (cellIndex % 8), (7 - (cellIndex / 8)) };
 
+            // Create the Border
+            CellBorder = new Border();
+            CellBorder.BorderBrush = Brushes.Green;
+            CellBorder.BorderThickness = new Thickness(0);
+            CellBorder.Name = "CellBorder";
+
             // Generate the Grid
             Grid = new Grid();
-            Grid.AllowDrop = true;
-            Grid.Drop += Grid_Drop;
 
             // Action, when Mouse Button is pushed
-            Grid.MouseLeftButtonDown += Grid_MouseLeftButtonDown;
             Grid.MouseLeftButtonUp += Grid_MouseLeftButtonUp;
 
             // Set the color of the Cell
@@ -87,6 +94,10 @@ namespace ChessEngineClassLibrary
 
             // Set the Background of the Cell
             Grid.Background = new SolidColorBrush(CellBackgroundColor);
+
+            // Add the Boarder to the Grid
+            Grid.Children.Add(CellBorder);
+
         }
 
         #endregion
@@ -122,40 +133,68 @@ namespace ChessEngineClassLibrary
         public void RemovePiece()
         {
 
-            // Empty the Cell and set internal state
-            Grid.Children.Clear();
+            // None the Cell and set internal state
+            if(PieceOnTheCell != null)
+            {
+                Grid.Children.Remove(PieceOnTheCell.Image);
+            }
+
+            //Grid.Children.Clear();
             IsSelected = false;
             IsEmpty = true;
             PieceOnTheCell = null;
 
+            // Set the Border of the Cell
+            CellBorder.BorderThickness = new Thickness(0);
+            
             // Set the Background of the Cell
-            Grid.Background = new SolidColorBrush(CellBackgroundColor);
+            //Grid.Background = new SolidColorBrush(CellBackgroundColor);
         }
 
 
-        public void SetSelected(bool isSelected)
+        /// <summary>
+        /// Set the Background Color of this Cell
+        /// </summary>
+        /// <param name="isSelected">TRUE if selected, otherwise FALS</param>
+        public void SetSelected(bool isSelected, int? selection = 0)
         {   
             if(isSelected)
             {
                 IsSelected = true;
 
-                // Set the Background of the Cell
-                Grid.Background = new SolidColorBrush(Colors.Yellow);
+                // Set the Border of the Cell
+                if (selection == 0)
+                    CellBorder.BorderBrush = Brushes.Yellow;
+                else if (selection == 1)
+                    CellBorder.BorderBrush = Brushes.Green;
+                else if (selection == 2)
+                    CellBorder.BorderBrush = Brushes.Red;
+
+                CellBorder.BorderThickness = new Thickness(3);
+                //Grid.Background = new SolidColorBrush(Colors.Yellow);
             }
             else
             { 
-                IsSelected = false; 
+                IsSelected = false;
+
+                // Set the Border of the Cell
+                CellBorder.BorderThickness = new Thickness(0);
 
                 // Set the Background of the Cell
-                Grid.Background = new SolidColorBrush(CellBackgroundColor);
+                //Grid.Background = new SolidColorBrush(CellBackgroundColor);
             }
         }
 
 
+        /// <summary>
+        /// Eventhandler for Cell Selection
+        /// </summary>
+        /// <param name="e"></param>
         public virtual void OnCellSelected(EventArgs e)
         {
             CellSelected?.Invoke(this, e);
         }
+
 
         /// <summary>
         /// Mouse Event, wenn the Cell is clicked
@@ -167,31 +206,6 @@ namespace ChessEngineClassLibrary
             // Notify all Eventhandler on the Cell
             this.OnCellSelected(e);
 
-        }
-
-
-        /// <summary>
-        /// Mouse Event for drag and drop
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void Grid_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
-        {
-            Debug.WriteLine("Mouse pressed, Cell-Id: " + Index + " Empty: " + IsEmpty);
-
-            // Set a Frame around the Grid
-
-        }
-
-        /// <summary>
-        /// Event, when a object was dropped on the cell
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void Grid_Drop(object sender, System.Windows.DragEventArgs e)
-        {
-            Debug.WriteLine("Mouse pressed, Cell-Id: " + Index + " Empty: " + IsEmpty);
-            
         }
 
         #endregion

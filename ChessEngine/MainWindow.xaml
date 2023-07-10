@@ -5,8 +5,11 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ChessEngine"
         mc:Ignorable="d"
+        Loaded="ChessMainWindow_Loaded"
+        Closing="ChessMainWindow_Closing"
         Title="Chess" Height="660" Width="660" Icon="Resources\ChessLogo.jpg" WindowStartupLocation="CenterScreen" ResizeMode="NoResize">
-
+        
+    
     <Window.CommandBindings>
         <CommandBinding Command="New" CanExecute="CommandBindingNew_CanExecute" Executed="CommandBindingNew_Executed"/>
         <CommandBinding Command="Open" CanExecute="CommandBindingOpen_CanExecute" Executed="CommandBindingOpen_Executed"/>
@@ -21,13 +24,18 @@
                 <MenuItem Command="New" x:Name="MenuItemNewGame" Header="Neues Spiel" Click="MenuItemNewGame_Click"/>
                 <MenuItem Command="Open" x:Name="MenuItemLoad" Header="Spiel öffnen" />
                 <MenuItem Command="Save" x:Name="MenuItemSave" Header="Spiel speichern" />
+                <MenuItem x:Name="MenuItemEndGame" Header="Spiel beenden" Click="MenuItemEndGame_Click"/>
                 <Separator/>
                 <MenuItem x:Name="MenuItemQuit" Header="Beenden" HorizontalAlignment="Left" Click="MenuItemQuit_Click"/>
             </MenuItem>
             <MenuItem Header="Bearbeiten" Height="20" Width="80" >
+                <MenuItem x:Name="MenuItemUndo" Header="Zug rückgängig" Click="MenuItemUndo_Click"/>
+                <Separator/>
                 <MenuItem x:Name="MenuItemSettings" Header="Einstellungen" Click="MenuItemSettings_Click"/>
+            </MenuItem>
+            <MenuItem Header="Hilfe" Height="20" Width="60" >
                 <MenuItem x:Name="About" Header="Über" Click="MenuItemAbout_Click"/>
-             </MenuItem>
+            </MenuItem>
         </Menu>
         
         <!--- Dockpanel for Board Markers around the Chessboard-->

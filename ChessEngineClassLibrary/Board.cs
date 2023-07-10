@@ -89,6 +89,8 @@ namespace ChessEngineClassLibrary
             {
                 if (!cell.IsEmpty)
                     cell.RemovePiece();
+
+                cell.SetSelected(false);
             }
         }
 

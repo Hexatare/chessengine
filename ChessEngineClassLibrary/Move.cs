@@ -1,5 +1,6 @@
 ﻿using ChessEngineClassLibrary.Pieces;
 using Microsoft.Win32;
+using System;
 
 namespace ChessEngineClassLibrary
 {
@@ -10,14 +11,14 @@ namespace ChessEngineClassLibrary
     {
         #region Properties and Members
 
-        // Starting Cell of the Move
-        private Cell Start;
-
-        // End Cell of the Move
-        private Cell End;
-
         // The Piece that was moved
         private Piece PieceMoved; 
+
+        // Starting Cell of the Move
+        public Cell Start { get; set; }
+
+        // End Cell of the Move
+        public Cell End { get; set; }
 
         // A Piece that was killed
         public Piece PieceKilled { set; get; }
@@ -40,6 +41,25 @@ namespace ChessEngineClassLibrary
             End = end;
             PieceMoved = Start.GetPiece();
         }
+
+        /// <summary>
+        /// Returns the X Distance of the Move in absolute Value
+        /// </summary>
+        /// <returns>X Distance</returns>
+        public int GetXMovement()
+        {
+            return Math.Abs(Start.Location[0] - End.Location[0]);
+        }
+
+        /// <summary>
+        /// Returns the Y Distance of the Move in absolute Value
+        /// </summary>
+        /// <returns>X Distance</returns>
+        public int GetYMovement()
+        {
+            return Math.Abs(Start.Location[1] - End.Location[1]);
+        }
+
 
         #endregion
     }

@@ -251,62 +251,39 @@ namespace ChessEngineClassLibrary.Pieces
         /// <returns></returns>
         public bool CanMoveDiagonal(Cell destCell)
         {
-            int startIndex = 0;
-            int endIndex = 0;
-            int cellInc = 0;
+            int rowInc, columInc;
 
-            // Get Index of this Cell
-            int sourceCellIndex = chessBoard.GetArrayIndex(Location[0], Location[1]);
+            // Turn the start and end cell indexes into row and column numbers
+            int bishopStartRow = Location[1];
+            int bishopStartCol = Location[0];
+            int bishopEndRow = destCell.Location[1];
+            int bishopEndCol = destCell.Location[0];
 
-            // Check for a diagonal move
-            int cellMove = Math.Abs(sourceCellIndex - destCell.Index);
+            // Get the absolute difference between the start and end row and column numbers
+            int bishopRowDiff = Math.Abs(bishopEndRow - bishopStartRow);
+            int bishopColDiff = Math.Abs(bishopEndCol - bishopStartCol);
 
-            // If not a diagonal move, return
-            if( !( ((cellMove % 7) == 0) || ((cellMove % 9) == 0)) )
-                return false;
-
-            if ((cellMove % 7) == 0)
+            // Use the if statement to check if the Bishop can move to the cell
+            if (bishopRowDiff == bishopColDiff)
             {
-                if (sourceCellIndex < destCell.Index)
-                {
-                    startIndex = sourceCellIndex;
-                    endIndex = destCell.Index;
-                }
-                else if (sourceCellIndex > destCell.Index)
-                {
-                    startIndex = destCell.Index;
-                    endIndex = sourceCellIndex;
-                }
-                else
-                    return false;
-                cellInc = 7;
-            }
-            else if ((cellMove % 9) == 0)
-            {
-                if (sourceCellIndex < destCell.Index)
-                {
-                    startIndex = sourceCellIndex;
-                    endIndex = destCell.Index;
-                }
-                else if (sourceCellIndex > destCell.Index)
-                {
-                    startIndex = destCell.Index;
-                    endIndex = sourceCellIndex;
-                }
-                else
-                    return false;
-                cellInc = 9;
-            }
+                // Set the cell increments for row and colums
+                columInc = (bishopEndCol > bishopStartCol) ? 1 : -1;
+                rowInc = (bishopEndRow > bishopStartRow) ? 1 : -1;
 
-            // Loop to see if any piece is in between
-            for (startIndex += cellInc; startIndex < endIndex; startIndex += cellInc)
-            {
-                if (!chessBoard.GetCell(startIndex).IsEmpty)
+                // Loop trough all Cells, adjust the start postion
+                int currColum = bishopStartCol + columInc;
+                int currRow = bishopStartRow + rowInc;
+
+                for(int i1 = 0; i1 < (bishopColDiff - 1); i1++, currColum += columInc, currRow += rowInc)
                 {
-                    return false;
+                    if (!chessBoard.GetCell(currColum, currRow).IsEmpty)
+                    {
+                        return false;
+                    }
                 }
+                return true;
             }
-            return true;
+            return false;
         }
 
 
