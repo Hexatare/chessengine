@@ -1,4 +1,5 @@
-﻿using ChessEngineClassLibrary.Pieces;
+﻿using ChessEngineClassLibrary.Models;
+using ChessEngineClassLibrary.Pieces;
 using System;
 using System.Diagnostics;
 using System.Windows;
@@ -16,12 +17,7 @@ namespace ChessEngineClassLibrary
         #region Enumerations
 
 
-        // Color of the Cell 
-        public enum CellColor
-        {
-            White,
-            Black
-        }
+
 
         #endregion
 
@@ -33,9 +29,6 @@ namespace ChessEngineClassLibrary
         // Location of the piece on the board, [0] = x, [1] = y; 
         public int[] Location { get; set; }
 
-        // Actual Color or the Cell 
-        public CellColor Color { get; set; }
-
         // Status if cell is occupied with a piece
         public bool IsEmpty { get; set; }
       
@@ -44,9 +37,6 @@ namespace ChessEngineClassLibrary
 
         // A public Eventdelegate for a Cell that is selected
         public event EventHandler CellSelected;
-
-        // Status if cell is selected
-        private bool IsSelected = false;
 
         // Chess Piece or null if cell is empty
         private Piece? PieceOnTheCell;
@@ -70,7 +60,6 @@ namespace ChessEngineClassLibrary
         public Cell(Board chessBoard, CellColor cellColor, int cellIndex)
         {
             Index = cellIndex;
-            Color = cellColor;
             IsEmpty = true;
             Location = new int[] { (cellIndex % 8), (7 - (cellIndex / 8)) };
 
@@ -132,23 +121,15 @@ namespace ChessEngineClassLibrary
         /// </summary>
         public void RemovePiece()
         {
-
             // None the Cell and set internal state
-            if(PieceOnTheCell != null)
+            if (PieceOnTheCell != null)
             {
                 Grid.Children.Remove(PieceOnTheCell.Image);
             }
 
             //Grid.Children.Clear();
-            IsSelected = false;
             IsEmpty = true;
             PieceOnTheCell = null;
-
-            // Set the Border of the Cell
-            CellBorder.BorderThickness = new Thickness(0);
-            
-            // Set the Background of the Cell
-            //Grid.Background = new SolidColorBrush(CellBackgroundColor);
         }
 
 
@@ -160,8 +141,6 @@ namespace ChessEngineClassLibrary
         {   
             if(isSelected)
             {
-                IsSelected = true;
-
                 // Set the Border of the Cell
                 if (selection == 0)
                     CellBorder.BorderBrush = Brushes.Yellow;
@@ -171,17 +150,11 @@ namespace ChessEngineClassLibrary
                     CellBorder.BorderBrush = Brushes.Red;
 
                 CellBorder.BorderThickness = new Thickness(3);
-                //Grid.Background = new SolidColorBrush(Colors.Yellow);
             }
             else
             { 
-                IsSelected = false;
-
                 // Set the Border of the Cell
                 CellBorder.BorderThickness = new Thickness(0);
-
-                // Set the Background of the Cell
-                //Grid.Background = new SolidColorBrush(CellBackgroundColor);
             }
         }
 

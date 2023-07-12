@@ -1,8 +1,9 @@
 ﻿using ChessEngineClassLibrary;
+using ChessEngineClassLibrary.Models;
+using ChessEngineClassLibrary.Pieces;
 using ChessEngineClassLibrary.Resources;
 using Microsoft.Win32;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Windows;
@@ -24,7 +25,6 @@ namespace ChessEngine
         /// </summary>
         private Board board;
 
-
         /// <summary>
         /// Reference to the Game
         /// </summary>
@@ -32,6 +32,11 @@ namespace ChessEngine
 
         #endregion
 
+        #region Constructor
+
+        /// <summary>
+        /// Constructor of the Main Window, which create the Board and the Game Class
+        /// </summary>
         public MainWindow()
         {
             InitializeComponent();
@@ -42,8 +47,12 @@ namespace ChessEngine
             // Create the Game Class
             game = new Game(board);
 
+            // Register Eventhanlder for Promotion Dlg
+            game.PromotionEvent += PromotionDlgEvent;
+
         }
 
+        #endregion
 
         #region Command Bindings
 
@@ -54,8 +63,12 @@ namespace ChessEngine
         /// <param name="e"></param>
         private void CommandBindingNew_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
-            e.CanExecute = true;
+            if (game.ActGameState != GameState.None)
+                e.CanExecute = false;
+            else
+                e.CanExecute = true;
         }
+
 
         /// <summary>
         /// Binding to the NewGame ShortCut
@@ -65,43 +78,82 @@ namespace ChessEngine
         private void CommandBindingNew_Executed(object sender, ExecutedRoutedEventArgs e)
         {
             // Command to the Board, to start a new Game
+            this.MenuItemNewGame_Click(sender, e);
         }
 
+
+        /// <summary>
+        /// Binding to the Open ShortCut
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void CommandBindingOpen_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
-            e.CanExecute = true;
+            if (game.ActGameState != GameState.None)
+                e.CanExecute = false;
+            else
+                e.CanExecute = true;
         }
+        
 
+        /// <summary>
+        /// Command Short Cut for opening a saved Game
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void CommandBindingOpen_Executed(object sender, ExecutedRoutedEventArgs e)
         {
             // Ask for the End of the Game first
             this.MenuItemEndGame_Click(sender, e);
-
-            if (game.gameState != Game.GameState.None)
-                return;
-
             ShowOpenFileDialog();
         }
 
+
+        /// <summary>
+        /// Binding to the Open ShortCut
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void CommandBindingSave_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
-            e.CanExecute = true;
+            if (game.ActGameState != GameState.None)
+                e.CanExecute = true;
+            else
+                e.CanExecute = false;
         }
 
+
+        /// <summary>
+        /// Command Short Cut to save the current Game
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void CommandBindingSave_Executed(object sender, ExecutedRoutedEventArgs e)
         {
             ShowSaveFileDialog();
         }
 
+
+        /// <summary>
+        /// Action Method, when the Window ist loaded and shown
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void ChessMainWindow_Loaded(object sender, RoutedEventArgs e)
         {
             this.MenuItemNewGame.IsEnabled = true;
             this.MenuItemSave.IsEnabled = false;
             this.MenuItemEndGame.IsEnabled = false;
-            this.MenuItemUndo.IsEnabled = false;
+            this.MenuItemSettings.IsEnabled = true;
+            //this.MenuItemUndo.IsEnabled = false;
         }
 
 
+        /// <summary>
+        /// Method is called, when the user presses the window close buttion
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void ChessMainWindow_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
             MessageBoxResult Result = MessageBox.Show("Wollen Sie das Programm beenden", "Chess", MessageBoxButton.YesNo, MessageBoxImage.Question);
@@ -112,7 +164,6 @@ namespace ChessEngine
 
 
         #endregion
-
 
         #region Menu Commands
 
@@ -126,14 +177,15 @@ namespace ChessEngine
             // Ask for the End of the Game first
             this.MenuItemEndGame_Click(sender, e);
 
-            if (game.gameState != Game.GameState.None)
+            if (game.ActGameState != GameState.None)
                 return;
 
             // Command to the Board, to start a new Game
             game.SetNewGame(Resource1.DefaultFEN);
             this.MenuItemSave.IsEnabled = true;
-            this.MenuItemUndo.IsEnabled = true;
+            //this.MenuItemUndo.IsEnabled = true;
             this.MenuItemEndGame.IsEnabled = true;
+            this.MenuItemSettings.IsEnabled = false;
         }
 
 
@@ -144,7 +196,7 @@ namespace ChessEngine
         /// <param name="e"></param>
         private void MenuItemEndGame_Click(object sender, RoutedEventArgs e)
         {
-            if(game.gameState != Game.GameState.None)
+            if(game.ActGameState != GameState.None)
             {
                 MessageBoxResult Result = MessageBox.Show("Wollen Sie das laufende Spiel beenden", "Chess", 
                     MessageBoxButton.YesNo, MessageBoxImage.Warning);
@@ -154,6 +206,7 @@ namespace ChessEngine
                     game.EndGame();
                     this.MenuItemEndGame.IsEnabled = false;
                     this.MenuItemSave.IsEnabled=false;
+                    this.MenuItemSettings.IsEnabled = true;
                 }
             }
         }
@@ -181,7 +234,7 @@ namespace ChessEngine
             MessageBoxImage icon = MessageBoxImage.Information;
             MessageBoxButton button = MessageBoxButton.OK;
 
-            MessageBox.Show("Chess Play, Current Version 0.1\nDeveloped by Noël, written by Amir.",
+            MessageBox.Show("Chess Play, Current Version 0.1\nDeveloped and written by Noël.",
                 "About Chess", button, icon);
         }
 
@@ -199,9 +252,11 @@ namespace ChessEngine
 
         #endregion
 
-
         #region Private Methods
 
+        /// <summary>
+        /// Shows the standard Windows Open File Dialog
+        /// </summary>
         private void ShowOpenFileDialog()
         {
 
@@ -228,7 +283,7 @@ namespace ChessEngine
                     {
                         game.SetNewGame(line);
                         this.MenuItemSave.IsEnabled = true;
-                        this.MenuItemUndo.IsEnabled = true;
+                        //this.MenuItemUndo.IsEnabled = true;
                         this.MenuItemEndGame.IsEnabled = true;
                     }
                 }
@@ -239,6 +294,10 @@ namespace ChessEngine
             }
         }
 
+
+        /// <summary>
+        /// Shows the standard Windows File Save Dialog
+        /// </summary>
         private void ShowSaveFileDialog()
         {
             // Create an instance of the SaveFileDialog
@@ -256,12 +315,24 @@ namespace ChessEngine
                 // Retrieve the selected file path
                 string selectedFilePath = saveFileDialog.FileName;
 
-                // TODO: Save the file at the selected file path
+                // If the file name is not an empty string open it for saving.
+                if (saveFileDialog.FileName != "")
+                {
+                    // Saves the Image via a FileStream created by the OpenFile method.
+                    StreamWriter fs = new StreamWriter(saveFileDialog.OpenFile());
+                    fs.Write(game.GetFenString());
+                    fs.Flush();
+                    fs.Close();
+                }
             }
         }
 
-        #endregion
 
+        /// <summary>
+        /// Shows the Game Settings Dialog and saves the Value to the Game Class
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void MenuItemSettings_Click(object sender, RoutedEventArgs e)
         {
             SettingDialog settingDialog = new SettingDialog();
@@ -269,12 +340,44 @@ namespace ChessEngine
             settingDialog.WindowStartupLocation = WindowStartupLocation.CenterOwner;
 
             // Setting the Properties of the Window
-            settingDialog.SetValues(new List<string> { "Human", "Computer" },
-                                    new List<string> { "White", "Black" },
-                                    new List<string> { "Easy", "Intermediate", "Hard" });
-            // Show the Dialog
-            settingDialog.ShowDialog();
+            settingDialog.SetGameSettings(game.CurrGameMode);
 
+            // Show the Dialog
+            Nullable<bool> dialogResult = settingDialog.ShowDialog();
+
+            if(dialogResult == true) 
+            {
+                game.CurrGameMode = settingDialog.Settings;
+            }
         }
+
+
+        /// <summary>
+        /// Delegate for the show Promotion Dialog
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void PromotionDlgEvent(object sender, EventArgs e)
+        {
+            game.promotionPiece = this.ShowPromotionDlg();
+        }
+
+
+        /// <summary>
+        /// Method to show the Promotion Dialog
+        /// </summary>
+        private Piece.PType ShowPromotionDlg()
+        {
+            PromotionDialog promotionDialog = new PromotionDialog();
+            promotionDialog.Owner = this;
+            promotionDialog.WindowStartupLocation= WindowStartupLocation.CenterOwner;
+
+            // Show the Dialog
+            Nullable<bool> dialogResult = promotionDialog.ShowDialog();
+
+            return promotionDialog.SelectedPiece;
+        }
+
+        #endregion
     }
 }

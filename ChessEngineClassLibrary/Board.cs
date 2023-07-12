@@ -1,4 +1,5 @@
-﻿using ChessEngineClassLibrary.Pieces;
+﻿using ChessEngineClassLibrary.Models;
+using ChessEngineClassLibrary.Pieces;
 using System.Collections.Generic;
 using System.Windows.Controls;
 
@@ -39,7 +40,7 @@ namespace ChessEngineClassLibrary
                 bool isLightSquare = (i / 8 + i % 8) % 2 == 0;
 
                 // Set the color
-                CellsOnBoard[i] = new Cell(this, isLightSquare ? Cell.CellColor.White : Cell.CellColor.Black, i);
+                CellsOnBoard[i] = new Cell(this, isLightSquare ? CellColor.White : CellColor.Black, i);
 
                 // Add Cell to the Grid
                 chessGrid.Children.Add(CellsOnBoard[i].Grid);

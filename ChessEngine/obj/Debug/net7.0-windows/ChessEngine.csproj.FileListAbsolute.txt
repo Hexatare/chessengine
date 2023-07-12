@@ -36,3 +36,5 @@ C:\Users\rolfm\source\repos\chessengine\ChessEngine\obj\Debug\net7.0-windows\ref
 C:\Users\rolfm\source\repos\chessengine\ChessEngine\obj\Debug\net7.0-windows\ChessEngine.pdb
 C:\Users\rolfm\source\repos\chessengine\ChessEngine\obj\Debug\net7.0-windows\ChessEngine.genruntimeconfig.cache
 C:\Users\rolfm\source\repos\chessengine\ChessEngine\obj\Debug\net7.0-windows\ref\ChessEngine.dll
+C:\Users\rolfm\source\repos\chessengine\ChessEngine\obj\Debug\net7.0-windows\PromotionDialog.g.cs
+C:\Users\rolfm\source\repos\chessengine\ChessEngine\obj\Debug\net7.0-windows\PromotionDialog.baml

@@ -131,16 +131,6 @@ namespace ChessEngineClassLibrary.Pieces
             Location = new int[] { xIndex, yIndex };
         }
 
-        //// Method to handle the Drag of the Image
-        //public void Image_MouseMove(object sender, MouseEventArgs e)
-        //{
-        //    if (e.LeftButton == MouseButtonState.Pressed)
-        //    {
-        //        //DataObject dataObject = new DataObject(DataFormats.Bitmap, pieceImage.Source);
-        //        //DragDrop.DoDragDrop(pieceImage, dataObject, DragDropEffects.Move);
-        //    }
-        //}
-
         #endregion
 
         #region Game Logic of the Piece and Helper Methods
@@ -148,7 +138,7 @@ namespace ChessEngineClassLibrary.Pieces
 
         /// <summary>
         /// Checks if a piece can move to a certain spot. The spot must either be empty or be occupied by
-	    /// and enemy chess piece. Finally, for specific pieces, the move must be a valid
+        /// and enemy chess piece. Finally, for specific pieces, the move must be a valid
         /// style of movement (depending on the chess piece). This method should be overwritten.Only
         /// should be used in this form for the generic chess piece.
         /// </summary>

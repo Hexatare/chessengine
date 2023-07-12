@@ -29,8 +29,8 @@
                 <MenuItem x:Name="MenuItemQuit" Header="Beenden" HorizontalAlignment="Left" Click="MenuItemQuit_Click"/>
             </MenuItem>
             <MenuItem Header="Bearbeiten" Height="20" Width="80" >
-                <MenuItem x:Name="MenuItemUndo" Header="Zug rückgängig" Click="MenuItemUndo_Click"/>
-                <Separator/>
+                <!--<MenuItem x:Name="MenuItemUndo" Header="Zug rückgängig" Click="MenuItemUndo_Click"/>
+                <Separator/>-->
                 <MenuItem x:Name="MenuItemSettings" Header="Einstellungen" Click="MenuItemSettings_Click"/>
             </MenuItem>
             <MenuItem Header="Hilfe" Height="20" Width="60" >

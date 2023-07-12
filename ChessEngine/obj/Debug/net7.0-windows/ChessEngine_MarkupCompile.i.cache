@@ -10,11 +10,11 @@ none
 false
 TRACE;DEBUG;NET;NET7_0;NETCOREAPP
 C:\Users\rolfm\source\repos\chessengine\ChessEngine\App.xaml
-2-694697646
+32056428954
 
-61993858125
+7-1161503819
 199-898004092
-MainWindow.xaml;SettingDialog.xaml;
+MainWindow.xaml;PromotionDialog.xaml;SettingDialog.xaml;
 
-False
+True
 
