@@ -37,23 +37,30 @@ namespace ChessEngineClassLibrary.Pieces
 
         #region Properties and private Members
 
-        // Image of the Piece 
-        public Image Image { get; }
-
-        // Piece Type
+        /// <summary>
+        /// Piece Type
+        /// </summary>
         public PType PieceType { get; set; }
 
-        // Piece Color
+        /// <summary>
+        /// Piece Color
+        /// </summary>
         public PColor PieceColor { get; set; }
 
-        // Piece has been moved from start position
+        /// <summary>
+        /// Piece has been moved from start position
+        /// </summary>
         public bool HasMoved { get; set; }
 
-        // Current Postion of the Piece on the Board
-        public int[] Location { get; set; }
+        /// <summary>
+        /// Current Postion of the Piece on the Board
+        /// </summary>
+        public int[]? Location { get; set; }
 
-        // Reference to the Board
-        private Board chessBoard;
+        /// <summary>
+        /// Reference to the Board
+        /// </summary>
+        protected Board chessBoard;
 
         #endregion
 
@@ -64,8 +71,7 @@ namespace ChessEngineClassLibrary.Pieces
         /// </summary>
         /// <param name="chessboard">Reference to the Board</param>
         /// <param name="pColor"></param>
-        /// <param name="imgName"></param>
-        public Piece(Board chessboard, PColor pColor, string imgName)
+        public Piece(Board chessboard, PColor pColor)
         {
             // Set the Reference to the Board
             this.chessBoard = chessboard;
@@ -75,34 +81,6 @@ namespace ChessEngineClassLibrary.Pieces
 
             // Initialize local information
             HasMoved = false;
-            //Location = new int[] { -1, -1};
-
-            // Get the assembly containing the resource
-            Assembly assembly = Assembly.GetExecutingAssembly();
-
-            // Load Image for this Piece
-            string fullResourceName = assembly.GetName().Name + "."
-                + Resource1.ResourcePath + "." + imgName;
-            Stream? stream = assembly.GetManifestResourceStream(fullResourceName);
-
-            if (stream != null)
-            {
-                BitmapImage bImage = new BitmapImage();
-
-                bImage.BeginInit();
-                bImage.StreamSource = stream;
-                bImage.CacheOption = BitmapCacheOption.OnLoad;
-                bImage.EndInit();
-
-                Image = new Image
-                {
-                    Source = bImage,
-                    Width = int.Parse(Resource1.PieceWidth),
-                    Height = int.Parse(Resource1.PieceHeight)
-                };
-
-                stream.Dispose();
-            }
         }
 
         #endregion
@@ -275,7 +253,6 @@ namespace ChessEngineClassLibrary.Pieces
             }
             return false;
         }
-
 
         #endregion
 

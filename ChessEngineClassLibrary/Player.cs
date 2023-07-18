@@ -1,7 +1,9 @@
 ﻿using ChessEngineClassLibrary.Pieces;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using static ChessEngineClassLibrary.Pieces.Piece;
 
 namespace ChessEngineClassLibrary
 {
@@ -30,22 +32,12 @@ namespace ChessEngineClassLibrary
         /// <summary>
         /// Name of the player
         /// </summary>
-        public string Name { set; get; }
+        public string Name { set; get; } = string.Empty;
 
         /// <summary>
         /// Color of this player (White or Black)
         /// </summary>
         public Piece.PColor Color { get; set; }
-
-        /// <summary>
-        /// Kingside castling availability.
-        /// </summary>
-        public bool CanKingsideCastle { get; set; }
-
-        /// <summary>
-        /// Queenside castling availability.
-        /// </summary>
-        public bool CanQueensideCastle { get; set; }
 
         /// <summary>
         /// Actual Counter of Halfmoves of the Player
@@ -87,10 +79,6 @@ namespace ChessEngineClassLibrary
 
             // Reset the Time played 
             Stopwatch.Reset();
-
-            // Castling possible
-            CanKingsideCastle = CanQueensideCastle = true;
- 
         }
 
 
@@ -124,6 +112,36 @@ namespace ChessEngineClassLibrary
 
 
         /// <summary>
+        /// Returns the Number of Moves of this Player
+        /// </summary>
+        /// <returns></returns>
+        public int GetNbrOfMoves()
+        {
+            return Moves.Count;
+        }
+
+
+        /// <summary>
+        /// Returns a List of all captures Pieces in the corresponding sequence
+        /// </summary>
+        /// <returns></returns>
+        public List<string> GetAllCapturedPieces()
+        {
+            List<string> pieces = new List<string>();
+
+            foreach (Move move in Moves)
+            {
+                if(move.PieceKilled!=null)
+                {
+                    pieces.Add("Zug: " + move.GetUciMoveNaming() + " - " 
+                        + Enum.GetName(typeof(PType), (int)move.PieceKilled.PieceType));
+                }
+            }
+            return pieces;
+        }
+        
+
+        /// <summary>
         /// Sets this Player as the current Player to make a move. This starts the Timer
         /// </summary>
         /// <param name="color">Color of the Player with the next move</param>
@@ -139,7 +157,6 @@ namespace ChessEngineClassLibrary
                 // Stop the Timer
                 Stopwatch.Stop();
             }
-
         }
 
 
@@ -147,9 +164,19 @@ namespace ChessEngineClassLibrary
         /// Total Time the Player has used
         /// </summary>
         /// <returns>Total Time in Hours, Minutes and Seconds</returns>
-        public string TimePlayed()
+        public TimeSpan TimePlayed()
         {
-            return string.Format("{0:hh\\:mm\\:ss}", Stopwatch.Elapsed);
+            //return string.Format("{0:hh\\:mm\\:ss}", Stopwatch.Elapsed);
+            return Stopwatch.Elapsed;
+        }
+
+
+        /// <summary>
+        /// Set the End of the Game 
+        /// </summary>
+        public void SetEndGame()
+        {
+            Stopwatch.Stop();
         }
 
         #endregion

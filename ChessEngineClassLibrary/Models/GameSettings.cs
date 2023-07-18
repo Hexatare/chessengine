@@ -34,6 +34,11 @@ namespace ChessEngineClassLibrary.Models
         /// </summary>
         public GameTime TimePlay { get; set; }
 
+        /// <summary>
+        /// Max Time for each Player
+        /// </summary>
+        public TimeSpan MaxTime { get; set; }
+
 
         /// <summary>
         /// Constructor
@@ -48,6 +53,8 @@ namespace ChessEngineClassLibrary.Models
             Color = color;
             Difficulty = difficulty;
             TimePlay = timePlay;
+
+            MaxTime = new TimeSpan(0, (int)TimePlay, 0);
         }
 
     }

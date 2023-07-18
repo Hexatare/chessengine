@@ -14,8 +14,8 @@ namespace ChessEngineClassLibrary.Models
     /// </summary>
     public enum CellColor
     {
-        White,
-        Black
+        White = 0,
+        Black = 1
     }
 
     /// <summary>
@@ -44,6 +44,7 @@ namespace ChessEngineClassLibrary.Models
     {
         None,
         Running,
+        Calculating,
         End
     }
 

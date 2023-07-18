@@ -18,13 +18,15 @@ C:\Users\rolfm\source\repos\chessengine\ChessEngine\bin\Debug\net7.0-windows\Che
 C:\Users\rolfm\source\repos\chessengine\ChessEngine\bin\Debug\net7.0-windows\ChessEngineClassLibrary.dll
 C:\Users\rolfm\source\repos\chessengine\ChessEngine\bin\Debug\net7.0-windows\ChessEngineClassLibrary.pdb
 C:\Users\rolfm\source\repos\chessengine\ChessEngine\obj\Debug\net7.0-windows\ChessEngine.csproj.AssemblyReference.cache
+C:\Users\rolfm\source\repos\chessengine\ChessEngine\obj\Debug\net7.0-windows\Dialogs\PromotionDialog.g.cs
+C:\Users\rolfm\source\repos\chessengine\ChessEngine\obj\Debug\net7.0-windows\Dialogs\SettingDialog.g.cs
 C:\Users\rolfm\source\repos\chessengine\ChessEngine\obj\Debug\net7.0-windows\MainWindow.g.cs
-C:\Users\rolfm\source\repos\chessengine\ChessEngine\obj\Debug\net7.0-windows\SettingDialog.g.cs
 C:\Users\rolfm\source\repos\chessengine\ChessEngine\obj\Debug\net7.0-windows\App.g.cs
 C:\Users\rolfm\source\repos\chessengine\ChessEngine\obj\Debug\net7.0-windows\ChessEngine_MarkupCompile.cache
 C:\Users\rolfm\source\repos\chessengine\ChessEngine\obj\Debug\net7.0-windows\ChessEngine_MarkupCompile.lref
+C:\Users\rolfm\source\repos\chessengine\ChessEngine\obj\Debug\net7.0-windows\Dialogs\PromotionDialog.baml
+C:\Users\rolfm\source\repos\chessengine\ChessEngine\obj\Debug\net7.0-windows\Dialogs\SettingDialog.baml
 C:\Users\rolfm\source\repos\chessengine\ChessEngine\obj\Debug\net7.0-windows\MainWindow.baml
-C:\Users\rolfm\source\repos\chessengine\ChessEngine\obj\Debug\net7.0-windows\SettingDialog.baml
 C:\Users\rolfm\source\repos\chessengine\ChessEngine\obj\Debug\net7.0-windows\ChessEngine.g.resources
 C:\Users\rolfm\source\repos\chessengine\ChessEngine\obj\Debug\net7.0-windows\ChessEngine.GeneratedMSBuildEditorConfig.editorconfig
 C:\Users\rolfm\source\repos\chessengine\ChessEngine\obj\Debug\net7.0-windows\ChessEngine.AssemblyInfoInputs.cache
@@ -36,5 +38,5 @@ C:\Users\rolfm\source\repos\chessengine\ChessEngine\obj\Debug\net7.0-windows\ref
 C:\Users\rolfm\source\repos\chessengine\ChessEngine\obj\Debug\net7.0-windows\ChessEngine.pdb
 C:\Users\rolfm\source\repos\chessengine\ChessEngine\obj\Debug\net7.0-windows\ChessEngine.genruntimeconfig.cache
 C:\Users\rolfm\source\repos\chessengine\ChessEngine\obj\Debug\net7.0-windows\ref\ChessEngine.dll
-C:\Users\rolfm\source\repos\chessengine\ChessEngine\obj\Debug\net7.0-windows\PromotionDialog.g.cs
-C:\Users\rolfm\source\repos\chessengine\ChessEngine\obj\Debug\net7.0-windows\PromotionDialog.baml
+C:\Users\rolfm\source\repos\chessengine\ChessEngine\obj\Debug\net7.0-windows\Dialogs\GameEndDialog.g.cs
+C:\Users\rolfm\source\repos\chessengine\ChessEngine\obj\Debug\net7.0-windows\Dialogs\GameEndDialog.baml

@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.NetworkInformation;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -65,8 +66,11 @@ namespace ChessEngineClassLibrary.Models
             FullMoveNumber = fullMoveNumber;
 
             // Setup Castling Information
-            CanKingsideCastle = new bool[] { Players[0].CanKingsideCastle, Players[1].CanKingsideCastle };
-            CanQueensideCastle = new bool[] { Players[0].CanQueensideCastle, Players[1].CanQueensideCastle };
+            King wKing = (King?)chessBoard.GetPieces(Piece.PColor.White).Find(obj => obj.PieceType == Piece.PType.King);
+            King bKing = (King?)chessBoard.GetPieces(Piece.PColor.Black).Find(obj => obj.PieceType == Piece.PType.King);
+
+            CanKingsideCastle = new bool[] { wKing.CanKingsideCastle, bKing.CanKingsideCastle };
+            CanQueensideCastle = new bool[] { wKing.CanQueensideCastle, bKing.CanQueensideCastle };
         }
 
         /// <summary>

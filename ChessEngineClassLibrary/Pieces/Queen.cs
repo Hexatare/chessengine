@@ -22,7 +22,7 @@ namespace ChessEngineClassLibrary.Pieces
         /// <param name="chessboard">Reference to the Board</param>
         /// <param name="pColor"></param>
         /// <param name="imgName"></param>
-        public Queen(Board chessboard, PColor pColor, string imgName) : base(chessboard, pColor, imgName)
+        public Queen(Board chessboard, PColor pColor) : base(chessboard, pColor)
         {
             PieceType = PType.Queen;
         }

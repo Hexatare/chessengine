@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ChessEngineClassLibrary.Resources;
+using System;
 
 namespace ChessEngineClassLibrary.Pieces
 {
@@ -15,8 +16,7 @@ namespace ChessEngineClassLibrary.Pieces
         /// </summary>
         /// <param name="chessboard">Reference to the Board</param>
         /// <param name="pColor"></param>
-        /// <param name="imgName"></param>
-        public Pawn(Board chessboard, PColor pColor, string imgName) : base(chessboard, pColor, imgName)
+        public Pawn(Board chessboard, PColor pColor) : base(chessboard, pColor)
         {
             PieceType = PType.Pawn;
         }
@@ -87,6 +87,91 @@ namespace ChessEngineClassLibrary.Pieces
                 }
             }
             return false;
+        }
+
+
+        /// <summary>
+        /// Method that implements the En Passant Pawn Movement
+        /// </summary>
+        /// <param name="moveToDo">The move to perform</param>
+        /// <param name="previousMove">The previouse move, that was performed</param>
+        /// <returns>TRUE, if the En Pasant Pawn move was done</returns>
+        public bool PawnEnPassantMove(Move moveToDo, Move previousMove)
+        {
+            Cell? pawnToRemove;
+
+            // Do the Move and remove the Opponents Pawn
+            if (moveToDo.PColor == Piece.PColor.White)
+            {
+                pawnToRemove = chessBoard.GetCell(moveToDo.End.Location[0], moveToDo.End.Location[1] - 1);
+            }
+            else
+            {
+                pawnToRemove = chessBoard.GetCell(moveToDo.End.Location[0], moveToDo.End.Location[1] + 1);
+            }
+
+            // Call the Move Method
+            chessBoard.DoMove(moveToDo);
+
+            if (pawnToRemove != null)
+            {
+                moveToDo.PieceKilled = pawnToRemove.GetPiece();
+                pawnToRemove.RemovePiece();
+            }
+            return true;
+        }
+
+
+        /// <summary>
+        ///  Method that implements the Promotion Pawn Movement
+        /// </summary>
+        /// <param name="moveToDo">Moveto perform</param>
+        /// <param name="promotionPiece">Type of the Piece, that replaces the Pawn</param>
+        /// <returns></returns>
+        public bool PawnPromotionMove(Move moveToDo, Piece.PType promotionPiece)
+        {
+            Piece? newPiece = null;
+
+            // Greate the new Piece and replace whith the old one
+            // Use switch statement to update the array based on the Piece type
+            switch (promotionPiece)
+            {
+                case Piece.PType.Knight:
+
+                    newPiece = new Knight(chessBoard, moveToDo.PColor);
+                    break;
+
+                case Piece.PType.Bishop:
+
+                    newPiece = new Bishop(chessBoard, moveToDo.PColor);
+                    break;
+
+                case Piece.PType.Rook:
+
+                    newPiece = new Rook(chessBoard, moveToDo.PColor);
+                    break;
+
+                case Piece.PType.Queen:
+
+                    newPiece = new Queen(chessBoard, moveToDo.PColor);
+                    break;
+            }
+
+            // Tell to board to do the move
+            chessBoard.DoMove(moveToDo);
+
+            // Remove the Piece from the destCell and set the new created Piece there
+            Piece? oldPawn = moveToDo.End.GetPiece();
+
+            if(oldPawn != null && newPiece != null)
+            { 
+                moveToDo.End.RemovePiece();
+                moveToDo.End.SetPiece(newPiece);
+                moveToDo.PieceKilled = oldPawn;
+                moveToDo.PromotionMove = true;
+            }
+
+            return true;
         }
 
         #endregion

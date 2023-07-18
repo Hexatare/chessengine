@@ -1,6 +1,7 @@
 ﻿using ChessEngineClassLibrary.Pieces;
-using Microsoft.Win32;
 using System;
+using System.Text;
+using static ChessEngineClassLibrary.Pieces.Piece;
 
 namespace ChessEngineClassLibrary
 {
@@ -11,21 +12,61 @@ namespace ChessEngineClassLibrary
     {
         #region Properties and Members
 
-        // The Piece that was moved
-        private Piece PieceMoved; 
+        /// <summary>
+        /// Tags for the x-Axis
+        /// </summary>
+        private readonly char[] xCoordTag = { 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h' };
 
-        // Starting Cell of the Move
-        public Cell Start { get; set; }
+        /// <summary>
+        /// Tags for the y-Axis
+        /// </summary>
+        private readonly char[] yCoordTag = { '1', '2', '3', '4', '5', '6', '7', '8' };
 
-        // End Cell of the Move
-        public Cell End { get; set; }
+        /// <summary>
+        /// Tags for the Pieces
+        /// </summary>
+        private readonly char[] pieceTag = { 'p', 'n', 'b', 'r', 'q', 'k' };
 
-        // A Piece that was killed
-        public Piece PieceKilled { set; get; }
+        /// <summary>
+        /// The Piece that was moved
+        /// </summary>
+        private Piece? PieceMoved;
 
-        // Castling Move
+        /// <summary>
+        /// The Color of the the Piece, that was moved, e.q. the Player that performed this move
+        /// </summary>
+        public Piece.PColor PColor;
+
+        /// <summary>
+        /// Starting Cell of the Move
+        /// </summary>
+        public Cell Start { set; get; }
+
+        /// <summary>
+        /// End Cell of the Move
+        /// </summary>
+        public Cell End { set; get; }
+
+        /// <summary>
+        /// A Piece that was killed
+        /// </summary>
+        public Piece? PieceKilled { set; get; }
+
+        /// <summary>
+        /// Flag for castling move 
+        /// </summary>
         public bool CastlingMove { set; get; }
 
+        /// <summary>
+        /// Flag for Promotion move
+        /// </summary>
+        public bool PromotionMove { set; get; } 
+
+        /// <summary>
+        /// In case of a castling move, the old position of the rook
+        /// </summary>
+        public Cell? RookLoc { set; get; }
+         
         #endregion
 
         #region Constructor
@@ -35,12 +76,23 @@ namespace ChessEngineClassLibrary
         /// </summary>
         /// <param name="start">Start Cell of the Move</param>
         /// <param name="end">Destination Cell of the Move</param>
-        public Move(Cell start, Cell end)
+        public Move(Cell start, Cell end, Piece.PColor color)
         { 
             Start = start;
             End = end;
-            PieceMoved = Start.GetPiece();
+            PColor = color;
+
+            Piece? piece = start.GetPiece();
+            if(piece != null)
+            {
+                PieceMoved = start.GetPiece();
+                PColor = piece.PieceColor;
+            }
         }
+
+        #endregion
+
+        #region Methods
 
         /// <summary>
         /// Returns the X Distance of the Move in absolute Value
@@ -51,6 +103,7 @@ namespace ChessEngineClassLibrary
             return Math.Abs(Start.Location[0] - End.Location[0]);
         }
 
+
         /// <summary>
         /// Returns the Y Distance of the Move in absolute Value
         /// </summary>
@@ -60,6 +113,29 @@ namespace ChessEngineClassLibrary
             return Math.Abs(Start.Location[1] - End.Location[1]);
         }
 
+
+        /// <summary>
+        /// Returns the Move in UCI Style
+        /// </summary>
+        /// <returns>Move in UCI Style</returns>
+        public string GetUciMoveNaming()
+        {
+            StringBuilder sb = new StringBuilder();
+
+            if(PieceMoved.PieceColor == Piece.PColor.White)
+            {
+                sb.Append(pieceTag[(int)PieceMoved.PieceType].ToString().ToUpper());
+            }
+            else
+            {
+                sb.Append(pieceTag[(int)(PieceMoved.PieceType)]);
+            }
+
+            sb.Append(xCoordTag[End.Location[0]]);
+            sb.Append(yCoordTag[End.Location[1]]);
+
+            return sb.ToString();
+        }
 
         #endregion
     }

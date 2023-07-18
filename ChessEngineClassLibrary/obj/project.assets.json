@@ -13,11 +13,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\rolfm\\Source\\Repos\\chessengine\\ChessEngineClassLibrary\\ChessEngineClassLibrary.csproj",
+      "projectUniqueName": "C:\\Users\\rolfm\\source\\repos\\chessengine\\ChessEngineClassLibrary\\ChessEngineClassLibrary.csproj",
       "projectName": "ChessEngineClassLibrary",
-      "projectPath": "C:\\Users\\rolfm\\Source\\Repos\\chessengine\\ChessEngineClassLibrary\\ChessEngineClassLibrary.csproj",
+      "projectPath": "C:\\Users\\rolfm\\source\\repos\\chessengine\\ChessEngineClassLibrary\\ChessEngineClassLibrary.csproj",
       "packagesPath": "C:\\Users\\rolfm\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\rolfm\\Source\\Repos\\chessengine\\ChessEngineClassLibrary\\obj\\",
+      "outputPath": "C:\\Users\\rolfm\\source\\repos\\chessengine\\ChessEngineClassLibrary\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\rolfm\\AppData\\Roaming\\NuGet\\NuGet.Config",
@@ -64,7 +64,7 @@
             "privateAssets": "none"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.304\\RuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.306\\RuntimeIdentifierGraph.json"
       }
     }
   }

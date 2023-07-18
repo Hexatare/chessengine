@@ -10,11 +10,11 @@ none
 false
 TRACE;DEBUG;NET;NET7_0;NETCOREAPP
 C:\Users\rolfm\source\repos\chessengine\ChessEngine\App.xaml
-32056428954
+443134233
 
-7-1161503819
-199-898004092
-MainWindow.xaml;PromotionDialog.xaml;SettingDialog.xaml;
+10-1335065558
+199873290701
+Dialogs\GameEndDialog.xaml;Dialogs\PromotionDialog.xaml;Dialogs\SettingDialog.xaml;MainWindow.xaml;
 
 True
 

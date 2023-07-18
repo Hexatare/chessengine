@@ -12,7 +12,20 @@ namespace ChessEngineClassLibrary.Pieces
     /// </summary>
     public class King : Piece
     {
-       
+        #region Properties and Members
+
+        /// <summary>
+        /// Kingside castling availability.
+        /// </summary>
+        public bool CanKingsideCastle { get; set; }
+
+        /// <summary>
+        /// Queenside castling availability.
+        /// </summary>
+        public bool CanQueensideCastle { get; set; }
+
+        #endregion
+
         #region Constructor
 
         /// <summary>
@@ -20,10 +33,11 @@ namespace ChessEngineClassLibrary.Pieces
         /// </summary>
         /// <param name="chessboard">Reference to the Board</param>
         /// <param name="pColor"></param>
-        /// <param name="imgName"></param>
-        public King(Board chessboard, PColor pColor, string imgName) : base(chessboard, pColor, imgName)
+        public King(Board chessboard, PColor pColor) : base(chessboard, pColor)
         {
             PieceType = PType.King;
+            CanKingsideCastle = true;
+            CanQueensideCastle = true;
         }
 
         #endregion
@@ -49,7 +63,7 @@ namespace ChessEngineClassLibrary.Pieces
         /// Movement logic of the King
         /// </summary>
         /// <param name="destCell">destination postion of the Pawn</param>
-        /// <returns></returns>
+        /// <returns>True, if the King can move to this destination</returns>
         public bool KingMovement(Cell destCell)
         {
             int absoluteX = Math.Abs(destCell.Location[0] - Location[0]);
@@ -61,6 +75,53 @@ namespace ChessEngineClassLibrary.Pieces
                 {
                     return false;
                 }
+                return true;
+            }
+            return false;
+        }
+
+
+        /// <summary>
+        /// Method that implements the Castling movement of the King and the Rook
+        /// </summary>
+        /// <param name="destCell">Target Cell to move the King to</param>
+        /// <returns>TRUE if the castling was done</returns>
+        public bool KingCastlingMove(Move moveToDo)
+        {
+            Cell? rookSourceCell;
+            Cell? rookDestCell;
+
+            if (moveToDo.End !=  null)
+            {
+                // Perform the move and move also the Rook
+                if (moveToDo.End.Location[0] < 4)
+                {
+                    rookSourceCell = chessBoard.GetCell(0, moveToDo.End.Location[0]);
+                    rookDestCell = chessBoard.GetCell(moveToDo.End.Location[0] + 1, moveToDo.End.Location[1]);
+                }
+                else
+                {
+                    rookSourceCell = chessBoard.GetCell(7, moveToDo.End.Location[1]);
+                    rookDestCell = chessBoard.GetCell(moveToDo.End.Location[0] - 1, moveToDo.End.Location[1]);
+                }
+
+                // Create a Move and tell the Board store it
+                Move rookMove = new(rookSourceCell, rookDestCell, this.PieceColor);
+
+                // Store Info about this castling Move in the Move Object
+                moveToDo.CastlingMove = true;
+                moveToDo.RookLoc = rookSourceCell;
+
+                CanQueensideCastle = CanKingsideCastle = false;
+
+                // Inform the Rook, he has been moved
+                Piece? rook = rookSourceCell.GetPiece();
+                if (rook != null )
+                    rook.HasMoved = true;
+
+                // Tell the Bord to do the Moves
+                chessBoard.DoMove(moveToDo);
+                chessBoard.DoMove(rookMove);
                 return true;
             }
             return false;

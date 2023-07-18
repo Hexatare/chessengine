@@ -21,8 +21,7 @@ namespace ChessEngineClassLibrary.Pieces
         /// </summary>
         /// <param name="chessboard">Reference to the Board</param>
         /// <param name="pColor"></param>
-        /// <param name="imgName"></param>
-        public Knight(Board chessboard, PColor pColor, string imgName) : base(chessboard, pColor, imgName)
+        public Knight(Board chessboard, PColor pColor) : base(chessboard, pColor)
         {
             PieceType = PType.Knight;
         }

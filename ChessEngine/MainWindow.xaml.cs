@@ -1,4 +1,6 @@
-﻿using ChessEngineClassLibrary;
+﻿using ChessEngine.Dialogs;
+using ChessEngine.Models;
+using ChessEngineClassLibrary;
 using ChessEngineClassLibrary.Models;
 using ChessEngineClassLibrary.Pieces;
 using ChessEngineClassLibrary.Resources;
@@ -23,13 +25,18 @@ namespace ChessEngine
         /// <summary>
         /// Reference to the board
         /// </summary>
-        private Board board;
+        private readonly Board board;
 
         /// <summary>
         /// Reference to the Game
         /// </summary>
-        private Game game;
+        private readonly Game game;
 
+        /// <summary>
+        /// The ViewModel for the Board
+        /// </summary>
+        private readonly MainWindowViewModel viewModel;
+           
         #endregion
 
         #region Constructor
@@ -42,13 +49,19 @@ namespace ChessEngine
             InitializeComponent();
 
             // Create Board
-            board = new Board(ChessGrid);
+            board = new Board();
 
             // Create the Game Class
             game = new Game(board);
 
-            // Register Eventhanlder for Promotion Dlg
-            game.PromotionEvent += PromotionDlgEvent;
+            viewModel = new MainWindowViewModel();
+            viewModel.CreateCells(this.ChessGrid, this.board, this.game);
+
+            // Register Eventhandler for Promotion Dlg
+            game.PromotionEvent += new EventHandler(PromotionDlgEvent);
+
+            // Register Eventhandler for End Game Dialog
+            game.EndGameEvent += new EventHandler(GameEndDlgEvent);   
 
         }
 
@@ -203,7 +216,7 @@ namespace ChessEngine
                 
                 if (Result == MessageBoxResult.Yes)
                 {
-                    game.EndGame();
+                    game.SetGameEnd();
                     this.MenuItemEndGame.IsEnabled = false;
                     this.MenuItemSave.IsEnabled=false;
                     this.MenuItemSettings.IsEnabled = true;
@@ -247,7 +260,7 @@ namespace ChessEngine
         private void MenuItemUndo_Click(object sender, RoutedEventArgs e)
         {
             // Undo the last move of the player
-            game.UndoLastMove();
+            //game.UndoLastMove();
         }
 
         #endregion
@@ -340,14 +353,14 @@ namespace ChessEngine
             settingDialog.WindowStartupLocation = WindowStartupLocation.CenterOwner;
 
             // Setting the Properties of the Window
-            settingDialog.SetGameSettings(game.CurrGameMode);
+            settingDialog.SetGameSettings(game.CurrGameSettings);
 
             // Show the Dialog
             Nullable<bool> dialogResult = settingDialog.ShowDialog();
 
             if(dialogResult == true) 
             {
-                game.CurrGameMode = settingDialog.Settings;
+                game.CurrGameSettings = settingDialog.Settings;
             }
         }
 
@@ -359,24 +372,32 @@ namespace ChessEngine
         /// <param name="e"></param>
         private void PromotionDlgEvent(object sender, EventArgs e)
         {
-            game.promotionPiece = this.ShowPromotionDlg();
-        }
-
-
-        /// <summary>
-        /// Method to show the Promotion Dialog
-        /// </summary>
-        private Piece.PType ShowPromotionDlg()
-        {
             PromotionDialog promotionDialog = new PromotionDialog();
             promotionDialog.Owner = this;
-            promotionDialog.WindowStartupLocation= WindowStartupLocation.CenterOwner;
+            promotionDialog.WindowStartupLocation = WindowStartupLocation.CenterOwner;
 
             // Show the Dialog
             Nullable<bool> dialogResult = promotionDialog.ShowDialog();
 
-            return promotionDialog.SelectedPiece;
+            game.PromotionPiece = promotionDialog.SelectedPiece;
         }
+
+
+        /// <summary>
+        /// Delegate for the show Promotion Dialog
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void GameEndDlgEvent(object sender, EventArgs e)
+        {
+            GameEndEventArgs gameResult = (GameEndEventArgs)e;
+            GameEndDialog gameEndDialog = new GameEndDialog(gameResult);
+            gameEndDialog.Owner = this;
+            gameEndDialog.WindowStartupLocation = WindowStartupLocation.CenterOwner;
+
+            gameEndDialog.Show();
+        }
+
 
         #endregion
     }

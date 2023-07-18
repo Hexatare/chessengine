@@ -1,0 +1,55 @@
+﻿<Window x:Class="ChessEngine.SettingDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:ChessEngine"
+        mc:Ignorable="d"
+        Title="Spiel Einstellungen" Height="300" Width="500" ResizeMode="NoResize">
+    <Grid>
+        <DockPanel LastChildFill="True">
+            <Image x:Name="ChessLogo" DockPanel.Dock="Left" Width="150" Source="../Resources/ChessLogo.jpg" />
+            
+            <!-- Grid für die Buttons -->
+            <Grid DockPanel.Dock="Bottom" Margin="10">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <Button Grid.Column="0" Margin="10 0 10 0" x:Name="cmdOk" Content="Ok" Click="CmdOk_Click"/>
+                <Button Grid.Column="1" Margin="10 0 10 0" x:Name="cmdCancel" Content="Cancel" Click="CmdCancel_Click"/>
+            </Grid>
+
+
+            <StackPanel>
+                <TextBlock Text="Spieler" FontSize="16" FontWeight="Bold" Padding="8"/>
+                
+                <!-- Grid für die Elemente -->
+                <Grid Margin="10">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="2*"/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="30"/>
+                        <RowDefinition Height="30"/>
+                        <RowDefinition Height="30"/>
+                        <RowDefinition Height="30"/>
+                    </Grid.RowDefinitions>
+
+                    <TextBlock Grid.Row="0" Grid.Column="0" Text="Modus:" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                    <TextBlock Grid.Row="1" Grid.Column="0" Text="Farbe:" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                    <TextBlock Grid.Row="2" Grid.Column="0" Text="Schwierigkeit:" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                    <TextBlock Grid.Row="3" Grid.Column="0" Text="Spielzeit (min.):" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+
+                    <ComboBox x:Name="CboMode"  Grid.Row="0" Grid.Column="1" Height="20" Width="190"/>
+                    <ComboBox x:Name="CboColor"  Grid.Row="1" Grid.Column="1" Height="20" Width="190"/>
+                    <ComboBox x:Name="CboDiff"  Grid.Row="2" Grid.Column="1" Height="20" Width="190"/>
+                    <ComboBox x:Name="CboTime"  Grid.Row="3" Grid.Column="1" Height="20" Width="190"/>
+                </Grid>
+            </StackPanel>
+        </DockPanel>
+
+    </Grid>
+</Window>

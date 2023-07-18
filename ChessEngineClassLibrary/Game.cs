@@ -1,12 +1,16 @@
 ﻿using ChessEngineClassLibrary.Models;
 using ChessEngineClassLibrary.Pieces;
-using ChessEngineClassLibrary.Resources;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Diagnostics.Eventing.Reader;
 using System.Linq;
+using System.Net.NetworkInformation;
 using System.Numerics;
+using System.Threading;
+using System.Timers;
+using System.Windows.Media.Media3D;
+using System.Windows.Threading;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace ChessEngineClassLibrary
 {
@@ -16,31 +20,11 @@ namespace ChessEngineClassLibrary
     public class Game
     {
         #region Properties and Members
-
-        /// <summary>
-        /// Constant for En Passant Row where Black is possible
-        /// </summary>
-        private const int ENP_ROW_BLACK = 4;
-
-        /// <summary>
-        /// Constant for En Passant Row where White is possible
-        /// </summary>
-        private const int ENPL_ROW_WHITE = 5;
-
+         
         /// <summary>
         /// Current Player, Black or White
         /// </summary>
         public Piece.PColor CurrentPlayer { get; set; }
-
-        /// <summary>
-        /// List of all black Pieces
-        /// </summary>
-        public List<Piece> BlackPieces { get; set; }
-
-        /// <summary>
-        /// List of all white Pieces
-        /// </summary>        
-        public List<Piece> WhitePieces { get; set; }
 
         /// <summary>
         /// The game's halfmove counter, used to determine a draw.
@@ -63,34 +47,39 @@ namespace ChessEngineClassLibrary
         public GameState ActGameState { get; set; }
 
         /// <summary>
-        /// 
+        /// Reason, why the Game has Ended
         /// </summary>
         public GameEndReason GameEnd { get; set; } = GameEndReason.None;
 
         /// <summary>
         /// Current Game Settings
         /// </summary>
-        public GameSettings CurrGameMode { get; set; }
+        public GameSettings CurrGameSettings { get; set; }
 
         /// <summary>
         /// Eventhandler for the Promotion Dialog Event
         /// </summary>
-        public EventHandler PromotionEvent;
+        public EventHandler? PromotionEvent;
 
         /// <summary>
         /// The selected Promotion Piece
         /// </summary>
-        public Piece.PType promotionPiece = Piece.PType.Queen;
+        public Piece.PType PromotionPiece = Piece.PType.Queen;
+
+        /// <summary>
+        /// Eventhandler to fire the End of the Game Event
+        /// </summary>
+        public EventHandler? EndGameEvent; 
 
         /// <summary>
         /// Reference to the ChessBoard
         /// </summary>
-        private Board ChessBoard;
+        private readonly Board ChessBoard;
 
         /// <summary>
         /// List of Players, either can be black or white
         /// </summary>
-        private Player[] PlayerList;
+        private readonly Player[] PlayerList;
 
         /// <summary>
         /// The selected Cell, form which a Piece is moved
@@ -100,8 +89,12 @@ namespace ChessEngineClassLibrary
         /// <summary>
         /// The Chess Engine, that implements the MinMax Algorithem
         /// </summary>
-        private Engine engine;
+        private readonly Engine engine;
 
+        /// <summary>
+        /// Timer for cyclic Events during the Game
+        /// </summary>
+        private System.Timers.Timer timer;
 
         #endregion
 
@@ -127,16 +120,6 @@ namespace ChessEngineClassLibrary
             PlayerList[0].Color = Piece.PColor.White;
             PlayerList[1].Color = Piece.PColor.Black;
 
-            // List with all Pieces for each Color
-            BlackPieces = new List<Piece>();
-            WhitePieces = new List<Piece>();
-
-            // Register Eventhandler for Cell selection
-            foreach (Cell cell in ChessBoard.GetCells())
-            {
-                cell.CellSelected += Cell_CellSelected;
-            }
-
             // Create the Engine
             engine = new Engine(this, ChessBoard, PlayerList);
 
@@ -144,53 +127,62 @@ namespace ChessEngineClassLibrary
             ActGameState = GameState.None;
 
             // Set the Game Mode
-            this.CurrGameMode = new GameSettings(GameMode.Human, Piece.PColor.White, Difficulty.Easy, GameTime.Min_5);
+            this.CurrGameSettings = new GameSettings(GameMode.Human, Piece.PColor.White, Difficulty.Easy, GameTime.Min_5);
+
+            // Setup a Timer for Timerevents
+            timer = new System.Timers.Timer();
+            timer.Interval = 1000;
+            timer.Elapsed += Timer_Elapsed;
+            timer.AutoReset = true;
         }
 
         #endregion
 
-        #region Eventhandler
+        #region Inputmethods for Moves
 
         /// <summary>
-        /// Eventhandler for cell selection
+        /// The user has selected a Cell - Event from the GUI
         /// </summary>
-        /// <param name="sender">Selected cell</param>
-        /// <param name="e"></param>
-        private void Cell_CellSelected(object? sender, EventArgs e)
+        /// <param name="cellIndex">Index of the selected Cell</param>
+        public void UserCellSelection(int cellIndex)
         {
-            // Convert sender to Cell
-            Cell? cell = (Cell)sender;
-
-            // Make sure, cell is not empty and a Game is Running
-            if (ActGameState != GameState.Running || cell == null)
+            // Make sure, viewCell is not empty and a Game is Running
+            if (ActGameState != GameState.Running)
                 return;
 
-            // if no cell is selected and the cell is empty, exit
+            // Get the Board Cell
+            Cell? cell = ChessBoard.GetCell(cellIndex);
+
+            // if no viewCell is selected and the viewCell is empty, exit
             if (sourceCell == null && cell.IsEmpty)
                 return;
 
-            // Set the source cell
+            // Set the source viewCell
             if (sourceCell == null && !cell.IsEmpty && (cell.GetPiece().PieceColor == CurrentPlayer))
             {
                 sourceCell = cell;
 
                 // Set the Cell as selected
-                cell.SetSelected(true);
+                cell.CurrCellBorderColor = Cell.CellBorderColor.Yellow;
+                Move move = new(cell, cell, CurrentPlayer);
 
                 // Get all possible Cells to move the Piece to
-                foreach (Cell targetCell in this.GetTargetMoveCells())
-                    targetCell.SetSelected(true, 1);
+                foreach (Cell targetCell in ChessBoard.GetTargetMoveCells(move))
+                    targetCell.CurrCellBorderColor = Cell.CellBorderColor.Green;
             }
 
-            // Same cell is clicked again
+            // Same viewCell is clicked again
             else if (sourceCell != null && sourceCell.Index == cell.Index)
             {
-                // Get all possible Cells to move the Piece to and remove selection
-                foreach (Cell targetCell in this.GetTargetMoveCells())
-                    targetCell.SetSelected(false);
+                cell.CurrCellBorderColor = Cell.CellBorderColor.None;
+                Move move = new(cell, cell, CurrentPlayer);
 
-                // deselect the source cell
-                sourceCell.SetSelected(false);
+                // Get all possible Cells to move the Piece to and remove selection
+                foreach (Cell targetCell in ChessBoard.GetTargetMoveCells(move))
+                    targetCell.CurrCellBorderColor = Cell.CellBorderColor.None;
+
+                // deselect the source viewCell
+                sourceCell.CurrCellBorderColor = Cell.CellBorderColor.None;
 
                 sourceCell = null;
 
@@ -199,93 +191,172 @@ namespace ChessEngineClassLibrary
             }
             // Check for a possible new position
             else if (sourceCell != null)
-                this.BoardAction(cell);
+            {
+                this.BoardAction(new Move(sourceCell, cell, CurrentPlayer));
+                sourceCell = null;
+            }
 
-         }
+            // Update View
+            ChessBoard.OnUpdateView();
 
+        }
 
-        #endregion
-
-        #region Methods
 
         /// <summary>
         /// A Interface Method for the Chess Engine to make a move
         /// </summary>
-        /// <param name="srcCell"></param>
-        /// <param name="destCell"></param>
-        public void EngineMove(Cell srcCell, Cell destCell)
+        /// <param name="move">The move to performe</param>
+        public void EngineMove(Move move)
         {
-            // Set the Source Cell
-            sourceCell = srcCell;
-
             // Call the BoardAction
-            this.BoardAction(destCell);
+            this.BoardAction(move);
+
+            // Update the Board
+            this.ChessBoard.OnUpdateView();
+
+            // Set Game State:
+            ActGameState = GameState.Running;
+
         }
 
 
         /// <summary>
         /// This Method implements the Game State and ist Called, when either a Player or the Computer is Performing a move
         /// </summary>
-        /// <param name="cell">The selected Cell </param>
-        private void BoardAction(Cell cell)
+        /// <param name="move">The move to make</param>
+        private void BoardAction(Move move)
         {
+            Piece? piece = move.Start.GetPiece();
 
-            // Game State Machine
-            switch (ActGameState)
+            // Check for spezial Pawn movements
+            if (piece != null && piece.PieceType == Piece.PType.Pawn)
             {
-                // No Active Game
-                case GameState.None:
-                    break;
+                // En Passant Move ?
+                if (ChessBoard.IsEnPassantMove(move))
+                {
+                    Cell? pawnCell;
 
+                    // Do the Move and remove the Opponents Pawn
+                    pawnCell = ChessBoard.GetCell(move.End.Location[0], move.End.Location[1] - 1);
 
-                // Game Loaded
-                case GameState.Running:
+                    // Store the Pawn in the move and delete it on the cell
+                    move.PieceKilled = pawnCell.GetPiece();
+                    pawnCell.RemovePiece();
 
-                    // Check for a possible new position
-                    if (sourceCell != null)
+                    // Perform the move
+                    this.PerformMove(move);
+                    return;
+
+                }
+                if (ChessBoard.IsPromotionMove(move))
+                {
+                    Piece? newPiece = null;
+                    Piece.PColor pColor = CurrentPlayer;
+
+                    // Perform the move
+                    this.PerformMove(move);
+
+                    // Raise Event to show the Dialog
+                    PromotionEvent?.Invoke(this, EventArgs.Empty);
+
+                    // create the new Piece and replace whith the old one
+                    // Use switch statement to update the array based on the Piece type
+                    switch (this.PromotionPiece)
                     {
-                        // If Pawn, check for En Passant and for Promotion
-                        if (sourceCell.GetPiece().PieceType == Piece.PType.Pawn && DoSpecialPawnMove(cell))
-                            return;
+                        case Piece.PType.Knight:
 
-                        // If King -> test for castling
-                        if (sourceCell.GetPiece().PieceType == Piece.PType.King && DoSpecialKingMove(cell))
-                            return;
+                            newPiece = new Knight(ChessBoard, pColor);
+                            break;
 
-                        // If destination Cell is not empty but from the same color as the current player, do nothing
-                        if (!cell.IsEmpty && cell.GetPiece().PieceColor == sourceCell.GetPiece().PieceColor)
-                            return;
+                        case Piece.PType.Bishop:
 
-                        // Check if the current Players King is in Check and will remain in Check after the move
-                        if (!IsCheckResolved(CurrentPlayer, cell))
-                        {
-                            // Get all possible Cells to move the Piece to and remove selection
-                            foreach (Cell targetCell in this.GetTargetMoveCells())
-                                targetCell.SetSelected(false);
+                            newPiece = new Bishop(ChessBoard, pColor);
+                            break;
 
-                            sourceCell.SetSelected(false);
-                            sourceCell = null;
-                            return;
-                        }
-                        else
-                        {
-                            if (sourceCell.GetPiece().CanMoveToDest(cell))
-                                this.PerformMove(cell);
-                        }
+                        case Piece.PType.Rook:
+
+                            newPiece = new Rook(ChessBoard, pColor);
+                            break;
+
+                        case Piece.PType.Queen:
+
+                            newPiece = new Queen(ChessBoard, pColor);
+                            break;
                     }
-                    // Test both Kings of Check Position
-                    SetKingInCheckColor();
 
-                    break;
+                    // Remove the Piece from the destCell and set the new created Piece there
+                    Piece? oldPawn = move.End.GetPiece();
+                    move.End.RemovePiece();
+                    move.PromotionMove = true;
 
-                    // Game Ended
-                case GameState.End: 
-                    break;
+                    if (newPiece != null)
+                        move.End.SetPiece(newPiece);
+
+                    return;
+                }
 
             }
-            
-    }
 
+            // Check for special King movements
+            if (piece != null && piece.PieceType == Piece.PType.King)
+            {
+                if (ChessBoard.IsCastlingMove(move))
+                {
+                    Cell? sourceRookCell;
+                    Cell? destRookCell;
+
+                    // Perform the move and move also the Rook
+                    if (move.End.Location[0] < 4)
+                    {
+                        sourceRookCell = ChessBoard.GetCell(0, move.End.Location[1]);
+                        destRookCell = ChessBoard.GetCell(move.End.Location[0] + 1, move.End.Location[1]);
+                    }
+                    else
+                    {
+                        sourceRookCell = ChessBoard.GetCell(7, move.End.Location[1]);
+                        destRookCell = ChessBoard.GetCell(move.End.Location[0] - 1, move.End.Location[1]);
+                    }
+
+                    // Move the Piece from Source to Destination
+                    Piece? rook = sourceRookCell.GetPiece();
+
+                    if (rook != null)
+                    {
+                        rook.HasMoved = true;
+                        sourceRookCell.RemovePiece();
+                        destRookCell.SetPiece(rook);
+                        move.CastlingMove = true;
+                        move.RookLoc = sourceRookCell;
+                    }
+
+                    // Call the Move Method
+                    this.PerformMove(move);
+                    return;
+                }
+
+            }
+
+            // Check if the current Players King is in Check and will remain in Check after the move
+            if (!ChessBoard.IsCheckResolved(move, CurrentPlayer))
+            {
+                // Get all possible Cells to move the Piece to and remove selection
+                foreach (Cell targetCell in ChessBoard.GetTargetMoveCells(move))
+                    targetCell.CurrCellBorderColor = Cell.CellBorderColor.None;
+
+                move.Start.CurrCellBorderColor = Cell.CellBorderColor.None;
+                sourceCell = null;
+                return;
+            }
+            else
+            {
+                if (piece != null && piece.CanMoveToDest(move.End))
+                    this.PerformMove(move);
+            }
+        }
+
+        #endregion
+
+        #region Methods
 
         /// <summary>
         /// Starts a new Game, Settings to default
@@ -305,14 +376,15 @@ namespace ChessEngineClassLibrary
             // Other members to reset
             sourceCell = null;
             ActGameState = GameState.Running;
-
+            
             // Initalize the board
             ChessBoard.RemoveAllPieces();
-            WhitePieces.Clear();
-            BlackPieces.Clear();
 
             // Initialize the Engine
-            engine.StartNewGame(CurrGameMode);
+            engine.StartNewGame(CurrGameSettings);
+
+            // Start the Timer
+            timer.Enabled = true;
         }
 
 
@@ -321,35 +393,28 @@ namespace ChessEngineClassLibrary
         /// </summary>
         /// <param name="fenString">FEN String</param>
         public void SetNewGame(string fenString)
-        {   
+        {
             // Initialize both players
             this.SetNewGame();
-            
+
             // Parse the Fen String and create the Board
-            FenParser fenParser = new FenParser(fenString);
-
-            // Setup the Player
-            foreach (var player in PlayerList)
-            {
-                player.CanQueensideCastle = fenParser.BoardStateData.CanQueensideCastle[((int)player.Color)];
-                player.CanKingsideCastle = fenParser.BoardStateData.CanKingsideCastle[((int)player.Color)]; 
-            }
-
+            FenParser fenParser = new(fenString);
+ 
             // Initialize the Game
             this.CurrentPlayer = fenParser.BoardStateData.ActivePlayerColor;
             this.FullMoveNumber = fenParser.BoardStateData.FullMoveNumber;
             this.HalfMoveCounter = fenParser.BoardStateData.HalfMoveCounter;
-            
+
             // Setup to board with all pieces
-            for(int row = 0; row < fenParser.BoardStateData.Ranks.GetLength(0); row++) 
+            for (int row = 0; row < fenParser.BoardStateData.Ranks.GetLength(0); row++)
             {
                 // retreive the first column
                 var cValues = fenParser.BoardStateData.Ranks[row];
 
-                // for each cell in this column, create a piece when necessary
-                for (int column = 0; column < cValues.Length;  column++) 
+                // for each viewCell in this column, create a piece when necessary
+                for (int column = 0; column < cValues.Length; column++)
                 {
-                    Piece newPiece = null;
+                    Piece? newPiece = null;
 
                     // Define Attributes of that will be given to the Piece instance
                     char pieceIdent = cValues[column].ToCharArray().First();
@@ -361,49 +426,58 @@ namespace ChessEngineClassLibrary
                         case 'p':
 
                             if (pieceColor == Piece.PColor.White)
-                                newPiece = new Pawn(ChessBoard, Piece.PColor.White, Resource1.wPawn);
+                                newPiece = new Pawn(ChessBoard, Piece.PColor.White);
                             else
-                                newPiece = new Pawn(ChessBoard, Piece.PColor.Black, Resource1.bPawn);
+                                newPiece = new Pawn(ChessBoard, Piece.PColor.Black);
                             break;
 
                         case 'n':
 
                             if (pieceColor == Piece.PColor.White)
-                                newPiece = new Knight(ChessBoard, Piece.PColor.White, Resource1.wKnight);
+                                newPiece = new Knight(ChessBoard, Piece.PColor.White);
                             else
-                                newPiece = new Knight(ChessBoard, Piece.PColor.Black, Resource1.bKnight);
+                                newPiece = new Knight(ChessBoard, Piece.PColor.Black);
                             break;
 
                         case 'b':
 
                             if (pieceColor == Piece.PColor.White)
-                                newPiece = new Bishop(ChessBoard, Piece.PColor.White, Resource1.wBishop);
+                                newPiece = new Bishop(ChessBoard, Piece.PColor.White);
                             else
-                                newPiece = new Bishop(ChessBoard, Piece.PColor.Black, Resource1.bBishop);
+                                newPiece = new Bishop(ChessBoard, Piece.PColor.Black);
                             break;
 
                         case 'r':
 
                             if (pieceColor == Piece.PColor.White)
-                                newPiece = new Rook(ChessBoard, Piece.PColor.White, Resource1.wRook);
+                                newPiece = new Rook(ChessBoard, Piece.PColor.White);
                             else
-                                newPiece = new Rook(ChessBoard, Piece.PColor.Black, Resource1.bRook);
+                                newPiece = new Rook(ChessBoard, Piece.PColor.Black);
                             break;
 
                         case 'q':
 
                             if (pieceColor == Piece.PColor.White)
-                                newPiece = new Queen(ChessBoard, Piece.PColor.White, Resource1.wQueen);
+                                newPiece = new Queen(ChessBoard, Piece.PColor.White);
                             else
-                                newPiece = new Queen(ChessBoard, Piece.PColor.Black, Resource1.bQueen);
+                                newPiece = new Queen(ChessBoard, Piece.PColor.Black);
                             break;
 
                         case 'k':
 
                             if (pieceColor == Piece.PColor.White)
-                                newPiece = new King(ChessBoard, Piece.PColor.White, Resource1.wKing);
+                            {
+                                newPiece = new King(ChessBoard, Piece.PColor.White);
+                                ((King)newPiece).CanQueensideCastle = fenParser.BoardStateData.CanQueensideCastle[(int)Piece.PColor.White];
+                                ((King)newPiece).CanKingsideCastle = fenParser.BoardStateData.CanKingsideCastle[(int)Piece.PColor.White];
+                            }
+
                             else
-                                newPiece = new King(ChessBoard, Piece.PColor.Black, Resource1.bKing);
+                            {
+                                newPiece = new King(ChessBoard, Piece.PColor.Black);
+                                ((King)newPiece).CanQueensideCastle = fenParser.BoardStateData.CanQueensideCastle[(int)Piece.PColor.Black];
+                                ((King)newPiece).CanKingsideCastle = fenParser.BoardStateData.CanKingsideCastle[(int)Piece.PColor.Black];
+                            }
                             break;
                     }
 
@@ -411,75 +485,77 @@ namespace ChessEngineClassLibrary
                     if (newPiece != null)
                     {
                         ChessBoard.PlacePlieceOnBoard(newPiece, (row * 8) + column);
-
-                        // Add the Piece to the List of all Pieces
-                        if(newPiece.PieceColor.Equals(Piece.PColor.White))
-                            WhitePieces.Add(newPiece);
-                        else
-                            BlackPieces.Add(newPiece);
-
-                        // Set newPiece to NULL
-                        newPiece = null;
                     }
                 }
             }
+
+            // Update the view
+            ChessBoard.OnUpdateView();
+
+            // If Game Mode Computer and Computer ist White, do the first move
+            if (CurrGameSettings.Mode == GameMode.Computer && CurrGameSettings.Color == Piece.PColor.Black)
+                engine.DoMove();
         }
 
 
         /// <summary>
         /// Clears the Board and sets the Game State to None
         /// </summary>
-        public void EndGame()
+        public void SetGameEnd()
         {
             this.SetNewGame();
             ActGameState = GameState.None;
+            timer.Enabled = false;
+
+            // Update the view
+            ChessBoard.OnUpdateView();
         }
 
 
         /// <summary>
         /// Method to undo the players last move
         /// </summary>
-        public void UndoLastMove()
-        {
-            Move lastMove = GetPlayer(CurrentPlayer == Piece.PColor.White ? Piece.PColor.Black : Piece.PColor.White).GetLastMove(true) ;
+        //public void UndoLastMove()
+        //{
+        //    Move lastMove = GetPlayer(CurrentPlayer == Piece.PColor.White ? Piece.PColor.Black : Piece.PColor.White).GetLastMove(true);
 
-            // Undo the last move
-            if (!lastMove.End.IsEmpty)
-            {
-                // Move the Piece from Source to Destination
-                Piece? piece = lastMove.End.GetPiece();
-                lastMove.End.RemovePiece();
-                lastMove.Start.SetPiece(piece);
-            }
+        //    // Undo the last move
+        //    if (!lastMove.End.IsEmpty)
+        //    {
+        //        // Move the Piece from Source to Destination
+        //        Piece? piece = lastMove.End.GetPiece();
+        //        lastMove.End.RemovePiece();
+        //        lastMove.Start.SetPiece(piece);
+        //    }
 
-            // If a Piece was captured, restore the piece
-            if(lastMove.PieceKilled != null)
-            {
-                lastMove.End.SetPiece(lastMove.PieceKilled);
-                if (CurrentPlayer == Piece.PColor.White)
-                    WhitePieces.Add(lastMove.PieceKilled);
-                else
-                    BlackPieces.Add(lastMove.PieceKilled);
-            }
+        //    // If a Piece was captured, restore the piece
+        //    if (lastMove.PieceKilled != null)
+        //    {
+        //        lastMove.End.SetPiece(lastMove.PieceKilled);
+        //        //if (CurrentPlayer == Piece.PColor.White)
+        //        //    WhitePieces.Add(lastMove.PieceKilled);
+        //        //else
+        //        //    BlackPieces.Add(lastMove.PieceKilled);
+        //    }
 
-            // Decrement the half move Counter
-            this.HalfMoveCounter--;
+        //    // Decrement the half move Counter
+        //    this.HalfMoveCounter--;
 
-            // Change current player
-            if ((int)CurrentPlayer == (int)Piece.PColor.White)
-            {
-                CurrentPlayer = Piece.PColor.Black;
-            }
-            else
-            {
-                CurrentPlayer = Piece.PColor.White;
-                this.FullMoveNumber--;
-            }
+        //    // Change current player
+        //    if ((int)CurrentPlayer == (int)Piece.PColor.White)
+        //    {
+        //        CurrentPlayer = Piece.PColor.Black;
+        //    }
+        //    else
+        //    {
+        //        CurrentPlayer = Piece.PColor.White;
+        //        this.FullMoveNumber--;
+        //    }
 
-            // Start Timer of the new player, stop Timer of old Player
-            foreach (Player player in PlayerList)
-                player.SetCurrentPlayer(CurrentPlayer);
-        }
+        //    // Start Timer of the new player, stop Timer of old Player
+        //    foreach (Player player in PlayerList)
+        //        player.SetCurrentPlayer(CurrentPlayer);
+        //}
 
 
         /// <summary>
@@ -498,51 +574,44 @@ namespace ChessEngineClassLibrary
         /// <summary>
         /// This Method performs the acutal move and adjusts the board
         /// </summary>
-        /// <param name="destCell">Target Cell for the Piece</param>
-        private void PerformMove(Cell? destCell)
+        /// <param name="move">The move to be performed</param>
+        private void PerformMove(Move move)
         {
-            // Check that destCell not NULL
-            if (destCell == null)
-                return;
-
             // Create a move and store it a the actual Player
-            Move move = new Move(sourceCell, destCell);
+            //Move move = new Move(sourceCell, destCell);
             GetPlayer(CurrentPlayer).AddMove(move);
 
-            // if target Cell was not empty, a kill was performed
-            if (!destCell.IsEmpty)
+            // Get the piece from the Start Position
+            Piece? piece = move.Start.GetPiece();
+
+            if (piece != null)
             {
-                move.PieceKilled = destCell.GetPiece();
+                // Piece has moved
+                piece.HasMoved = true;
 
-                // Remove the capuret Piec, from Cell and List
-                destCell.RemovePiece();
-
-                if (GetPlayer(CurrentPlayer).Color == Piece.PColor.White)
-                    this.BlackPieces.Remove(move.PieceKilled);
-                else
-                    this.WhitePieces.Remove(move.PieceKilled);
-
-                // Reset Halfmove Counter
-                this.HalfMoveCounter = 0;
+                // If Pawn Movement, Reset the Halfmove Counter
+                if (piece.PieceType == Piece.PType.Pawn)
+                    this.HalfMoveCounter = 0;
             }
 
-            // Move the Piece from Source to Destination
-            Piece? piece = sourceCell.GetPiece();
-            piece.HasMoved = true;
-            sourceCell.RemovePiece();
-            destCell.SetPiece(piece);
+            // Perform the move
+            ChessBoard.DoMove(move);
 
-            foreach(Cell cell in ChessBoard.GetCells())
-                cell.SetSelected(false);
-            sourceCell = null;
+            // Remove all Cell selections
+            foreach (Cell cell in ChessBoard.GetCells())
+                cell.CurrCellBorderColor = Cell.CellBorderColor.None;
+
+            // Test both Kings of Check Position
+            SetKingInCheckColor();
 
             // Check if Game is over
             if (this.IsGameOver())
+            {
+                PlayerList[(int)Piece.PColor.White].SetEndGame();
+                PlayerList[(int)Piece.PColor.Black].SetEndGame();
+                this.ShowEndGameInfo();
                 return;
-  
-            // If Pawn Movement, Reset the Halfmove Counter
-            if (piece.PieceType == Piece.PType.Pawn)
-                this.HalfMoveCounter = 0;
+            }
 
             // If first move, set flag
             if (!FirstMoveDone)
@@ -550,9 +619,72 @@ namespace ChessEngineClassLibrary
 
             // Switch Player
             this.SwitchCurrentPlayer();
-
         }
 
+
+        /// <summary>
+        /// Cyclic Timer Events
+        /// </summary>
+        /// <param name="sender">Sender for the Event, e.q. Timer</param>
+        /// <param name="e">Event Arguments</param>
+        private void Timer_Elapsed(object? sender, ElapsedEventArgs e)
+        {
+            Debug.WriteLine("Timer Event: " + GetPlayer(CurrentPlayer).TimePlayed() );
+
+            // Check for Remaining Time;
+            if( GetPlayer(CurrentPlayer).TimePlayed() > CurrGameSettings.MaxTime)
+            {
+                ActGameState = GameState.End;
+                GameEnd = HasInsufficientMaterial() ? GameEndReason.TimeOutVsInsufficient_Material : GameEndReason.ClockFlagged;
+                timer.Enabled = false;
+
+                this.ShowEndGameInfo();
+            }
+
+            // Check for 50 Move Rule
+            if(GetPlayer(CurrentPlayer).NbrOfHalfMoves >= 50)
+            {
+                ActGameState = GameState.End;
+                GameEnd = GameEndReason.FiftyMoveRule;
+                timer.Enabled = false;
+
+                this.ShowEndGameInfo();
+            }
+
+            // Check for Insufficient Material
+            if(HasInsufficientMaterial())
+            {
+                ActGameState = GameState.End;
+                GameEnd = GameEndReason.Insufficient_Material;
+                timer.Enabled = false;
+
+                this.ShowEndGameInfo();
+            }
+
+            // Update Gui Values -> to be done
+
+        }
+        
+
+        /// <summary>
+        /// Generate Event to show the End Game Dialog
+        /// </summary>
+        private void ShowEndGameInfo()
+        {
+            // Stop the Timer
+            timer.Enabled = false;
+
+            // Collect the Game Information
+            GameEndEventArgs gameEndEventArgs = new();
+            gameEndEventArgs.Winner = CurrentPlayer;
+            gameEndEventArgs.Reason = GameEnd;
+            gameEndEventArgs.TimePlayed = string.Format("{0:mm\\:ss}", GetPlayer(CurrentPlayer).TimePlayed());
+            gameEndEventArgs.NbrOfMoves = GetPlayer(CurrentPlayer).GetNbrOfMoves();
+            gameEndEventArgs.CapturedPieces = GetPlayer(CurrentPlayer).GetAllCapturedPieces();
+
+            // Raise Event to show the Dialog
+            EndGameEvent?.Invoke(this, gameEndEventArgs);
+        }
 
         #endregion
 
@@ -565,7 +697,7 @@ namespace ChessEngineClassLibrary
         /// <returns></returns>
         private Player GetPlayer(Piece.PColor color)
         {
-            if (PlayerList[0].Color.Equals(color)) 
+            if (PlayerList[0].Color.Equals(color))
                 return PlayerList[0];
             else
                 return PlayerList[1];
@@ -592,125 +724,28 @@ namespace ChessEngineClassLibrary
             foreach (Player player in PlayerList)
                 player.SetCurrentPlayer(CurrentPlayer);
 
-            // If Computer mode, inform Engine
-            if (CurrGameMode.Mode == GameMode.Computer)
-                engine.DoMove();
-        }
-
-        /// <summary>
-        /// Method to Set a red Frame around the King if in Check
-        /// </summary>
-        private void SetKingInCheckColor()
-        {
-            King? king = (King?)WhitePieces.Find(obj => obj.PieceType == Piece.PType.King);
-
-            if( king  != null )
+            // If Game Mode Computer and Computer ist White, do the first move
+            if (CurrGameSettings.Mode == GameMode.Computer
+                && ((CurrGameSettings.Color == Piece.PColor.Black && CurrentPlayer == Piece.PColor.White)
+                    || (CurrGameSettings.Color == Piece.PColor.White && CurrentPlayer == Piece.PColor.Black)))
             {
-                // Test both Kings of Check Position
-                ChessBoard.GetCell(king.Location[0], king.Location[1]).SetSelected(IsKingInCheck(Piece.PColor.White), 2);
-            }
-            
-            king = (King?)BlackPieces.Find(obj => obj.PieceType == Piece.PType.King);
+                // Set Game Mode
+                ActGameState = GameState.Calculating;
 
-            if( king  != null )
-            {
-                // Test both Kings of Check Position
-                ChessBoard.GetCell(king.Location[0], king.Location[1]).SetSelected(IsKingInCheck(Piece.PColor.Black), 2);
+                // Do the calc in seprate Thread
+                Dispatcher.CurrentDispatcher.BeginInvoke(DispatcherPriority.Normal, () =>
+                {
+                    //engine.DoMove();
+                    Thread calcThread = new(() => engine.DoMove());
+                    calcThread.Name = "Engine Thread";
+                    calcThread.Start();
+                });
             }
         }
-
 
         #endregion
 
-        #region GameLogic            
-
-        /// <summary>
-        /// Check, if the King is in Check Position
-        /// </summary>
-        /// <param name="color">Color of the King be checked, if InCheck</param>
-        /// <param name="cell">Cell, on whtich the King would be InCheck</param>
-        /// <returns>TRUE if in Check</returns>
-        private bool IsKingInCheck(Piece.PColor color, Cell? cell = null)
-        {
-            bool result = false;
-
-            List<Piece> originalList;
-            King? kingInQuestion;
-
-            if (color == Piece.PColor.Black)
-            {
-                originalList = WhitePieces;
-                kingInQuestion = (King?)BlackPieces.Find(obj => obj.PieceType == Piece.PType.King);
-            }
-            else
-            {
-                originalList = BlackPieces;
-                kingInQuestion = (King?)WhitePieces.Find(obj => obj.PieceType == Piece.PType.King);
-            }
-
-            // Get the Location of the King
-            int xKingLoc = (cell == null) ? kingInQuestion.Location[0] : cell.Location[0];
-            int yKingLoc = (cell == null) ? kingInQuestion.Location[1] : cell.Location[1];
-
-
-            // Check for each Piece of the opponent Player, if it can move to the King's position
-            foreach(Piece currentPiece in originalList)
-            {
-                if (currentPiece.CanMoveToDest(this.ChessBoard.GetCell(xKingLoc, yKingLoc)))
-                {
-                    result = true;
-                }
-            }
-            return result;
-        }
-        
-
-        /// <summary>
-        /// Method to check a Games Postion, e.q. if the King is still or new in Check after a Move has been performed
-        /// </summary>
-        /// <param name="color">Color of the current player</param>
-        /// <param name="cell">Target Cell, where to move to</param>
-        /// <returns></returns>
-        private bool IsCheckResolved(Piece.PColor color, Cell cell)
-        {
-            bool isResolved = false;
-            List<Piece> checkPieces;
-
-            // Select all of the opponents pieces 
-            if (color == Piece.PColor.Black)
-                checkPieces = WhitePieces;
-            else
-                checkPieces = BlackPieces;
-
-            // Perform the desired move and check, if any Piece of the opponent can still go to the Kings Position
-
-            // Save Piece on Cell and Save the old coordinates of the piece
-            Piece? pieceOnSourceCell = sourceCell.GetPiece();
-            Piece? pieceOnDestCell = cell.GetPiece();
-
-            // Move the Piece to the new Cell, remove from old cell before AND remove from List of all Pieces
-            sourceCell.RemovePiece();
-            cell.RemovePiece();
-            if (pieceOnDestCell != null)
-                checkPieces.Remove(pieceOnDestCell);
-            cell.SetPiece(pieceOnSourceCell);
-
-            // If any piece can move to this spot, move here, the king is still in check, then go to next location.
-            isResolved = !IsKingInCheck(color);
-
-            // Restore old positions and return true AND add the removed Piece back in the List of all Pieces
-            cell.RemovePiece();
-            sourceCell.SetPiece(pieceOnSourceCell);
-            if (pieceOnDestCell != null)
-            {
-                cell.SetPiece(pieceOnDestCell);
-                checkPieces.Add(pieceOnDestCell);
-                Debug.Assert(pieceOnDestCell.PieceColor == checkPieces.First().PieceColor);
-            }
-
-            return isResolved;
-        }
-
+        #region Bord Logic    
 
         /// <summary>
         /// Test, if the Game is over
@@ -718,13 +753,13 @@ namespace ChessEngineClassLibrary
         /// <returns>TRUE if Game is over</returns>
         private bool IsGameOver()
         {
-            if (IsCheckmate(Piece.PColor.White) || IsCheckmate(Piece.PColor.Black))
+            if (ChessBoard.IsCheckmate(Piece.PColor.White) || ChessBoard.IsCheckmate(Piece.PColor.Black))
             {
                 ActGameState = GameState.End;
                 GameEnd = GameEndReason.Checkmate;
                 return true;
             }
-            else if (!IsMovePossible(CurrentPlayer))
+            else if (!ChessBoard.IsMovePossible(CurrentPlayer))
             {
                 ActGameState = GameState.End;
                 GameEnd = GameEndReason.Stalemate;
@@ -735,406 +770,46 @@ namespace ChessEngineClassLibrary
 
 
         /// <summary>
-        /// Check for Checkmate
+        /// Method to Set a red Frame around the King if in Check
         /// </summary>
-        /// <param name="color"></param>
-        /// <returns>TRUE if Checkmate</returns>
-        public bool IsCheckmate(Piece.PColor color)
+        private void SetKingInCheckColor()
         {
-            if (IsKingInCheck(color))
+            King? king = (King?)ChessBoard.GetPieces(Piece.PColor.White).Find(obj => obj.PieceType == Piece.PType.King);
+
+            if (king != null)
             {
-                if (!IsMovePossible(color))
-                    return true;
+                // Test both Kings of Check Position
+                ChessBoard.GetCell(king.Location).CurrCellBorderColor =
+                    ChessBoard.IsKingInCheck(Piece.PColor.White) ? Cell.CellBorderColor.Red : Cell.CellBorderColor.None;
             }
-            return false;
+
+            king = (King?)ChessBoard.GetPieces(Piece.PColor.Black).Find(obj => obj.PieceType == Piece.PType.King);
+
+            if (king != null)
+            {
+                // Test both Kings of Check Position
+                ChessBoard.GetCell(king.Location).CurrCellBorderColor =
+                    ChessBoard.IsKingInCheck(Piece.PColor.Black) ? Cell.CellBorderColor.Red : Cell.CellBorderColor.None; ;
+            }
         }
 
-
         /// <summary>
-        /// Checks, if the given Player has any valid Moves left
+        /// Test, if in Case of Time - Out, the other Player has Insufficient Material to Win the Game 
         /// </summary>
         /// <returns></returns>
-        private bool IsMovePossible(Piece.PColor color)
+        /// 
+        private bool HasInsufficientMaterial()
         {
-            bool movePossible;
-            List<Piece> checkPieces;
 
-            if (color == Piece.PColor.Black)
-                checkPieces = BlackPieces;
-            else
-                checkPieces = WhitePieces;
+            //If both sides have any one of the following, and there are no pawns on the board:
 
-            // Test for each Cell, if a Piece of the given Player can move to
-            foreach (Cell cell in ChessBoard.GetCells())
-            {
-                // If any piece can move to this spot, move here
-                // If king is still in check, then go to next location.
-                foreach (Piece piece in checkPieces)
-                {
-                    // Check if move possible
-                    movePossible = this.IsMovePossible(cell, piece);
+            //A lone king
+            //A king and bishop
+            //A king and knight
 
-                    if (movePossible)
-                        return true;
-                }
-            }
             return false;
         }
 
-
-        /// <summary>
-        /// The Method checks, if a piece can move to the cell
-        /// </summary>
-        /// <param name="cell">Destination Cell to move the Piece to</param>
-        /// <param name="piece">Piece that should be moved</param>
-        /// <returns></returns>
-        private bool IsMovePossible(Cell cell, Piece piece)
-        {
-            bool movePossible = false;
-            Cell oldCell;
-            Piece? destCellPiece = null;
-            List<Piece> pieceList;
-
-            // Get the List of all Pieces of the color in Question
-            pieceList = piece.PieceColor == Piece.PColor.White ? BlackPieces : WhitePieces; 
-
-            // Test if the Piece can move to the destination Cell
-            if (piece.CanMoveToDest(cell))
-            {
-                // For the Target Cell, if not empty, store the Piece on that Cell and remove it from its List of Pieces
-                // and remove it from the Board
-                if( !cell.IsEmpty )
-                {
-                    destCellPiece = cell.GetPiece();
-                    cell.RemovePiece();
-                    pieceList.Remove(destCellPiece);
-                }
-
-                // For the Piece to move, store its old location and its olf cellSave Piece on Cell ad Save the old coordinates of the piece
-                oldCell = ChessBoard.GetCell(piece.Location[0], piece.Location[1]);
-
-                // Move the Piece to the new Cell, remove from old cell before
-                oldCell.RemovePiece();
-                cell.SetPiece(piece);
-
-                // no InCheck, take Move back and return true
-                movePossible = !this.IsKingInCheck(piece.PieceColor);
-
-                // Restore old positions
-                cell.RemovePiece();
-                oldCell.SetPiece(piece);
-
-                // if the destination Cell was not empty, restor this Piece on that cell and add the Piece back to the List of Pieces
-                if (destCellPiece != null)
-                {
-                    cell.SetPiece(destCellPiece);
-                    pieceList.Add(destCellPiece);
-                    Debug.Assert(destCellPiece.PieceColor == pieceList.First().PieceColor);
-                }
-
-            }
-            return movePossible;
-        }
-
-
-        /// <summary>
-        /// Gets a List with all possible Cells, a Piece can move to
-        /// </summary>
-        /// <returns>The List with possible Cells</returns>
-        private List<Cell> GetTargetMoveCells()
-        {
-            List<Cell> cells = new List<Cell>();
-
-            if (sourceCell == null || sourceCell.IsEmpty)
-                return cells;
-
-            // Check for the source Cell, where it can possible move to
-            foreach (Cell cell in ChessBoard.GetCells())
-            {
-                if( IsMovePossible(cell, sourceCell.GetPiece()) )
-                    cells.Add(cell);
-
-                // Check for Castling, and add the Cell to the List
-                if (sourceCell.GetPiece().PieceType == Piece.PType.King && IsCastlingMove(cell))
-                    cells.Add(cell);
-
-                // Check for En Passant, and add the Cell to the List
-                if (sourceCell.GetPiece().PieceType == Piece.PType.Pawn && IsEnPassantMove(cell))
-                    cells.Add(cell);
-
-            }
-            return cells;
-        }
-
-
-        /// <summary>
-        /// Check, if the King can do a castling move
-        /// </summary>
-        /// <param name="destCell"></param>
-        /// <returns>TRUE if in Check</returns>
-        private bool IsCastlingMove(Cell destCell)
-        {
-            List<Piece> originalList;
-            King? kingInQuestion;
-            Cell? rookCell;
-            bool kingPassingThroughCheck;
-
-            // Current Color
-            Piece.PColor playerColor = GetPlayer(CurrentPlayer).Color;
-
-            if (playerColor == Piece.PColor.Black)
-            {
-                originalList = BlackPieces;
-                kingInQuestion = (King?)originalList.Find(obj => obj.PieceType == Piece.PType.King);
-            }
-            else
-            {
-                originalList = WhitePieces;
-                kingInQuestion = (King?)originalList.Find(obj => obj.PieceType == Piece.PType.King);
-            }
-
-            // Check the four conditions of Castling - King has not moved and is not in Check
-            if ( kingInQuestion.HasMoved || IsKingInCheck(playerColor) )
-                return false;
-
-            // Check movement of the King - max 2 moves
-            int kingMovement = kingInQuestion.Location[0] - destCell.Location[0];
-
-            if (    Math.Abs( kingMovement ) != 2 
-                || destCell.Location[1] != kingInQuestion.Location[1] )
-                return false;
-
-            // Castling Queenside - no pieces in between and Rook has not moved and King will not be in Check
-            if (GetPlayer(CurrentPlayer).CanQueensideCastle && kingMovement > 0)
-            {
-                rookCell = ChessBoard.GetCell(0, kingInQuestion.Location[1]);
-                kingPassingThroughCheck = IsKingInCheck(playerColor, ChessBoard.GetCell(destCell.Location[0], destCell.Location[1]))
-                                          || IsKingInCheck(playerColor, ChessBoard.GetCell(destCell.Location[0] - 1, destCell.Location[1]));
-            }
-            else if (GetPlayer(CurrentPlayer).CanKingsideCastle && kingMovement < 0)
-            {
-                rookCell = ChessBoard.GetCell(7, kingInQuestion.Location[1]);
-                kingPassingThroughCheck = IsKingInCheck(playerColor, ChessBoard.GetCell(destCell.Location[0], destCell.Location[1]))
-                                          || IsKingInCheck(playerColor, ChessBoard.GetCell(destCell.Location[0] + 1, destCell.Location[1]));
-            }
-            else
-                return false;
-            
-            // Rook has not moved and the way to the Rook is empty
-            if (    rookCell.GetPiece() != null 
-                && !rookCell.GetPiece().HasMoved
-                &&  kingInQuestion.CanMoveStraight(rookCell)
-                && !kingPassingThroughCheck)
-            {
-                return true;                
-            }
-            return false;
-        }
-
-
-        /// <summary>
-        /// Check if a Promotion Move has been done
-        /// </summary>
-        /// <param name="destCell">destion cell</param>
-        /// <returns>TRUE, if Promotion is possible</returns>
-        private bool IsPromotionMove(Cell destCell)
-        {
-            int yEndCoord;
-
-            if (GetPlayer(CurrentPlayer).Color == Piece.PColor.Black)
-                yEndCoord = 0;
-            else
-                yEndCoord = 7;
-
-            // not the end positioin
-            if (destCell.Location[1] != yEndCoord)
-                return false;
-
-            return true;
-        }
-
-
-        /// <summary>
-        /// Check if a Promotion Move has been done
-        /// </summary>
-        /// <param name="destCell"></param>
-        /// <returns></returns>
-        private bool IsEnPassantMove(Cell destCell)
-        {
-            Move? lastMove;
-            bool previousMoveOk;
-            int yTargetPos;
-
-            //get last move from opponent player
-            if (GetPlayer(CurrentPlayer).Color == Piece.PColor.White)
-            {
-                lastMove = GetPlayer(Piece.PColor.Black).GetLastMove(false);
-
-                // If no moves so far
-                if (lastMove == null)
-                    return false;
-
-                yTargetPos = lastMove.End.Location[1] + 1;
-                previousMoveOk = (lastMove.GetYMovement() == 2) && (lastMove.End.Location[1] == ENP_ROW_BLACK);
-            }
-            else
-            {
-                lastMove = GetPlayer(Piece.PColor.White).GetLastMove(false);
-
-                // If no moves so far
-                if (lastMove == null)
-                    return false;
-
-                yTargetPos = lastMove.End.Location[1] - 1;
-                previousMoveOk = (lastMove.GetYMovement() == 2) && (lastMove.End.Location[1] == ENPL_ROW_WHITE);
-            }
-
-            // if last Move was a double move and the piece is on the right colum
-            if (previousMoveOk 
-                && (destCell.Location[0] == lastMove.End.Location[0])
-                && (sourceCell.Location[1] == lastMove.End.Location[1])
-                && (destCell.Location[1] == yTargetPos))
-                return true;
-
-            return false;
-        }
- 
-
-        /// <summary>
-        /// Method that implements special Pawn Movements, e.q. En Passant and Promotion
-        /// </summary>
-        /// <param name="destCell">Target Cell to move the Pawn to</param>
-        /// <returns>TRUE, if a spezial Pawn move was done</returns>
-        private bool DoSpecialPawnMove(Cell destCell)
-        {
-            Piece newPiece = null;
-            Piece.PColor pColor = CurrentPlayer;
-
-            // Check for En Passant
-            if (this.IsEnPassantMove(destCell))
-            {
-                Cell? pawnToRemove;
-                Move? lastMove;
-
-                // Do the Move and remove the Opponents Pawn
-                if (GetPlayer(pColor).Color == Piece.PColor.White)
-                {
-                    pawnToRemove = ChessBoard.GetCell(destCell.Location[0], destCell.Location[1] - 1);
-                    lastMove = this.PlayerList[(int)Piece.PColor.Black].GetLastMove(false);
-                    this.BlackPieces.Remove(pawnToRemove.GetPiece());
-                }
-                else
-                {
-                    pawnToRemove = ChessBoard.GetCell(destCell.Location[0], destCell.Location[1] + 1);
-                    lastMove = this.PlayerList[(int)Piece.PColor.White].GetLastMove(false);
-                    this.WhitePieces.Remove(pawnToRemove.GetPiece());
-                }
-
-                // Call the Move Method
-                this.PerformMove(destCell);
-
-                // Remove the capured Piec, from Cell, store it in the current players last move
-                GetPlayer(pColor).GetLastMove(false).PieceKilled = pawnToRemove.GetPiece();
-                pawnToRemove.RemovePiece();
-
-                return true;
-            }
-
-            // Check for Promotion
-            else if (this.IsPromotionMove(destCell))
-            {
-                // Raise Event to show the Dialog
-                PromotionEvent?.Invoke(this, EventArgs.Empty);
- 
-                // Greate the new Piece and replace whith the old one
-                // Use switch statement to update the array based on the Piece type
-                switch (this.promotionPiece)
-                {
-                    case Piece.PType.Knight:
-
-                        newPiece = new Knight(ChessBoard, pColor, Resource1.wKnight);
-                        break;
-
-                    case Piece.PType.Bishop:
-
-                        newPiece = new Bishop(ChessBoard, pColor, Resource1.wBishop);
-                        break;
-
-                    case Piece.PType.Rook:
-
-                        newPiece = new Rook(ChessBoard, pColor, Resource1.wRook);
-                        break;
-
-                    case Piece.PType.Queen:
-
-                        newPiece = new Queen(ChessBoard, pColor, Resource1.wQueen);
-                        break;
-                }
-
-                // Perform the move
-                this.PerformMove(destCell);
-
-                // Remove the Piece from the destCell and set the new created Piece     there
-                Piece oldPawn = destCell.GetPiece();
-                destCell.RemovePiece();
-                destCell.SetPiece(newPiece);
-
-                // Adjust the corresponding List of pieces
-                if (pColor == Piece.PColor.White)
-                {
-                    WhitePieces.Remove(oldPawn);
-                    WhitePieces.Add(newPiece);
-                }
-                else
-                {
-                    BlackPieces.Remove(oldPawn);
-                    BlackPieces.Add(newPiece);
-                }
-                return true;
-            }
-            return false;
-        }
-
-
-        /// <summary>
-        /// Method that implements the Castling movement of the King and the Rook
-        /// </summary>
-        /// <param name="destCell">Target Cell to move the King to</param>
-        /// <returns>TRUE if the castling was done</returns>
-        private bool DoSpecialKingMove(Cell destCell)
-        {
-            // If King -> test for castling
-            if (IsCastlingMove(destCell))
-            {
-                Cell? sourceRookCell;
-                Cell? destRookCell;
-
-                // Perform the move and move also the Rook
-                if (destCell.Location[0] < 4)
-                {
-                    sourceRookCell = ChessBoard.GetCell(0, destCell.Location[1]);
-                    destRookCell = ChessBoard.GetCell(destCell.Location[0] + 1, destCell.Location[1]);
-                }
-                else
-                {
-                    sourceRookCell = ChessBoard.GetCell(7, destCell.Location[1]);
-                    destRookCell = ChessBoard.GetCell(destCell.Location[0] - 1, destCell.Location[1]);
-                }
-
-                // Move the Piece from Source to Destination
-                Piece? piece = sourceRookCell.GetPiece();
-                piece.HasMoved = true;
-                sourceRookCell.RemovePiece();
-                destRookCell.SetPiece(piece);
-
-                // Call the Move Method
-                this.PerformMove(destCell);
-
-                return true;
-            }
-            return false;
-         }
+        #endregion
     }
-
-    #endregion
 }
