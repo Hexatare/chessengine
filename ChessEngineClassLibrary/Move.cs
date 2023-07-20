@@ -25,12 +25,12 @@ namespace ChessEngineClassLibrary
         /// <summary>
         /// Tags for the Pieces
         /// </summary>
-        private readonly char[] pieceTag = { 'p', 'n', 'b', 'r', 'q', 'k' };
+        private readonly char[] pieceTag = { ' ', 'N', 'B', 'R', 'Q', 'K' };
 
         /// <summary>
         /// The Piece that was moved
         /// </summary>
-        private Piece? PieceMoved;
+        private readonly Piece? PieceMoved;
 
         /// <summary>
         /// The Color of the the Piece, that was moved, e.q. the Player that performed this move
@@ -53,6 +53,11 @@ namespace ChessEngineClassLibrary
         public Piece? PieceKilled { set; get; }
 
         /// <summary>
+        /// Flag, if this was the last Move to Checkmate
+        /// </summary>
+        public bool CheckMateMove { set; get; }   
+
+        /// <summary>
         /// Flag for castling move 
         /// </summary>
         public bool CastlingMove { set; get; }
@@ -61,6 +66,11 @@ namespace ChessEngineClassLibrary
         /// Flag for Promotion move
         /// </summary>
         public bool PromotionMove { set; get; } 
+
+        /// <summary>
+        /// In Case of a Promotion Move, the newly created Piece
+        /// </summary>
+        public Piece.PType PromotionPiece { set; get; }
 
         /// <summary>
         /// In case of a castling move, the old position of the rook
@@ -122,17 +132,39 @@ namespace ChessEngineClassLibrary
         {
             StringBuilder sb = new StringBuilder();
 
-            if(PieceMoved.PieceColor == Piece.PColor.White)
+            // Test for Castling Move
+            if( this.CastlingMove && RookLoc != null)
             {
-                sb.Append(pieceTag[(int)PieceMoved.PieceType].ToString().ToUpper());
-            }
-            else
-            {
-                sb.Append(pieceTag[(int)(PieceMoved.PieceType)]);
+                sb.Append(RookLoc.Location[0] == 0 ? "0-0-0" : "0-0");
+                return sb.ToString();
             }
 
+            if( PieceMoved != null )
+            {
+                sb.Append(pieceTag[(int)PieceMoved.PieceType]);
+            }
+
+            // if cyptured piece, add x
+            if(PieceKilled != null )
+            {
+                sb.Append('x');
+            }
+            
             sb.Append(xCoordTag[End.Location[0]]);
             sb.Append(yCoordTag[End.Location[1]]);
+
+            // If Promotion Move, add = plus the new Piece
+            if( this.PromotionMove )
+            {
+                sb.Append('=');
+                sb.Append(pieceTag[(int)this.PromotionPiece]);
+            }
+
+            // If Checkmate Move
+            if( this.CheckMateMove )
+            {
+                sb.Append('#');
+            }
 
             return sb.ToString();
         }

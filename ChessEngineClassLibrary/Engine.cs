@@ -85,9 +85,9 @@ namespace ChessEngineClassLibrary
             if(ActGameSettings != null)
             {
                 if (ActGameSettings.Color == Piece.PColor.White)
-                    color = Piece.PColor.Black;
-                else
                     color = Piece.PColor.White;
+                else
+                    color = Piece.PColor.Black;
 
                 // Setting the Depth according to the difficulty
                 switch( ActGameSettings.Difficulty )

@@ -3,12 +3,11 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:ChessEngine"
+        xmlns:local="clr-namespace:ChessEngine.Models"
         mc:Ignorable="d"
         Loaded="ChessMainWindow_Loaded"
         Closing="ChessMainWindow_Closing"
-        Title="Chess" Height="660" Width="660" Icon="Resources\ChessLogo.jpg" WindowStartupLocation="CenterScreen" ResizeMode="NoResize">
-        
+        Title="Chess" Height="660" Width="860" Icon="Resources\ChessLogo.jpg" WindowStartupLocation="CenterScreen" ResizeMode="NoResize">
     
     <Window.CommandBindings>
         <CommandBinding Command="New" CanExecute="CommandBindingNew_CanExecute" Executed="CommandBindingNew_Executed"/>
@@ -19,7 +18,7 @@
     <DockPanel LastChildFill="True">
         
         <!--- Create Menubar and Menu Items-->        
-        <Menu DockPanel.Dock="Top" Width="800" Height="20" HorizontalAlignment="Left" VerticalAlignment="Top">
+        <Menu DockPanel.Dock="Top" Height="20" HorizontalAlignment="Left" VerticalAlignment="Top">
             <MenuItem x:Name="FileMenu" Header="Datei" Height="20" Width="40">
                 <MenuItem Command="New" x:Name="MenuItemNewGame" Header="Neues Spiel" Click="MenuItemNewGame_Click"/>
                 <MenuItem Command="Open" x:Name="MenuItemLoad" Header="Spiel öffnen" />
@@ -37,7 +36,67 @@
                 <MenuItem x:Name="About" Header="Über" Click="MenuItemAbout_Click"/>
             </MenuItem>
         </Menu>
-        
+
+        <Border BorderBrush="Black" BorderThickness="2" CornerRadius="5"  DockPanel.Dock="Right" Margin="0,20,5,20">
+
+            <!-- Stackpanel for Player Information-->
+            <StackPanel DockPanel.Dock="Right" Width="180" Margin="10,10,10,15">
+
+
+                <!--- Spielinformationen-->
+                <Label x:Name="lblPlay" Content="Spielinformation" FontSize="20" FontWeight="Bold"/>
+
+                <!---Use a 2x2Grid-->
+                <Grid Margin="0,10,0,20">
+
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition/>
+                        <ColumnDefinition/>
+                    </Grid.ColumnDefinitions>
+
+                    <Grid.RowDefinitions>
+                        <RowDefinition />
+                        <RowDefinition />
+                    </Grid.RowDefinitions>
+
+                    <!--- White Player-->
+                    <TextBlock  x:Name="lblWhite" Text="Weiss:" Grid.Column="0" Grid.Row="0"  />
+                    <TextBlock  x:Name="lblTimeW" Text="Zeit:" Grid.Column="0" Grid.Row="1" />
+
+                    <TextBlock  x:Name="lblModeW" Text="-" Grid.Column="1" Grid.Row="0"  />
+                    <TextBlock  x:Name="lblActTimeW" Text="-" Grid.Column="1" Grid.Row="1"  />
+
+                </Grid>
+
+                <!---Use a 2x2Grid-->
+                <Grid Margin="0,10,0,20">
+
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition/>
+                        <ColumnDefinition/>
+                    </Grid.ColumnDefinitions>
+
+                    <Grid.RowDefinitions>
+                        <RowDefinition />
+                        <RowDefinition />
+                    </Grid.RowDefinitions>
+
+                    <!--- Black Player-->
+                    <TextBlock  x:Name="lblBlack" Text="Schwarz:" Grid.Column="0" Grid.Row="0" />
+                    <TextBlock  x:Name="lblTimeB" Text="Zeit:" Grid.Column="0" Grid.Row="1" />
+
+                    <TextBlock  x:Name="lblModeB" Text="-" Grid.Column="1" Grid.Row="0"  />
+                    <TextBlock  x:Name="lblActTimeB" Text="-" Grid.Column="1" Grid.Row="1"  />
+                </Grid>
+
+                <!--- Züge-->
+                <TextBlock x:Name="lblMoves" Text="Züge:"/>
+                <TextBlock x:Name="tblMoves" TextWrapping="Wrap" Height="350"/>
+
+
+            </StackPanel>
+        </Border>
+
         <!--- Dockpanel for Board Markers around the Chessboard-->
         <DockPanel LastChildFill="True">
             <Grid Name="TopMarker" DockPanel.Dock="Top" Height="20">
@@ -160,5 +219,10 @@
                 </Grid.ColumnDefinitions>
             </Grid>
         </DockPanel>
+        
+
+        
+        
+        
      </DockPanel>
 </Window>

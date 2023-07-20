@@ -1,15 +1,13 @@
-﻿using ChessEngineClassLibrary;
+﻿using ChessEngine.Resources;
+using ChessEngineClassLibrary;
 using ChessEngineClassLibrary.Models;
 using ChessEngineClassLibrary.Pieces;
-using ChessEngineClassLibrary.Resources;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media.Imaging;
 using System.Windows.Threading;
-
 
 namespace ChessEngine.Models
 {
@@ -241,7 +239,7 @@ namespace ChessEngine.Models
             if (bImage != null)
                 pieceImages.Add(key, bImage);
         }
-
+        
         #endregion
 
 

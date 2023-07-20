@@ -1,16 +1,17 @@
 ﻿using ChessEngine.Dialogs;
 using ChessEngine.Models;
+using ChessEngine.Resources;
 using ChessEngineClassLibrary;
 using ChessEngineClassLibrary.Models;
 using ChessEngineClassLibrary.Pieces;
-using ChessEngineClassLibrary.Resources;
 using Microsoft.Win32;
 using System;
 using System.Diagnostics;
 using System.IO;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
-
+using System.Windows.Threading;
 
 namespace ChessEngine
 {
@@ -21,6 +22,11 @@ namespace ChessEngine
     {
 
         #region Properties and private Members
+
+        /// <summary>
+        /// Texts for Play Mode
+        /// </summary>
+        private readonly string[] TxtGameMode = { "Spieler", "Computer" };
 
         /// <summary>
         /// Reference to the board
@@ -36,7 +42,7 @@ namespace ChessEngine
         /// The ViewModel for the Board
         /// </summary>
         private readonly MainWindowViewModel viewModel;
-           
+
         #endregion
 
         #region Constructor
@@ -58,11 +64,19 @@ namespace ChessEngine
             viewModel.CreateCells(this.ChessGrid, this.board, this.game);
 
             // Register Eventhandler for Promotion Dlg
-            game.PromotionEvent += new EventHandler(PromotionDlgEvent);
+            game.PromotionEvent += PromotionDlgEvent;
 
             // Register Eventhandler for End Game Dialog
-            game.EndGameEvent += new EventHandler(GameEndDlgEvent);   
+            game.EndGameEvent += GameEndDlgEvent;
 
+            // Register Eventhanlder for Game Update 
+            game.GameUpdateEvent += GameUpdateEvent;
+
+            // Initalize the Information
+            this.lblModeW.Text = TxtGameMode[0];
+            this.lblModeB.Text = TxtGameMode[0];
+            this.lblActTimeW.Text = "-";
+            this.lblActTimeB.Text = "-";
         }
 
         #endregion
@@ -199,6 +213,11 @@ namespace ChessEngine
             //this.MenuItemUndo.IsEnabled = true;
             this.MenuItemEndGame.IsEnabled = true;
             this.MenuItemSettings.IsEnabled = false;
+
+            this.lblActTimeW.Text = new TimeSpan(0, (int)game.CurrGameSettings.TimePlay, 0).ToString("hh\\:mm\\:ss");
+            this.lblActTimeB.Text = new TimeSpan(0, (int)game.CurrGameSettings.TimePlay, 0).ToString("hh\\:mm\\:ss");
+            this.lblActTimeW.FontWeight = FontWeights.Bold;
+            this.lblActTimeB.FontWeight = FontWeights.Light;
         }
 
 
@@ -220,6 +239,13 @@ namespace ChessEngine
                     this.MenuItemEndGame.IsEnabled = false;
                     this.MenuItemSave.IsEnabled=false;
                     this.MenuItemSettings.IsEnabled = true;
+
+                    // Initalize the Information
+                    this.lblModeW.Text = TxtGameMode[0];
+                    this.lblModeB.Text = TxtGameMode[0];
+                    this.lblActTimeW.Text = "-";
+                    this.lblActTimeB.Text = "-";
+                    this.tblMoves.Text = "";
                 }
             }
         }
@@ -236,6 +262,50 @@ namespace ChessEngine
         }
 
 
+        /// <summary>
+        /// Shows the Game Settings Dialog and saves the Value to the Game Class
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void MenuItemSettings_Click(object sender, RoutedEventArgs e)
+        {
+            SettingDialog settingDialog = new SettingDialog();
+            settingDialog.Owner = this;
+            settingDialog.WindowStartupLocation = WindowStartupLocation.CenterOwner;
+
+            // Setting the Properties of the Window
+            settingDialog.SetGameSettings(game.CurrGameSettings);
+
+            // Show the Dialog
+            Nullable<bool> dialogResult = settingDialog.ShowDialog();
+
+            if (dialogResult == true)
+            {
+                GameSettings settings = settingDialog.Settings;
+
+                if (settings != null)
+                {
+                    game.CurrGameSettings = settingDialog.Settings;
+
+                    if (settings.Mode == GameMode.Computer)
+                    {
+                        this.lblModeW.Text = settings.Color == Piece.PColor.White ? TxtGameMode[1] : TxtGameMode[0];
+                        this.lblModeB.Text = settings.Color == Piece.PColor.Black ? TxtGameMode[1] : TxtGameMode[0];
+                    }
+                    else
+                    {
+                        this.lblModeW.Text = TxtGameMode[0];
+                        this.lblModeB.Text = TxtGameMode[0];
+                    }
+
+                    this.lblActTimeW.Text = new TimeSpan(0, (int)settings.TimePlay, 0).ToString("hh\\:mm\\:ss");
+                    this.lblActTimeB.Text = new TimeSpan(0, (int)settings.TimePlay, 0).ToString("hh\\:mm\\:ss");
+                    this.lblActTimeW.FontWeight = FontWeights.Light;
+                    this.lblActTimeB.FontWeight = FontWeights.Light;
+                }
+            }
+        }
+
 
         /// <summary>
         /// Shows Information about the Game
@@ -247,7 +317,7 @@ namespace ChessEngine
             MessageBoxImage icon = MessageBoxImage.Information;
             MessageBoxButton button = MessageBoxButton.OK;
 
-            MessageBox.Show("Chess Play, Current Version 0.1\nDeveloped and written by Noël.",
+            MessageBox.Show("Chess Play, Current Version 1.0\nDeveloped and written by Noël Mani. © 2023.",
                 "About Chess", button, icon);
         }
 
@@ -272,7 +342,6 @@ namespace ChessEngine
         /// </summary>
         private void ShowOpenFileDialog()
         {
-
             // Create an instance of the OpenFileDialog
             OpenFileDialog openFileDialog = new OpenFileDialog();
 
@@ -298,6 +367,11 @@ namespace ChessEngine
                         this.MenuItemSave.IsEnabled = true;
                         //this.MenuItemUndo.IsEnabled = true;
                         this.MenuItemEndGame.IsEnabled = true;
+
+                        this.lblActTimeW.Text = new TimeSpan(0, (int)game.CurrGameSettings.TimePlay, 0).ToString("hh\\:mm\\:ss");
+                        this.lblActTimeB.Text = new TimeSpan(0, (int)game.CurrGameSettings.TimePlay, 0).ToString("hh\\:mm\\:ss");
+                        this.lblActTimeW.FontWeight = FontWeights.Bold;
+                        this.lblActTimeB.FontWeight = FontWeights.Light;
                     }
                 }
                 catch (Exception e)
@@ -340,31 +414,7 @@ namespace ChessEngine
             }
         }
 
-
-        /// <summary>
-        /// Shows the Game Settings Dialog and saves the Value to the Game Class
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void MenuItemSettings_Click(object sender, RoutedEventArgs e)
-        {
-            SettingDialog settingDialog = new SettingDialog();
-            settingDialog.Owner = this;
-            settingDialog.WindowStartupLocation = WindowStartupLocation.CenterOwner;
-
-            // Setting the Properties of the Window
-            settingDialog.SetGameSettings(game.CurrGameSettings);
-
-            // Show the Dialog
-            Nullable<bool> dialogResult = settingDialog.ShowDialog();
-
-            if(dialogResult == true) 
-            {
-                game.CurrGameSettings = settingDialog.Settings;
-            }
-        }
-
-
+        
         /// <summary>
         /// Delegate for the show Promotion Dialog
         /// </summary>
@@ -379,7 +429,7 @@ namespace ChessEngine
             // Show the Dialog
             Nullable<bool> dialogResult = promotionDialog.ShowDialog();
 
-            game.PromotionPiece = promotionDialog.SelectedPiece;
+            game.promotionPiece = promotionDialog.SelectedPiece;
         }
 
 
@@ -390,14 +440,59 @@ namespace ChessEngine
         /// <param name="e"></param>
         private void GameEndDlgEvent(object sender, EventArgs e)
         {
-            GameEndEventArgs gameResult = (GameEndEventArgs)e;
-            GameEndDialog gameEndDialog = new GameEndDialog(gameResult);
-            gameEndDialog.Owner = this;
-            gameEndDialog.WindowStartupLocation = WindowStartupLocation.CenterOwner;
+            this.Dispatcher.BeginInvoke(DispatcherPriority.Normal, (Action)(() => 
+            { 
+                GameEndEventArgs gameResult = (GameEndEventArgs)e;
+                GameEndDialog gameEndDialog = new GameEndDialog(gameResult);
+                gameEndDialog.Owner = this;
+                gameEndDialog.WindowStartupLocation = WindowStartupLocation.CenterOwner;
 
-            gameEndDialog.Show();
+                gameEndDialog.Show();
+            }));
         }
 
+
+        /// <summary>
+        /// Update Time and Moves information
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void GameUpdateEvent(object sender, EventArgs e)
+        {
+            this.Dispatcher.BeginInvoke(DispatcherPriority.Normal, (Action)(() => { UpdateView(e); }));
+        }
+
+
+        /// <summary>
+        /// Update the View, called in the Dispatcher Thread
+        /// </summary>
+        /// <param name="e"></param>
+        private void UpdateView(EventArgs e)
+        { 
+            GameStateEventArgs gameStateEventArgs = (GameStateEventArgs)e;
+
+            if( !string.IsNullOrEmpty(gameStateEventArgs.MoveInfo))
+            {
+                if(gameStateEventArgs.FullMoveNbr != 0)
+                {
+                    this.tblMoves.Text += gameStateEventArgs.FullMoveNbr + ": ";
+                }
+                this.tblMoves.Text += gameStateEventArgs.MoveInfo + " ";
+            }
+
+            if (gameStateEventArgs.CurrentPlayer == Piece.PColor.White)
+            {
+                this.lblActTimeW.Text = gameStateEventArgs.TimeLeft;
+                this.lblActTimeW.FontWeight = FontWeights.Bold;
+                this.lblActTimeB.FontWeight = FontWeights.Light;
+            }
+            else
+            {
+                this.lblActTimeB.Text = gameStateEventArgs.TimeLeft;
+                this.lblActTimeB.FontWeight = FontWeights.Bold;
+                this.lblActTimeW.FontWeight = FontWeights.Light;
+            }
+        }
 
         #endregion
     }

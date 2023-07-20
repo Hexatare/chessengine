@@ -1,10 +1,4 @@
-﻿using ChessEngineClassLibrary.Resources;
-using System;
-using System.IO;
-using System.Reflection;
-using System.Windows.Controls;
-using System.Windows.Input;
-using System.Windows.Media.Imaging;
+﻿using System;
 
 namespace ChessEngineClassLibrary.Pieces
 {

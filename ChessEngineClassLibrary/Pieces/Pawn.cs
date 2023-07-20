@@ -1,5 +1,4 @@
-﻿using ChessEngineClassLibrary.Resources;
-using System;
+﻿using System;
 
 namespace ChessEngineClassLibrary.Pieces
 {
@@ -80,7 +79,7 @@ namespace ChessEngineClassLibrary.Pieces
             {
                 if (destCell.Location[1] - Location[1] == two_step)
                 {
-                    if (Location[0] == destCell.Location[0] && destCell.IsEmpty)
+                    if (Location[0] == destCell.Location[0] && destCell.IsEmpty && CanMoveStraight(destCell))
                     {
                         return true;
                     }
@@ -167,8 +166,8 @@ namespace ChessEngineClassLibrary.Pieces
             { 
                 moveToDo.End.RemovePiece();
                 moveToDo.End.SetPiece(newPiece);
-                moveToDo.PieceKilled = oldPawn;
                 moveToDo.PromotionMove = true;
+                moveToDo.PromotionPiece = promotionPiece;
             }
 
             return true;

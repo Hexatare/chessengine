@@ -4,13 +4,10 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Net.NetworkInformation;
 using System.Numerics;
 using System.Threading;
 using System.Timers;
-using System.Windows.Media.Media3D;
 using System.Windows.Threading;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace ChessEngineClassLibrary
 {
@@ -57,6 +54,11 @@ namespace ChessEngineClassLibrary
         public GameSettings CurrGameSettings { get; set; }
 
         /// <summary>
+        /// Eventhandler for Game Updates
+        /// </summary>
+        public EventHandler? GameUpdateEvent;
+
+        /// <summary>
         /// Eventhandler for the Promotion Dialog Event
         /// </summary>
         public EventHandler? PromotionEvent;
@@ -64,7 +66,7 @@ namespace ChessEngineClassLibrary
         /// <summary>
         /// The selected Promotion Piece
         /// </summary>
-        public Piece.PType PromotionPiece = Piece.PType.Queen;
+        public Piece.PType promotionPiece = Piece.PType.Queen;
 
         /// <summary>
         /// Eventhandler to fire the End of the Game Event
@@ -95,6 +97,11 @@ namespace ChessEngineClassLibrary
         /// Timer for cyclic Events during the Game
         /// </summary>
         private System.Timers.Timer timer;
+
+        /// <summary>
+        /// Object to synchronize, e.q. make the Method ShowEndGameDialog Thread save
+        /// </summary>
+        private Object EndGameDlgSynch = new();
 
         #endregion
 
@@ -246,8 +253,8 @@ namespace ChessEngineClassLibrary
                     // Perform the move
                     this.PerformMove(move);
                     return;
-
                 }
+
                 if (ChessBoard.IsPromotionMove(move))
                 {
                     Piece? newPiece = null;
@@ -261,7 +268,7 @@ namespace ChessEngineClassLibrary
 
                     // create the new Piece and replace whith the old one
                     // Use switch statement to update the array based on the Piece type
-                    switch (this.PromotionPiece)
+                    switch (this.promotionPiece)
                     {
                         case Piece.PType.Knight:
 
@@ -352,6 +359,13 @@ namespace ChessEngineClassLibrary
                 if (piece != null && piece.CanMoveToDest(move.End))
                     this.PerformMove(move);
             }
+
+            // If the Game is over
+            if (ActGameState == GameState.End)
+            {
+                timer.Enabled = false;
+                ShowGameEndDialog();
+            }
         }
 
         #endregion
@@ -375,7 +389,6 @@ namespace ChessEngineClassLibrary
 
             // Other members to reset
             sourceCell = null;
-            ActGameState = GameState.Running;
             
             // Initalize the board
             ChessBoard.RemoveAllPieces();
@@ -491,9 +504,10 @@ namespace ChessEngineClassLibrary
 
             // Update the view
             ChessBoard.OnUpdateView();
+            ActGameState = GameState.Running;
 
             // If Game Mode Computer and Computer ist White, do the first move
-            if (CurrGameSettings.Mode == GameMode.Computer && CurrGameSettings.Color == Piece.PColor.Black)
+            if (CurrGameSettings.Mode == GameMode.Computer && CurrGameSettings.Color == Piece.PColor.White)
                 engine.DoMove();
         }
 
@@ -512,9 +526,9 @@ namespace ChessEngineClassLibrary
         }
 
 
-        /// <summary>
-        /// Method to undo the players last move
-        /// </summary>
+        ///// <summary>
+        ///// Method to undo the players last move
+        ///// </summary>
         //public void UndoLastMove()
         //{
         //    Move lastMove = GetPlayer(CurrentPlayer == Piece.PColor.White ? Piece.PColor.Black : Piece.PColor.White).GetLastMove(true);
@@ -597,6 +611,10 @@ namespace ChessEngineClassLibrary
             // Perform the move
             ChessBoard.DoMove(move);
 
+            // Update the GUI
+            move.CheckMateMove = ChessBoard.IsCheckmate( (CurrentPlayer == Piece.PColor.White) ? Piece.PColor.Black : Piece.PColor.White);
+            this.UpdateGui(move.GetUciMoveNaming());
+
             // Remove all Cell selections
             foreach (Cell cell in ChessBoard.GetCells())
                 cell.CurrCellBorderColor = Cell.CellBorderColor.None;
@@ -609,7 +627,6 @@ namespace ChessEngineClassLibrary
             {
                 PlayerList[(int)Piece.PColor.White].SetEndGame();
                 PlayerList[(int)Piece.PColor.Black].SetEndGame();
-                this.ShowEndGameInfo();
                 return;
             }
 
@@ -627,63 +644,32 @@ namespace ChessEngineClassLibrary
         /// </summary>
         /// <param name="sender">Sender for the Event, e.q. Timer</param>
         /// <param name="e">Event Arguments</param>
+        /// <exception cref="NotImplementedException"></exception>
         private void Timer_Elapsed(object? sender, ElapsedEventArgs e)
         {
-            Debug.WriteLine("Timer Event: " + GetPlayer(CurrentPlayer).TimePlayed() );
+            TimeSpan maxTime = new TimeSpan(0, (int)CurrGameSettings.TimePlay, 0);
 
             // Check for Remaining Time;
-            if( GetPlayer(CurrentPlayer).TimePlayed() > CurrGameSettings.MaxTime)
+            if( GetPlayer(CurrentPlayer).TimePlayed() > maxTime)
             {
-                ActGameState = GameState.End;
-                GameEnd = HasInsufficientMaterial() ? GameEndReason.TimeOutVsInsufficient_Material : GameEndReason.ClockFlagged;
                 timer.Enabled = false;
-
-                this.ShowEndGameInfo();
+                ActGameState = GameState.End;
+                GameEnd = GameEndReason.ClockFlagged;
+                ShowGameEndDialog();
             }
 
             // Check for 50 Move Rule
-            if(GetPlayer(CurrentPlayer).NbrOfHalfMoves >= 50)
+            if(GetPlayer(CurrentPlayer).NbrOfHalfMoves >= 49)
             {
+                timer.Enabled = false;
                 ActGameState = GameState.End;
                 GameEnd = GameEndReason.FiftyMoveRule;
-                timer.Enabled = false;
-
-                this.ShowEndGameInfo();
-            }
-
-            // Check for Insufficient Material
-            if(HasInsufficientMaterial())
-            {
-                ActGameState = GameState.End;
-                GameEnd = GameEndReason.Insufficient_Material;
-                timer.Enabled = false;
-
-                this.ShowEndGameInfo();
+                ShowGameEndDialog();
             }
 
             // Update Gui Values -> to be done
+            this.UpdateGui("");
 
-        }
-        
-
-        /// <summary>
-        /// Generate Event to show the End Game Dialog
-        /// </summary>
-        private void ShowEndGameInfo()
-        {
-            // Stop the Timer
-            timer.Enabled = false;
-
-            // Collect the Game Information
-            GameEndEventArgs gameEndEventArgs = new();
-            gameEndEventArgs.Winner = CurrentPlayer;
-            gameEndEventArgs.Reason = GameEnd;
-            gameEndEventArgs.TimePlayed = string.Format("{0:mm\\:ss}", GetPlayer(CurrentPlayer).TimePlayed());
-            gameEndEventArgs.NbrOfMoves = GetPlayer(CurrentPlayer).GetNbrOfMoves();
-            gameEndEventArgs.CapturedPieces = GetPlayer(CurrentPlayer).GetAllCapturedPieces();
-
-            // Raise Event to show the Dialog
-            EndGameEvent?.Invoke(this, gameEndEventArgs);
         }
 
         #endregion
@@ -726,8 +712,8 @@ namespace ChessEngineClassLibrary
 
             // If Game Mode Computer and Computer ist White, do the first move
             if (CurrGameSettings.Mode == GameMode.Computer
-                && ((CurrGameSettings.Color == Piece.PColor.Black && CurrentPlayer == Piece.PColor.White)
-                    || (CurrGameSettings.Color == Piece.PColor.White && CurrentPlayer == Piece.PColor.Black)))
+                && ((CurrGameSettings.Color == Piece.PColor.Black && CurrentPlayer == Piece.PColor.Black)
+                    || (CurrGameSettings.Color == Piece.PColor.White && CurrentPlayer == Piece.PColor.White)))
             {
                 // Set Game Mode
                 ActGameState = GameState.Calculating;
@@ -742,6 +728,65 @@ namespace ChessEngineClassLibrary
                 });
             }
         }
+
+
+        /// <summary>
+        /// Updates the Gui with current Game State Information
+        /// </summary>
+        /// <param name="move"></param>
+        private void UpdateGui(string move)
+        {
+            TimeSpan maxTime = new TimeSpan(0, (int)CurrGameSettings.TimePlay, 0);
+
+            // Update Gui Values -> to be done
+            GameStateEventArgs gameStateEventArgs = new GameStateEventArgs();
+            gameStateEventArgs.MoveInfo = move;
+
+            // If Move, switch the Player
+            if (!string.IsNullOrEmpty(move))
+            {
+                if (CurrentPlayer == Piece.PColor.White)
+                {
+                    gameStateEventArgs.FullMoveNbr = this.FullMoveNumber;
+                    gameStateEventArgs.CurrentPlayer = Piece.PColor.Black;
+                    gameStateEventArgs.TimeLeft = (maxTime - GetPlayer(Piece.PColor.Black).TimePlayed()).ToString("hh\\:mm\\:ss");
+                }
+                else
+                {
+                    gameStateEventArgs.CurrentPlayer = Piece.PColor.White;
+                    gameStateEventArgs.TimeLeft = (maxTime - GetPlayer(Piece.PColor.White).TimePlayed()).ToString("hh\\:mm\\:ss");
+                }
+            }
+            else
+            { 
+                gameStateEventArgs.CurrentPlayer = CurrentPlayer;
+                gameStateEventArgs.TimeLeft = (maxTime - GetPlayer(CurrentPlayer).TimePlayed()).ToString("hh\\:mm\\:ss");
+
+            }
+            // Fire the Event
+            GameUpdateEvent?.Invoke(this, gameStateEventArgs);
+}
+
+
+        /// <summary>
+        /// Invokes the Game End Dialog, collects the relevant Game Information
+        /// </summary>
+        private void ShowGameEndDialog()
+        {
+            lock(EndGameDlgSynch)
+            {
+                // Collect the Game Information
+                GameEndEventArgs gameEndEventArgs = new();
+                gameEndEventArgs.Winner = CurrentPlayer;
+                gameEndEventArgs.Reason = GameEnd;
+                gameEndEventArgs.TimePlayed = string.Format("{0:mm\\:ss}", GetPlayer(CurrentPlayer).TimePlayed());
+                gameEndEventArgs.NbrOfMoves = GetPlayer(CurrentPlayer).GetNbrOfMoves();
+                gameEndEventArgs.CapturedPieces = GetPlayer(CurrentPlayer).GetAllCapturedPieces();
+
+                EndGameEvent?.Invoke(this, gameEndEventArgs);
+            }
+        }
+
 
         #endregion
 
@@ -793,22 +838,6 @@ namespace ChessEngineClassLibrary
             }
         }
 
-        /// <summary>
-        /// Test, if in Case of Time - Out, the other Player has Insufficient Material to Win the Game 
-        /// </summary>
-        /// <returns></returns>
-        /// 
-        private bool HasInsufficientMaterial()
-        {
-
-            //If both sides have any one of the following, and there are no pawns on the board:
-
-            //A lone king
-            //A king and bishop
-            //A king and knight
-
-            return false;
-        }
 
         #endregion
     }
