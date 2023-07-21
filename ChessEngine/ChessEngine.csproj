@@ -8,6 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove=".gitignore" />
     <None Remove="Resources\ChessLogo.jpg" />
     <None Remove="Resources\Pictures\blackBishop.png" />
     <None Remove="Resources\Pictures\blackKing.png" />
