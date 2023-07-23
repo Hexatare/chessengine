@@ -4,7 +4,9 @@ using ChessEngineClassLibrary.Pieces;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Security.Policy;
 using System.Threading;
+using static System.Formats.Asn1.AsnWriter;
 
 namespace ChessEngineClassLibrary
 {
@@ -15,6 +17,17 @@ namespace ChessEngineClassLibrary
     {
 
         #region Properties and Members
+
+        /// <summary>
+        /// Algorithm Calc Depth, according to Grade of Difficulty
+        /// </summary>
+        private enum CalcDepth
+        {
+            Easy = 2,
+            Medium = 3,
+            Hard = 4
+        };
+
 
         /// <summary>
         /// Referenz to the Game Class
@@ -93,15 +106,15 @@ namespace ChessEngineClassLibrary
                 switch( ActGameSettings.Difficulty )
                 {
                     case Difficulty.Easy:
-                        this.calDepth = 2;
+                        this.calDepth = (int)CalcDepth.Easy;
                         break;
 
                         case Difficulty.Intermediate: 
-                        this.calDepth = 3; 
+                        this.calDepth = (int)CalcDepth.Medium; 
                         break;
 
                     case Difficulty.Hard: 
-                        this.calDepth = 4; 
+                        this.calDepth = (int)CalcDepth.Hard; 
                         break; 
                 }
             }
@@ -119,8 +132,18 @@ namespace ChessEngineClassLibrary
             Stopwatch stopwatch = new Stopwatch();
             stopwatch.Start();
 
-            // get the best move
-            Move bestMove = BestMoveUsingMinMax(calDepth, (color == Piece.PColor.Black));
+            // if difficutly is ease, use minmax, otherwise alpha beta
+            Move? bestMove;
+            if( this.calDepth > (int)CalcDepth.Easy)
+            {
+                // get the best move from Alpha Beta
+                bestMove = BestMoveUsingAlphaBeta(calDepth, (color == Piece.PColor.Black), -10000, 10000);
+            }
+            else
+            {
+                // get the best move from MinMax
+                bestMove = BestMoveUsingMinMax(calDepth, (color == Piece.PColor.Black));
+            }
 
             stopwatch.Stop();
             
@@ -138,7 +161,7 @@ namespace ChessEngineClassLibrary
 
 
         /// <summary>
-        /// Method to calculate the best move
+        /// Method to calculate the best move using MinMax Algorithm
         /// </summary>
         /// <param name="depth">Depth level according to the difficulty</param>
         /// <param name="maxValuePlayer">White = true, Black = false</param>
@@ -168,6 +191,40 @@ namespace ChessEngineClassLibrary
             return bestMove;
         }
 
+
+        /// <summary>
+        /// Method to calculate the best move using Alpha-Beta Algorithm
+        /// </summary>
+        /// <param name="depth">Depth level according to the difficulty</param>
+        /// <param name="maxValuePlayer">White = true, Black = false</param>
+        /// <param name="alpha">Value for Alpha</param>
+        /// <param name="beta">Value for Beta</param>
+        /// <returns></returns>
+        private Move BestMoveUsingAlphaBeta(int depth, bool maxValuePlayer, int alpha, int beta)
+        {
+            int bestMoveScore = -1000000;
+            Move? bestMove = null;
+
+            foreach (Move possibleMoves in ChessBoard.GetAllPossibleMoves(color))
+            {
+                // Do the move on the board
+                ChessBoard.DoMove(possibleMoves);
+
+                int moveScore = AlphaBeta(depth, depth, maxValuePlayer, alpha, beta, nbrOfNodesPerDepth);
+
+                int score = Math.Max(bestMoveScore, moveScore);
+                ChessBoard.UndoMove(possibleMoves);
+
+
+                if (score > bestMoveScore)
+                {
+                    bestMoveScore = score;
+                    bestMove = possibleMoves;
+                }
+            }
+            return bestMove;
+        }
+
         #endregion
 
         #region Algorithm
@@ -192,9 +249,7 @@ namespace ChessEngineClassLibrary
                     }
                 }
             }
-
             return evaluationValue;
-
         }
 
 
@@ -240,8 +295,6 @@ namespace ChessEngineClassLibrary
         /// <returns></returns>
         private int MinMax(int maxDepth, int currentDepth, bool maxValuePlayer, Dictionary<int, int> nodesPerDepth)
         {
-            //Debug.WriteLine("Current Depth: " + currentDepth + " maxValuePlayer: " + maxValuePlayer + " Dict-NrOfKeys: " + nodesPerDepth.Keys.Count);
-
             // Just for Debug - Reason, store the number of nodes for each depth
             if (nbrOfNodesPerDepth.ContainsKey(maxDepth - currentDepth))
                 nbrOfNodesPerDepth[maxDepth - currentDepth] += 1;
@@ -284,6 +337,88 @@ namespace ChessEngineClassLibrary
 
                     bestScore = Math.Min(bestScore, nodeScore);
                     ChessBoard.UndoMove(possibleMoves);
+                }
+                return bestScore;
+            }
+        }
+
+
+        /// <summary>
+        /// The Alpha, Beta Pruning Algorithm to calculate the possible best move
+        /// </summary>
+        /// <param name="maxDepth"></param>
+        /// <param name="currentDepth"></param>
+        /// <param name="maxValuePlayer"></param>
+        /// <param name="alpha"></param>
+        /// <param name="beta"></param>
+        /// <param name="nodesPerDepth"></param>
+        /// <returns></returns>
+        private int AlphaBeta(int maxDepth, int currentDepth, bool maxValuePlayer, int alpha, int beta, Dictionary<int, int> nodesPerDepth)
+        {
+            // Just for Debug - Reason, store the number of nodes for each depth
+            if (nbrOfNodesPerDepth.ContainsKey(maxDepth - currentDepth))
+                nbrOfNodesPerDepth[maxDepth - currentDepth] += 1;
+            else
+                nbrOfNodesPerDepth[maxDepth - currentDepth] = 1;
+
+            if (currentDepth == 0)
+            {
+                return EvaluateBoard();
+            }
+
+            // Evaluate for max Player
+            if (maxValuePlayer)
+            {
+                int bestScore = -100000;
+
+                foreach (Move possibleMoves in ChessBoard.GetAllPossibleMoves(color))
+                {
+                    // Do the move on the board
+                    ChessBoard.DoMove(possibleMoves);
+
+                    // calculating node score, if the current node will be the leaf node, then score will be
+                    // calculated by static evaluation;
+                    // score will be calculated by finding max value between node score and current best score.
+                    int nodeScore = AlphaBeta(maxDepth, currentDepth - 1, false, alpha, beta, nodesPerDepth);
+
+                    bestScore = Math.Max(bestScore, nodeScore);
+
+                    // undoing the last move, so as to explore new moves while backtracking
+                    ChessBoard.UndoMove(possibleMoves);
+
+                    // calculating alpha for current MAX node
+                    alpha = Math.Max(alpha, bestScore);
+
+                    // Cut off beta
+                    if (beta <= alpha)
+                        return bestScore;
+
+                }
+                return bestScore;
+            }
+            else
+            {
+                int bestScore = 100000;
+
+                foreach (Move possibleMoves in ChessBoard.GetAllPossibleMoves(color))
+                {
+                    // Do the move on the board
+                    ChessBoard.DoMove(possibleMoves);
+
+                    // calculating node score, if the current node will be the leaf node, then score will be
+                    // calculated by static evaluation;
+                    // score will be calculated by finding min value between node score and current best score.
+                    int nodeScore = AlphaBeta(maxDepth, currentDepth - 1, true, alpha, beta, nodesPerDepth);
+
+                    bestScore = Math.Min(bestScore, nodeScore);
+                    ChessBoard.UndoMove(possibleMoves);
+
+                    // calculating alpha for current MIN node
+                    beta = Math.Min(beta, bestScore);
+
+                    // beta cut off
+                    if (beta <= alpha)
+                        return bestScore;
                 }
                 return bestScore;
             }

@@ -2,6 +2,7 @@
 using ChessEngineClassLibrary.Pieces;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Reflection;
 using System.Windows.Controls;
 using System.Windows.Threading;
@@ -127,6 +128,8 @@ namespace ChessEngineClassLibrary
         public int GetArrayIndex(int xIndex, int yIndex)
         {
             // Index on the chess board, from 0 (a8) to 63 (h7)
+            int index = xIndex + ((7 - (yIndex % 8)) * 8);
+            Debug.Assert(index >= 0 || index <= 63);
             return xIndex + ((7 - (yIndex % 8) ) * 8);
         }
 

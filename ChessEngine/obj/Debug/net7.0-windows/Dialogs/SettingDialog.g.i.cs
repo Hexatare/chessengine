@@ -109,7 +109,7 @@ namespace ChessEngine {
                 return;
             }
             _contentLoaded = true;
-            System.Uri resourceLocater = new System.Uri("/ChessEngine;V1.0.0.0;component/dialogs/settingdialog.xaml", System.UriKind.Relative);
+            System.Uri resourceLocater = new System.Uri("/ChessEngine;component/dialogs/settingdialog.xaml", System.UriKind.Relative);
             
             #line 1 "..\..\..\..\Dialogs\SettingDialog.xaml"
             System.Windows.Application.LoadComponent(this, resourceLocater);

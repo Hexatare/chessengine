@@ -64,7 +64,7 @@ namespace ChessEngine.Dialogs
             this.LblReason.Content = TxtGameEndReason[gameEndReason];
 
             // Ermittlung des Gewinners
-            if(    (gameResults?.Reason == GameEndReason.Stalemate)
+            if(    (gameResults?.Reason == GameEndReason.Resignation)
                 || (gameResults?.Reason == GameEndReason.Checkmate) )
             {
                 this.LblWinner.Content = TxtGameResult[(int)gameResults.Winner];
@@ -75,7 +75,7 @@ namespace ChessEngine.Dialogs
                 this.LblWinner.Content = TxtGameResult[ ((int)gameResults.Winner + 1) % 2];
             }
 
-            if (    (gameResults?.Reason == GameEndReason.Resignation)
+            if (    (gameResults?.Reason == GameEndReason.Stalemate)
                  || (gameResults?.Reason == GameEndReason.Aggrement)
                  || (gameResults?.Reason == GameEndReason.FiftyMoveRule)
                  || (gameResults?.Reason == GameEndReason.Insufficient_Material)
