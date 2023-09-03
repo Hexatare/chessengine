@@ -10,3 +10,14 @@ C:\Users\rolfm\source\repos\chessengine\ChessEngineClassLibrary\obj\Debug\net7.0
 C:\Users\rolfm\source\repos\chessengine\ChessEngineClassLibrary\obj\Debug\net7.0-windows\refint\ChessEngineClassLibrary.dll
 C:\Users\rolfm\source\repos\chessengine\ChessEngineClassLibrary\obj\Debug\net7.0-windows\ChessEngineClassLibrary.pdb
 C:\Users\rolfm\source\repos\chessengine\ChessEngineClassLibrary\obj\Debug\net7.0-windows\ref\ChessEngineClassLibrary.dll
+C:\Users\Noël\Source\Repos\Hexatare\chessengine\ChessEngineClassLibrary\bin\Debug\net7.0-windows\ChessEngineClassLibrary.deps.json
+C:\Users\Noël\Source\Repos\Hexatare\chessengine\ChessEngineClassLibrary\bin\Debug\net7.0-windows\ChessEngineClassLibrary.dll
+C:\Users\Noël\Source\Repos\Hexatare\chessengine\ChessEngineClassLibrary\bin\Debug\net7.0-windows\ChessEngineClassLibrary.pdb
+C:\Users\Noël\Source\Repos\Hexatare\chessengine\ChessEngineClassLibrary\obj\Debug\net7.0-windows\ChessEngineClassLibrary.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Noël\Source\Repos\Hexatare\chessengine\ChessEngineClassLibrary\obj\Debug\net7.0-windows\ChessEngineClassLibrary.AssemblyInfoInputs.cache
+C:\Users\Noël\Source\Repos\Hexatare\chessengine\ChessEngineClassLibrary\obj\Debug\net7.0-windows\ChessEngineClassLibrary.AssemblyInfo.cs
+C:\Users\Noël\Source\Repos\Hexatare\chessengine\ChessEngineClassLibrary\obj\Debug\net7.0-windows\ChessEngineClassLibrary.csproj.CoreCompileInputs.cache
+C:\Users\Noël\Source\Repos\Hexatare\chessengine\ChessEngineClassLibrary\obj\Debug\net7.0-windows\ChessEngineClassLibrary.dll
+C:\Users\Noël\Source\Repos\Hexatare\chessengine\ChessEngineClassLibrary\obj\Debug\net7.0-windows\refint\ChessEngineClassLibrary.dll
+C:\Users\Noël\Source\Repos\Hexatare\chessengine\ChessEngineClassLibrary\obj\Debug\net7.0-windows\ChessEngineClassLibrary.pdb
+C:\Users\Noël\Source\Repos\Hexatare\chessengine\ChessEngineClassLibrary\obj\Debug\net7.0-windows\ref\ChessEngineClassLibrary.dll

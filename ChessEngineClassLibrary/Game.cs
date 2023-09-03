@@ -5,7 +5,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Numerics;
-using System.Threading;
 using System.Timers;
 using System.Windows.Threading;
 
@@ -99,7 +98,7 @@ namespace ChessEngineClassLibrary
         private System.Timers.Timer timer;
 
         /// <summary>
-        /// Object to synchronize, e.q. make the Method ShowEndGameDialog Thread save
+        /// Object to synchronize, e.g. make the Method ShowEndGameDialog Thread save
         /// </summary>
         private Object EndGameDlgSynch = new();
 
@@ -110,7 +109,7 @@ namespace ChessEngineClassLibrary
         /// <summary>
         /// Constructor
         /// </summary>
-        /// <param name="chessBoard">Referenz to the Board</param>
+        /// <param name="chessBoard">Reference to the Board</param>
         public Game(Board chessBoard)
         {
             // Referenz to the Chess Board
@@ -718,14 +717,8 @@ namespace ChessEngineClassLibrary
                 // Set Game Mode
                 ActGameState = GameState.Calculating;
 
-                // Do the calc in seprate Thread
-                Dispatcher.CurrentDispatcher.BeginInvoke(DispatcherPriority.Normal, () =>
-                {
-                    //engine.DoMove();
-                    Thread calcThread = new(() => engine.DoMove());
-                    calcThread.Name = "Engine Thread";
-                    calcThread.Start();
-                });
+                // Call the DoMove Method
+                engine.DoMove();
             }
         }
 

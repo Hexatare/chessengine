@@ -222,7 +222,7 @@ namespace ChessEngineClassLibrary
                 // Move the Piece from Source to Destination
                 Piece? piece = moveToDo.Start.GetPiece();
 
-                if(piece != null) 
+                if (piece != null) 
                 {
                     moveToDo.Start.RemovePiece();
                     moveToDo.End.SetPiece(piece);
