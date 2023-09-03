@@ -1,7 +1,12 @@
 ﻿using ChessEngineClassLibrary.Models;
 using ChessEngineClassLibrary.Pieces;
 using System;
+using System.Diagnostics;
 using System.Threading;
+using System.Threading.Tasks;
+using System.Windows.Documents;
+using static System.Formats.Asn1.AsnWriter;
+
 
 namespace ChessEngineClassLibrary
 {
@@ -58,7 +63,7 @@ namespace ChessEngineClassLibrary
         /// This is just a safety measure, theoretically the engine should
         /// never hit this because of the time limit
         /// </summary>
-        private int maxDepth = 5;
+        private int maxDepth = 3;
 
         #endregion
 
@@ -117,14 +122,16 @@ namespace ChessEngineClassLibrary
             // Start the search
             searchThread.Start();
 
+            /**
             // Wait for 2 seconds ("Thread" in this case is the engine / main thread, not the search thread)
             Thread.Sleep(2000);
 
             // Set the terminateThread bool to true to stop the search
             terminateThread = true;
+            **/
 
             // Join the search thread
-            // This is necessary that board is returned to the state before the search
+            // This is necessary that the board is returned to the state before the search
             searchThread.Join();
             
             // Make sure the best move is not null
@@ -149,6 +156,13 @@ namespace ChessEngineClassLibrary
             // Create a loop that iterates through the depth
             for (int i = 1; i <= maxDepth; i++)
             {
+                // Check if the thread should be terminated
+                if (terminateThread)
+                {
+                    // If it should, break out of the loop
+                    break;
+                }
+
                 // Get the best move using the AlphaBeta algorithm
                 BestMove = BestMoveUsingAlphaBeta(i, (color == Piece.PColor.Black), -10_000, 10_000);
             }
@@ -171,20 +185,29 @@ namespace ChessEngineClassLibrary
             // Set the best move to null
             Move? bestMove = null;
 
+            // Get the length of the possible moves
+            int possibleMovesLength = ChessBoard.GetAllPossibleMoves(color).Count;
+
+            // Create a array to store the tasks
+            // Task<int>[] tasks = new Task<int>[possibleMovesLength];
+
             // Loop through all the possible moves
-            foreach (Move possibleMove in ChessBoard.GetAllPossibleMoves(color))
+            for (int i = 0; i < ChessBoard.GetAllPossibleMoves(color).Count; i++)
             {
-                // Do the move on the board
-                ChessBoard.DoMove(possibleMove);
+                // Create a copy of the Chessboard
+                Board boardCopy = CopyBoard(ChessBoard);
 
-                // Get the score of the move
-                int moveScore = AlphaBeta(depth, depth, maxValuePlayer, alpha, beta);
+                // Get the possible move using the index
+                // ---- Important! ----
+                // This possibleMove variable IS NOT the same as the possible move
+                // passed into the AlphaBetaThread method
+                // Even though the right ChessBoard is called, passing in the wrong
+                // move will result in the other Board being changed
+                Move possibleMove = ChessBoard.GetAllPossibleMoves(color)[i];
 
-                // See if the score is better than the best move score
-                int score = Math.Max(bestMoveScore, moveScore);
-
-                // Undo the move
-                ChessBoard.UndoMove(possibleMove);
+                // Call the Alpha Beta thread method in a new thread and get the score
+                // tasks[i] = Task.Run(() => AlphaBetaThread(boardCopy, possibleMove, bestMoveScore, depth, maxValuePlayer, alpha, beta));
+                int score = AlphaBetaThread(boardCopy, boardCopy.GetAllPossibleMoves(color)[i], bestMoveScore, depth, maxValuePlayer, alpha, beta);
 
                 // Check if the score is better than the best move score
                 if (score > bestMoveScore)
@@ -195,14 +218,31 @@ namespace ChessEngineClassLibrary
                     // Set the best move to the possible move
                     bestMove = possibleMove;
                 }
+            }
 
-                // Check if the thread should be terminated
-                if (terminateThread)
+            /**
+            // Wait for all the tasks to finish
+            // Task.WaitAll(tasks);
+
+            // Define the score variable
+            int score;
+
+            // Loop through all the tasks
+            for (int j = 0; j < possibleMovesLength; j++)
+            {
+                score = tasks[j].Result;
+
+                // Check if the score is better than the best move score
+                if (score > bestMoveScore)
                 {
-                    // If it should, break out of the loop
-                    break;
+                    // If it is, set the best move score to the score
+                    bestMoveScore = score;
+
+                    // Set the best move to the possible move
+                    bestMove = ChessBoard.GetAllPossibleMoves(color)[j];
                 }
             }
+            **/
 
             // Return the best move
             return bestMove;
@@ -213,14 +253,14 @@ namespace ChessEngineClassLibrary
         #region Algorithm
 
         /// <summary>
-        /// Evaluates the overall value on the board, white Pieces count positively, black pieces count negatively
+        /// Evaluates the overall value on the board, white pieces count positively, black pieces count negatively
         /// </summary>
         /// <returns>Integer representing how good the board is</returns>
-        private int EvaluateBoard()
+        private int EvaluateBoard(Board chessBoard)
         {
             int evaluationValue = 0;
 
-            foreach (Cell? cell in ChessBoard.GetCells())
+            foreach (Cell? cell in chessBoard.GetCells())
             {
                 if (!cell.IsEmpty)
                 { 
@@ -267,6 +307,31 @@ namespace ChessEngineClassLibrary
             }
         }
 
+
+        /// <summary>
+        /// This method will be run in a seperate thread
+        /// It implements the Alpha-Beta-Pruning algorithm
+        /// </summary>
+        private int AlphaBetaThread(Board chessBoard, Move possibleMove, int bestMoveScore, int depth, bool maxValuePlayer, int alpha, int beta)
+        {
+            // Do the move on the board
+            
+            chessBoard.DoMove(possibleMove);
+
+            // Get the score of the move
+            int moveScore = AlphaBeta(chessBoard, depth, depth, maxValuePlayer, alpha, beta);
+
+            // See if the score is better than the best move score
+            int score = Math.Max(bestMoveScore, moveScore);
+
+            // Undo the move
+            chessBoard.UndoMove(possibleMove);
+
+            // Return the score
+            return score;
+        }
+
+
         /// <summary>
         /// The Alpha-Beta-Pruning algorithm to calculate the possible best move
         /// </summary>
@@ -276,14 +341,13 @@ namespace ChessEngineClassLibrary
         /// <param name="alpha"></param>
         /// <param name="beta"></param>
         /// <returns></returns>
-        private
-            int AlphaBeta(int maxDepth, int currentDepth, bool maxValuePlayer, int alpha, int beta)
+        private int AlphaBeta(Board chessBoard, int maxDepth, int currentDepth, bool maxValuePlayer, int alpha, int beta)
         {
             // Check if the current depth is 0
             if (currentDepth == 0)
             {
                 // If it is, return the evaluation of the board
-                return EvaluateBoard();
+                return EvaluateBoard(chessBoard);
             }
 
             // Evaluate for max Player
@@ -293,20 +357,20 @@ namespace ChessEngineClassLibrary
                 int bestScore = -100000;
 
                 // Loop through all the possible moves
-                foreach (Move possibleMove in ChessBoard.GetAllPossibleMoves(color))
+                foreach (Move possibleMove in chessBoard.GetAllPossibleMoves(color))
                 {
                     // Do the move on the board
-                    ChessBoard.DoMove(possibleMove);
+                    chessBoard.DoMove(possibleMove);
 
                     // calculating node score, if the current node will be the leaf node, then score will be
                     // calculated by static evaluation;
                     // score will be calculated by finding max value between node score and current best score.
-                    int nodeScore = AlphaBeta(maxDepth, currentDepth - 1, false, alpha, beta);
+                    int nodeScore = AlphaBeta(chessBoard, maxDepth, currentDepth - 1, false, alpha, beta);
 
                     bestScore = Math.Max(bestScore, nodeScore);
 
                     // undoing the last move, so as to explore new moves while backtracking
-                    ChessBoard.UndoMove(possibleMove);
+                    chessBoard.UndoMove(possibleMove);
 
                     // calculating alpha for current MAX node
                     alpha = Math.Max(alpha, bestScore);
@@ -326,18 +390,18 @@ namespace ChessEngineClassLibrary
                 int bestScore = 100000;
 
                 // Loop through all the possible moves
-                foreach (Move possibleMove in ChessBoard.GetAllPossibleMoves(color))
+                foreach (Move possibleMove in chessBoard.GetAllPossibleMoves(color))
                 {
                     // Do the move on the board
-                    ChessBoard.DoMove(possibleMove);
+                    chessBoard.DoMove(possibleMove);
 
                     // calculating node score, if the current node will be the leaf node, then score will be
                     // calculated by static evaluation;
                     // score will be calculated by finding min value between node score and current best score.
-                    int nodeScore = AlphaBeta(maxDepth, currentDepth - 1, true, alpha, beta);
+                    int nodeScore = AlphaBeta(chessBoard, maxDepth, currentDepth - 1, true, alpha, beta);
 
                     bestScore = Math.Min(bestScore, nodeScore);
-                    ChessBoard.UndoMove(possibleMove);
+                    chessBoard.UndoMove(possibleMove);
 
                     // calculating alpha for current MIN node
                     beta = Math.Min(beta, bestScore);
@@ -348,6 +412,63 @@ namespace ChessEngineClassLibrary
                 }
                 return bestScore;
             }
+        }
+        
+
+        /// <summary>
+        /// Method to get a copy of the current Board
+        /// </summary>
+        public Board CopyBoard(Board originalBoard)
+        {
+            // Create a new board with the default constructor (assuming it creates an 8x8 board)
+            Board copiedBoard = new Board();
+
+            // Iterate through all cells on the current board
+            for (int row = 0; row < 8; row++)
+            {
+                for (int col = 0; col < 8; col++)
+                {
+                    // Get the cell from the current board
+                    Cell currentCell = originalBoard.GetCell(row, col);
+
+                    // Check if the current cell is empty
+                    if (!currentCell.IsEmpty)
+                    {
+                        // Get the piece on the current cell
+                        Piece currentPiece = currentCell.GetPiece()!;
+
+                        // Create a new piece of the same type and color for the copied board
+                        Piece? copiedPiece = null;
+                        switch (currentPiece.PieceType)
+                        {
+                            case Piece.PType.Pawn:
+                                copiedPiece = new Pawn(copiedBoard, currentPiece.PieceColor);
+                                break;
+                            case Piece.PType.Knight:
+                                copiedPiece = new Knight(copiedBoard, currentPiece.PieceColor);
+                                break;
+                            case Piece.PType.Bishop:
+                                copiedPiece = new Bishop(copiedBoard, currentPiece.PieceColor);
+                                break;
+                            case Piece.PType.Rook:
+                                copiedPiece = new Rook(copiedBoard, currentPiece.PieceColor);
+                                break;
+                            case Piece.PType.Queen:
+                                copiedPiece = new Queen(copiedBoard, currentPiece.PieceColor);
+                                break;
+                            case Piece.PType.King:
+                                copiedPiece = new King(copiedBoard, currentPiece.PieceColor);
+                                break;
+                        }
+
+                        // Set the copied piece on the corresponding cell of the copied board
+                        copiedBoard.GetCell(row, col).SetPiece(copiedPiece);
+                    }
+                }
+            }
+
+            // Return the copied board
+            return copiedBoard;
         }
 
         #endregion

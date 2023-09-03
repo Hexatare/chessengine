@@ -2,10 +2,11 @@
 using ChessEngineClassLibrary.Pieces;
 using System;
 using System.Collections.Generic;
+using System.Data.SqlTypes;
 using System.Diagnostics;
 using System.Reflection;
 using System.Windows.Controls;
-using System.Windows.Threading;
+
 
 namespace ChessEngineClassLibrary
 {
@@ -49,8 +50,6 @@ namespace ChessEngineClassLibrary
         /// <summary>
         /// Constructor. The constructor is what the backend uses as the chessboard. It calls the methods CreateCells and CreatePieces
         /// </summary>
-        /// <param name="chessGrid">Reference to the Main Application</param>
-        //public Board(Grid chessGrid)
         public Board()
         {
             // Create a new array with the length of 64
@@ -97,7 +96,7 @@ namespace ChessEngineClassLibrary
         /// </summary>
         /// <param name="piece">Piece to be placed</param>
         /// <param name="arrayIndex">Array Index of the Board [0..63]</param>
-        public void PlacePlieceOnBoard(Piece piece, int arrayIndex)
+        public void PlacePieceOnBoard(Piece piece, int arrayIndex)
         {
             // Set a piece on the board
             CellsOnBoard[arrayIndex].SetPiece(piece);
@@ -197,7 +196,7 @@ namespace ChessEngineClassLibrary
         /// Moves a piece on the board, according to the Move parameter.
         /// If the move captures a piece, the piece will be removed from the board
         /// </summary>
-        /// <param name="move">The move to be done</param>
+        /// <param name="moveToDo">The move to be done</param>
         public void DoMove(Move moveToDo)
         {
             if(moveToDo != null)
@@ -211,7 +210,7 @@ namespace ChessEngineClassLibrary
                 {
                     Piece? killedPiece = moveToDo.End.GetPiece();
 
-                    if(killedPiece != null)
+                    if (killedPiece != null)
                     {
                         // Remove the capuret Piec, from Cell and List
                         moveToDo.End.RemovePiece();
@@ -239,7 +238,7 @@ namespace ChessEngineClassLibrary
         /// Undo a move on the Board, according to the Move parameter, e.q. a invers Move.
         /// If the move to be undone involves a capture of a piece, the captured piece will be restored on the board.
         /// </summary>
-        /// <param name="move">The move to be undone</param>
+        /// <param name="moveToUndo">The move to be undone</param>
         public void UndoMove(Move moveToUndo)
         {
             if (moveToUndo != null)
@@ -643,6 +642,7 @@ namespace ChessEngineClassLibrary
 
             return false;
         }
+
     }
 
     #endregion
