@@ -97,7 +97,7 @@ namespace ChessEngineClassLibrary
             ActGameSettings = actGameSettings;
 
             // Make sure the ActGameSettings are not null
-            if(ActGameSettings != null)
+            if (ActGameSettings != null)
             {
                 // Set the color of the engine
                 color = ActGameSettings.Color == Piece.PColor.White ? Piece.PColor.White : Piece.PColor.Black;
@@ -189,46 +189,31 @@ namespace ChessEngineClassLibrary
             int possibleMovesLength = ChessBoard.GetAllPossibleMoves(color).Count;
 
             // Create a array to store the tasks
-            // Task<int>[] tasks = new Task<int>[possibleMovesLength];
+            Task<int>[] tasks = new Task<int>[possibleMovesLength -1];
 
             // Loop through all the possible moves
-            for (int i = 0; i < ChessBoard.GetAllPossibleMoves(color).Count; i++)
+            for (int i = 0; i < ChessBoard.GetAllPossibleMoves(color).Count -1; i++)
             {
                 // Create a copy of the Chessboard
                 Board boardCopy = CopyBoard(ChessBoard);
 
-                // Get the possible move using the index
-                // ---- Important! ----
-                // This possibleMove variable IS NOT the same as the possible move
-                // passed into the AlphaBetaThread method
-                // Even though the right ChessBoard is called, passing in the wrong
-                // move will result in the other Board being changed
-                Move possibleMove = ChessBoard.GetAllPossibleMoves(color)[i];
-
                 // Call the Alpha Beta thread method in a new thread and get the score
-                // tasks[i] = Task.Run(() => AlphaBetaThread(boardCopy, possibleMove, bestMoveScore, depth, maxValuePlayer, alpha, beta));
-                int score = AlphaBetaThread(boardCopy, boardCopy.GetAllPossibleMoves(color)[i], bestMoveScore, depth, maxValuePlayer, alpha, beta);
-
-                // Check if the score is better than the best move score
-                if (score > bestMoveScore)
-                {
-                    // If it is, set the best move score to the score
-                    bestMoveScore = score;
-
-                    // Set the best move to the possible move
-                    bestMove = possibleMove;
-                }
+                // ----- Important! -----
+                // Altough ChessBoard and boardCopy have the same position, their
+                // moves are not interchangeable.
+                // Even if the right ChessBoard is called, passing in the wrong
+                // move will result in the other Board being changed
+                tasks[i] = Task.Run(() => AlphaBetaThread(boardCopy, boardCopy.GetAllPossibleMoves(color)[i], bestMoveScore, depth, maxValuePlayer, alpha, beta));
             }
 
-            /**
             // Wait for all the tasks to finish
-            // Task.WaitAll(tasks);
+            Task.WaitAll(tasks);
 
             // Define the score variable
             int score;
 
             // Loop through all the tasks
-            for (int j = 0; j < possibleMovesLength; j++)
+            for (int j = 0; j < possibleMovesLength - 1; j++)
             {
                 score = tasks[j].Result;
 
@@ -242,7 +227,6 @@ namespace ChessEngineClassLibrary
                     bestMove = ChessBoard.GetAllPossibleMoves(color)[j];
                 }
             }
-            **/
 
             // Return the best move
             return bestMove;
