@@ -122,13 +122,13 @@ namespace ChessEngineClassLibrary
             // Start the search
             searchThread.Start();
 
-            /**
+            /*
             // Wait for 2 seconds ("Thread" in this case is the engine / main thread, not the search thread)
             Thread.Sleep(2000);
 
             // Set the terminateThread bool to true to stop the search
             terminateThread = true;
-            **/
+            */
 
             // Join the search thread
             // This is necessary that the board is returned to the state before the search
@@ -137,8 +137,8 @@ namespace ChessEngineClassLibrary
             // Make sure the best move is not null
             if (BestMove == null)
             {
-                // If it is null, throw an exception
-                throw new ArgumentNullException();
+                // If the best move is null, play a random move
+                Game.EngineMove(ChessBoard.GetAllPossibleMoves(color)[new Random().Next(ChessBoard.GetAllPossibleMoves(color).Count)]);
             }
 
             // Do the best move
@@ -189,10 +189,10 @@ namespace ChessEngineClassLibrary
             int possibleMovesLength = ChessBoard.GetAllPossibleMoves(color).Count;
 
             // Create a array to store the tasks
-            Task<int>[] tasks = new Task<int>[possibleMovesLength -1];
+            Task<int>[] tasks = new Task<int>[possibleMovesLength -1]; // Why -1? Using possibleMovesLength without -1 results in an IndexOutOfRangeException
 
             // Loop through all the possible moves
-            for (int i = 0; i < ChessBoard.GetAllPossibleMoves(color).Count -1; i++)
+            for (int i = 0; i < ChessBoard.GetAllPossibleMoves(color).Count -1; i++) // Here as well
             {
                 // Create a copy of the Chessboard
                 Board boardCopy = CopyBoard(ChessBoard);
@@ -203,7 +203,7 @@ namespace ChessEngineClassLibrary
                 // moves are not interchangeable.
                 // Even if the right ChessBoard is called, passing in the wrong
                 // move will result in the other Board being changed
-                tasks[i] = Task.Run(() => AlphaBetaThread(boardCopy, boardCopy.GetAllPossibleMoves(color)[i], bestMoveScore, depth, maxValuePlayer, alpha, beta));
+                tasks[i] = Task.Run(() => AlphaBetaThread(boardCopy, boardCopy.GetAllPossibleMoves(color)[i], bestMoveScore, depth, maxValuePlayer, alpha, beta)); // Can even throw an SystemOutOfRangeException when using possibleMovesLength -1
             }
 
             // Wait for all the tasks to finish
@@ -242,17 +242,43 @@ namespace ChessEngineClassLibrary
         /// <returns>Integer representing how good the board is</returns>
         private int EvaluateBoard(Board chessBoard)
         {
+            // Set the evaluation value to 0
             int evaluationValue = 0;
 
+            // Loop through all the cells
             foreach (Cell? cell in chessBoard.GetCells())
             {
+                // Make sure the cell is not empty
                 if (!cell.IsEmpty)
                 { 
-                    if( cell.GetPiece() !=  null )
+                    // Check if the cell has a piece
+                    if (cell.GetPiece() !=  null)
                     {
+                        // Get the value of the piece
                         int pieceValue = GetPieceValue(cell.GetPiece()!.PieceType);
 
+                        // Add the value to the evaluation value
                         evaluationValue += cell.GetPiece()!.PieceColor == Piece.PColor.White ? pieceValue : -pieceValue;
+
+                        // Additionally, favor the center of the board
+                        if ((cell.Index >= 19 && cell.Index <= 22) ||
+                            (cell.Index >= 43 && cell.Index <= 46) ||
+                            cell.Index == 27 || 
+                            cell.Index == 30 ||
+                            cell.Index == 35 ||
+                            cell.Index == 38) {
+                            // If this is the case, it means that the piece is in the "outer ring" of the center
+                            // Add 1 to the evaluation value
+                            evaluationValue += cell.GetPiece()!.PieceColor == Piece.PColor.White ? 1 : -1;
+                        }
+
+                        else if ((cell.Index >= 28 && cell.Index <= 29) || (cell.Index >= 36 && cell.Index <= 37))
+                        {
+                            // If this is the case, it means that the piece is in the "inner ring" of the center
+                            // Add 2 to the evaluation value
+                            evaluationValue += cell.GetPiece()!.PieceColor == Piece.PColor.White ? 2 : -2;
+                        }
+
                     }
                 }
             }
