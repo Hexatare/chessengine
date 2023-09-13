@@ -229,6 +229,7 @@ namespace ChessEngineClassLibrary
   
                 // Add the move to the List
                 allMoves.Add(moveToDo);
+
             }
 
         }
@@ -452,7 +453,7 @@ namespace ChessEngineClassLibrary
                 // no InCheck, take Move back and return true
                 movePossible = !this.IsKingInCheck(piece.PieceColor);
 
-                // Perform the move on the Board
+                // Undo the move on the Board
                 UndoMove(move);
             }
             return movePossible;
@@ -515,8 +516,9 @@ namespace ChessEngineClassLibrary
 
                 foreach (Cell? targetCell in GetTargetMoveCells(move))
                 {
-                    move.End = targetCell;
-                    moves.Add(move);
+                     // Create a new Move and add it to the List of Moves
+                    Move pMove = new Move(cell, targetCell, pColor);
+                    moves.Add(pMove);
                 }
             }
             return moves;
@@ -552,6 +554,11 @@ namespace ChessEngineClassLibrary
             // a vaild King 
             if (kingInQuestion != null)
             {
+                // Check for position of the King
+                if (kingInQuestion.Location[0] != 4 && (    (kingInQuestion.Location[1] != 0 && playerColor == Piece.PColor.Black)
+                                                         || (kingInQuestion.Location[1] != 7 && playerColor == Piece.PColor.White) ))
+                    return false;
+
                 // Check the four conditions of Castling - King has not moved and is not in Check
                 if (kingInQuestion.HasMoved || IsKingInCheck(playerColor))
                     return false;
@@ -626,7 +633,7 @@ namespace ChessEngineClassLibrary
             lastMove = GetLastMove();
 
             // If no moves so far
-            if (lastMove == null)
+            if (lastMove == null || lastMove.PieceMoved.PieceType != Piece.PType.Pawn)
                 return false;
 
             yTargetPos = lastMove.End.Location[1] + 1;

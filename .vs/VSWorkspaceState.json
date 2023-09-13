@@ -2,8 +2,9 @@
   "ExpandedNodes": [
     "",
     "\\ChessEngine",
-    "\\ChessEngineClassLibrary"
+    "\\ChessEngineClassLibrary",
+    "\\ChessEngineClassLibrary\\Pieces"
   ],
-  "SelectedNode": "\\ChessEngine\\ChessEngine.sln",
+  "SelectedNode": "\\ChessEngineClassLibrary\\Pieces\\King.cs",
   "PreviewInSolutionExplorer": false
 }

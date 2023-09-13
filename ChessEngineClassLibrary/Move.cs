@@ -30,7 +30,7 @@ namespace ChessEngineClassLibrary
         /// <summary>
         /// The Piece that was moved
         /// </summary>
-        private readonly Piece? PieceMoved;
+        public readonly Piece? PieceMoved;
 
         /// <summary>
         /// The Color of the the Piece, that was moved, e.q. the Player that performed this move

@@ -4,9 +4,8 @@ using System;
 using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Windows.Documents;
-using static System.Formats.Asn1.AsnWriter;
-
+using System.Collections.Generic;
+using System.Data;
 
 namespace ChessEngineClassLibrary
 {
@@ -182,32 +181,74 @@ namespace ChessEngineClassLibrary
             // Set the best move score to a very low value
             int bestMoveScore = -1_000_000;
 
+            // List with all current Tasks
+            List<Task<int>> tasks = new List<Task<int>>();
+
             // Set the best move to null
             Move? bestMove = null;
 
             // Get the length of the possible moves
+
+            /** Debug */
+            List<Move> possibleMovesDebug = ChessBoard.GetAllPossibleMoves(color);
+            //Debug.WriteLine("Nbr of possible Moves on origin board: " + possibleMovesDebug.Count);
+            //Debug.WriteLine("IterativeDeepeningSearch: " + depth);
+            //int counter = 0;
+            //foreach (Move move in possibleMovesDebug)
+            //{
+            //    Debug.WriteLine(counter++ + " Move:" + move.GetUciMoveNaming());
+            //}
             int possibleMovesLength = ChessBoard.GetAllPossibleMoves(color).Count;
 
             // Create a array to store the tasks
-            Task<int>[] tasks = new Task<int>[possibleMovesLength -1]; // Why -1? Using possibleMovesLength without -1 results in an IndexOutOfRangeException
+            //Task<int>[] tasks = new Task<int>[possibleMovesLength -1]; // Why -1? Using possibleMovesLength without -1 results in an IndexOutOfRangeException
 
             // Loop through all the possible moves
-            for (int i = 0; i < ChessBoard.GetAllPossibleMoves(color).Count -1; i++) // Here as well
+            for (int i = 0; i < possibleMovesLength /* ChessBoard.GetAllPossibleMoves(color).Count -1*/ ; i++) // Here as well
             {
-                // Create a copy of the Chessboard
                 Board boardCopy = CopyBoard(ChessBoard);
 
+                // Get all possible moves for the current color
+                List<Move> possibleMoves = boardCopy.GetAllPossibleMoves(color);
+
+                Debug.Assert(possibleMoves.Count == possibleMovesLength, "The amount of possible moves is not the same as the length of the list");
+                
+                if(possibleMoves.Count != possibleMovesLength)
+                {
+                    ChessBoard.GetAllPossibleMoves(color);
+
+                    Debug.WriteLine("Nbr of possible Moves on copied board: " + possibleMoves.Count);
+                    int counter2 = 0;
+                    foreach (Move move in possibleMoves)
+                    {
+                        Debug.WriteLine(counter2++ + " Move:" + move.GetUciMoveNaming());
+                    }
+
+                    Debug.WriteLine("Nbr of possible Moves on origin board: " + possibleMovesDebug.Count);
+                    Debug.WriteLine("IterativeDeepeningSearch: " + depth);
+                    int counter = 0;
+                    foreach (Move move in possibleMovesDebug)
+                    {
+                        Debug.WriteLine(counter++ + " Move:" + move.GetUciMoveNaming());
+                    }
+                }
+
+                // Create a copy of the Chessboard
                 // Call the Alpha Beta thread method in a new thread and get the score
                 // ----- Important! -----
                 // Altough ChessBoard and boardCopy have the same position, their
                 // moves are not interchangeable.
                 // Even if the right ChessBoard is called, passing in the wrong
                 // move will result in the other Board being changed
-                tasks[i] = Task.Run(() => AlphaBetaThread(boardCopy, boardCopy.GetAllPossibleMoves(color)[i], bestMoveScore, depth, maxValuePlayer, alpha, beta)); // Can even throw an SystemOutOfRangeException when using possibleMovesLength -1
+                Debug.Assert(possibleMoves[i] != null, "The possible move is null");
+                Debug.Assert(i < possibleMovesLength, "The index is out of range");
+
+                Move taskMove = possibleMoves[i];
+                tasks.Add( Task.Run(() => AlphaBetaThread(boardCopy, taskMove, bestMoveScore, depth, maxValuePlayer, alpha, beta))); // Can even throw an SystemOutOfRangeException when using possibleMovesLength -1
             }
 
             // Wait for all the tasks to finish
-            Task.WaitAll(tasks);
+            Task.WaitAll(tasks.ToArray());
 
             // Define the score variable
             int score;
@@ -433,48 +474,42 @@ namespace ChessEngineClassLibrary
             // Create a new board with the default constructor (assuming it creates an 8x8 board)
             Board copiedBoard = new Board();
 
-            // Iterate through all cells on the current board
-            for (int row = 0; row < 8; row++)
+            // Get all Pieces on the board
+            List<Piece> pieces = originalBoard.GetPieces(Piece.PColor.Black);
+            pieces.AddRange(originalBoard.GetPieces(Piece.PColor.White));
+
+            // Loop through all the pieces
+            foreach(Piece piece in pieces)
             {
-                for (int col = 0; col < 8; col++)
+                // Create a new piece of the same type and color for the copied board
+                Piece? copiedPiece = null;
+                switch (piece.PieceType)
                 {
-                    // Get the cell from the current board
-                    Cell currentCell = originalBoard.GetCell(row, col);
-
-                    // Check if the current cell is empty
-                    if (!currentCell.IsEmpty)
-                    {
-                        // Get the piece on the current cell
-                        Piece currentPiece = currentCell.GetPiece()!;
-
-                        // Create a new piece of the same type and color for the copied board
-                        Piece? copiedPiece = null;
-                        switch (currentPiece.PieceType)
-                        {
-                            case Piece.PType.Pawn:
-                                copiedPiece = new Pawn(copiedBoard, currentPiece.PieceColor);
-                                break;
-                            case Piece.PType.Knight:
-                                copiedPiece = new Knight(copiedBoard, currentPiece.PieceColor);
-                                break;
-                            case Piece.PType.Bishop:
-                                copiedPiece = new Bishop(copiedBoard, currentPiece.PieceColor);
-                                break;
-                            case Piece.PType.Rook:
-                                copiedPiece = new Rook(copiedBoard, currentPiece.PieceColor);
-                                break;
-                            case Piece.PType.Queen:
-                                copiedPiece = new Queen(copiedBoard, currentPiece.PieceColor);
-                                break;
-                            case Piece.PType.King:
-                                copiedPiece = new King(copiedBoard, currentPiece.PieceColor);
-                                break;
-                        }
-
-                        // Set the copied piece on the corresponding cell of the copied board
-                        copiedBoard.GetCell(row, col).SetPiece(copiedPiece);
-                    }
+                    case Piece.PType.Pawn:
+                        copiedPiece = new Pawn(copiedBoard, piece.PieceColor);
+                        break;
+                    case Piece.PType.Knight:
+                        copiedPiece = new Knight(copiedBoard, piece.PieceColor);
+                        break;
+                    case Piece.PType.Bishop:
+                        copiedPiece = new Bishop(copiedBoard, piece.PieceColor);
+                        break;
+                    case Piece.PType.Rook:
+                        copiedPiece = new Rook(copiedBoard, piece.PieceColor);
+                        break;
+                    case Piece.PType.Queen:
+                        copiedPiece = new Queen(copiedBoard, piece.PieceColor);
+                        break;
+                    case Piece.PType.King:
+                        copiedPiece = new King(copiedBoard, piece.PieceColor);
+                        ((King)copiedPiece).CanQueensideCastle = ((King)piece).CanQueensideCastle;
+                        ((King)copiedPiece).CanKingsideCastle = ((King)piece).CanKingsideCastle;
+                        break;
                 }
+
+                // Set the copied piece on the corresponding cell of the copied board
+                copiedPiece.HasMoved = piece.HasMoved;
+                copiedBoard.GetCell(piece.Location).SetPiece(copiedPiece);
             }
 
             // Return the copied board
