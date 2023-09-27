@@ -37,14 +37,14 @@
         <DockPanel DockPanel.Dock="Bottom" Margin="20">
             <Border Background="#22211f" Margin="20,50,0,50" Width="275px" DockPanel.Dock="Right">
                 <!-- Stackpanel for the Moves -->
-                <StackPanel DockPanel.Dock="Right" Margin="10">
-                    <!---->
-                    <TextBlock Text="Spielinformationen" FontSize="20" FontWeight="Bold" Foreground="#faffff" />
+                <Grid DockPanel.Dock="Right" Margin="10">
+                    <TextBlock Text="Kein Spiel gestartet" FontSize="20" FontWeight="Bold" Foreground="#faffff" />
 
                     <!--- Züge-->
-                    <TextBlock x:Name="lblMoves" Text="Züge:" Foreground="#faffff" />
-                    <TextBlock x:Name="tblMoves" TextWrapping="Wrap" Height="350" />
-                </StackPanel>
+                    <TextBlock x:Name="lblMoves" Text="" Foreground="#faffff" />
+                    <TextBlock x:Name="tblMoves" TextWrapping="Wrap" Height="350" Foreground="#faffff" />
+                    <Button x:Name="NewGameButton" Background="DarkKhaki" FontWeight="Bold" FontSize="16"  Click="MenuItemNewGame_Click" Height="40" VerticalAlignment="Bottom">Neues Spiel</Button>
+                </Grid>
             </Border>
 
             <!-- The DockPanel that wraps the Board including the two players and their time respectively -->

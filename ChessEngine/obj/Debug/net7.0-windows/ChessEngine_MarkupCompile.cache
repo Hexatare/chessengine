@@ -5,15 +5,15 @@ winexe
 C#
 .cs
 C:\Users\Noël\Source\Repos\Hexatare\chessengine\ChessEngine\obj\Debug\net7.0-windows\
-ChessEngine
+ChessEngine_4umgiqbx_wpftmp
 none
 false
-TRACE;DEBUG;NET;NET7_0;NETCOREAPP
+TRACE;RELEASE;NET;NET7_0;NETCOREAPP
 C:\Users\Noël\Source\Repos\Hexatare\chessengine\ChessEngine\App.xaml
 443134233
 
-9920275498
-199-1899676730
+141670612210
+398-441096003
 Dialogs\GameEndDialog.xaml;Dialogs\PromotionDialog.xaml;Dialogs\SettingDialog.xaml;MainWindow.xaml;
 
 False
