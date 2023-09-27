@@ -183,7 +183,7 @@ namespace ChessEngine
         /// <param name="e"></param>
         private void ChessMainWindow_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
-            MessageBoxResult Result = MessageBox.Show("Wollen Sie das Programm beenden", "Chess", MessageBoxButton.YesNo, MessageBoxImage.Question);
+            MessageBoxResult Result = MessageBox.Show("Wollen Sie das Programm beenden?", "Chess", MessageBoxButton.YesNo, MessageBoxImage.Question);
     
             if (Result == MessageBoxResult.No)
                 e.Cancel = true;
@@ -214,8 +214,8 @@ namespace ChessEngine
             this.MenuItemEndGame.IsEnabled = true;
             this.MenuItemSettings.IsEnabled = false;
 
-            this.lblActTimeW.Text = new TimeSpan(0, (int)game.CurrGameSettings.TimePlay, 0).ToString("hh\\:mm\\:ss");
-            this.lblActTimeB.Text = new TimeSpan(0, (int)game.CurrGameSettings.TimePlay, 0).ToString("hh\\:mm\\:ss");
+            this.lblActTimeW.Text = new TimeSpan(0, (int)game.CurrGameSettings.TimePlay, 0).ToString("mm\\:ss");
+            this.lblActTimeB.Text = new TimeSpan(0, (int)game.CurrGameSettings.TimePlay, 0).ToString("mm\\:ss");
             this.lblActTimeW.FontWeight = FontWeights.Bold;
             this.lblActTimeB.FontWeight = FontWeights.Light;
         }
@@ -230,7 +230,7 @@ namespace ChessEngine
         {
             if(game.ActGameState != GameState.None)
             {
-                MessageBoxResult Result = MessageBox.Show("Wollen Sie das laufende Spiel beenden", "Chess", 
+                MessageBoxResult Result = MessageBox.Show("Wollen Sie das laufende Spiel beenden?", "Chess", 
                     MessageBoxButton.YesNo, MessageBoxImage.Warning);
                 
                 if (Result == MessageBoxResult.Yes)
@@ -298,8 +298,8 @@ namespace ChessEngine
                         this.lblModeB.Text = TxtGameMode[0];
                     }
 
-                    this.lblActTimeW.Text = new TimeSpan(0, (int)settings.TimePlay, 0).ToString("hh\\:mm\\:ss");
-                    this.lblActTimeB.Text = new TimeSpan(0, (int)settings.TimePlay, 0).ToString("hh\\:mm\\:ss");
+                    this.lblActTimeW.Text = new TimeSpan(0, (int)settings.TimePlay, 0).ToString("mm\\:ss");
+                    this.lblActTimeB.Text = new TimeSpan(0, (int)settings.TimePlay, 0).ToString("mm\\:ss");
                     this.lblActTimeW.FontWeight = FontWeights.Light;
                     this.lblActTimeB.FontWeight = FontWeights.Light;
                 }
@@ -368,8 +368,8 @@ namespace ChessEngine
                         //this.MenuItemUndo.IsEnabled = true;
                         this.MenuItemEndGame.IsEnabled = true;
 
-                        this.lblActTimeW.Text = new TimeSpan(0, (int)game.CurrGameSettings.TimePlay, 0).ToString("hh\\:mm\\:ss");
-                        this.lblActTimeB.Text = new TimeSpan(0, (int)game.CurrGameSettings.TimePlay, 0).ToString("hh\\:mm\\:ss");
+                        this.lblActTimeW.Text = new TimeSpan(0, (int)game.CurrGameSettings.TimePlay, 0).ToString("mm\\:ss");
+                        this.lblActTimeB.Text = new TimeSpan(0, (int)game.CurrGameSettings.TimePlay, 0).ToString("mm\\:ss");
                         this.lblActTimeW.FontWeight = FontWeights.Bold;
                         this.lblActTimeB.FontWeight = FontWeights.Light;
                     }

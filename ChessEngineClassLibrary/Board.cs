@@ -58,8 +58,6 @@ namespace ChessEngineClassLibrary
             // Create alls Cells
             for (int i = 0; i < NbrOfCells; i++)
             {
-                int cellIndex = i + 1;
-
                 // Check if the square is light or dark
                 bool isLightSquare = (i / 8 + i % 8) % 2 == 0;
 
