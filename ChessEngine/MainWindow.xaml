@@ -192,6 +192,7 @@
                 <TextBlock Grid.Row="6" Text="2" VerticalAlignment="Center" HorizontalAlignment="Center" FontWeight="Bold"/>
                 <TextBlock Grid.Row="7" Text="1" VerticalAlignment="Center" HorizontalAlignment="Center" FontWeight="Bold"/>
             </Grid>
+            
             <Grid  Name="ChessGrid">
 
                 <!-- Create 8 Rows -->

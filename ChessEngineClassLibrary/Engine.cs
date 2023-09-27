@@ -133,19 +133,12 @@ namespace ChessEngineClassLibrary
             // This is necessary that the board is returned to the state before the search
             searchThread.Join();
             
-            // Make sure the best move is not null
-            if (BestMove == null)
-            {
-                // If the best move is null, play a random move
-                Game.EngineMove(ChessBoard.GetAllPossibleMoves(color)[new Random().Next(ChessBoard.GetAllPossibleMoves(color).Count)]);
-            }
-
             // Do the best move
             Game.EngineMove(BestMove);
         }
 
 
-        /// <summary>
+        /// <summary>a
         /// Method that uses the iterative deepening search to calculate the best move
         /// All the code really does is call the AlphaBeta method with different depths
         /// and store the best move in the BestMove property
@@ -155,6 +148,8 @@ namespace ChessEngineClassLibrary
             // Create a loop that iterates through the depth
             for (int i = 1; i <= maxDepth; i++)
             {
+                Debug.WriteLine(i);
+
                 // Check if the thread should be terminated
                 if (terminateThread)
                 {
@@ -164,6 +159,7 @@ namespace ChessEngineClassLibrary
 
                 // Get the best move using the AlphaBeta algorithm
                 BestMove = BestMoveUsingAlphaBeta(i, (color == Piece.PColor.Black), -10_000, 10_000);
+                Debug.Assert(BestMove != null);
             }
         }
 
@@ -310,14 +306,14 @@ namespace ChessEngineClassLibrary
                             cell.Index == 38) {
                             // If this is the case, it means that the piece is in the "outer ring" of the center
                             // Add 1 to the evaluation value
-                            evaluationValue += cell.GetPiece()!.PieceColor == Piece.PColor.White ? 1 : -1;
+                            evaluationValue += cell.GetPiece()!.PieceColor == Piece.PColor.White ? 0 : 0;
                         }
 
                         else if ((cell.Index >= 28 && cell.Index <= 29) || (cell.Index >= 36 && cell.Index <= 37))
                         {
                             // If this is the case, it means that the piece is in the "inner ring" of the center
                             // Add 2 to the evaluation value
-                            evaluationValue += cell.GetPiece()!.PieceColor == Piece.PColor.White ? 2 : -2;
+                            evaluationValue += cell.GetPiece()!.PieceColor == Piece.PColor.White ? 1 : -1;
                         }
 
                     }
