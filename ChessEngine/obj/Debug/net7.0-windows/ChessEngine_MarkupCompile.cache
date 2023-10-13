@@ -4,16 +4,16 @@
 winexe
 C#
 .cs
-C:\Users\Noël\Source\Repos\Hexatare\chessengine\ChessEngine\obj\Debug\net7.0-windows\
-ChessEngine_4umgiqbx_wpftmp
+C:\Users\rolfm\source\repos\chessengine\ChessEngine\obj\Debug\net7.0-windows\
+ChessEngine
 none
 false
-TRACE;RELEASE;NET;NET7_0;NETCOREAPP
-C:\Users\Noël\Source\Repos\Hexatare\chessengine\ChessEngine\App.xaml
+TRACE;DEBUG;NET;NET7_0;NETCOREAPP
+C:\Users\rolfm\source\repos\chessengine\ChessEngine\App.xaml
 443134233
 
-141670612210
-398-441096003
+9920275498
+1991324483023
 Dialogs\GameEndDialog.xaml;Dialogs\PromotionDialog.xaml;Dialogs\SettingDialog.xaml;MainWindow.xaml;
 
 False

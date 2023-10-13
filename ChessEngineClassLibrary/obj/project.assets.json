@@ -8,19 +8,19 @@
     "net7.0-windows7.0": []
   },
   "packageFolders": {
-    "C:\\Users\\Noël\\.nuget\\packages\\": {}
+    "C:\\Users\\rolfm\\.nuget\\packages\\": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\Noël\\Source\\Repos\\Hexatare\\chessengine\\ChessEngineClassLibrary\\ChessEngineClassLibrary.csproj",
+      "projectUniqueName": "C:\\Users\\rolfm\\source\\repos\\chessengine\\ChessEngineClassLibrary\\ChessEngineClassLibrary.csproj",
       "projectName": "ChessEngineClassLibrary",
-      "projectPath": "C:\\Users\\Noël\\Source\\Repos\\Hexatare\\chessengine\\ChessEngineClassLibrary\\ChessEngineClassLibrary.csproj",
-      "packagesPath": "C:\\Users\\Noël\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\Noël\\Source\\Repos\\Hexatare\\chessengine\\ChessEngineClassLibrary\\obj\\",
+      "projectPath": "C:\\Users\\rolfm\\source\\repos\\chessengine\\ChessEngineClassLibrary\\ChessEngineClassLibrary.csproj",
+      "packagesPath": "C:\\Users\\rolfm\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\rolfm\\source\\repos\\chessengine\\ChessEngineClassLibrary\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
-        "C:\\Users\\Noël\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Users\\rolfm\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
@@ -64,7 +64,7 @@
             "privateAssets": "none"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.400\\RuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.402\\RuntimeIdentifierGraph.json"
       }
     }
   }

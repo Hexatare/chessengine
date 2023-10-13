@@ -6,6 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.Data;
+using System.Linq;
 
 namespace ChessEngineClassLibrary
 {
@@ -24,12 +25,7 @@ namespace ChessEngineClassLibrary
         /// <summary>
         /// Reference to the Chessboard
         /// </summary>
-        private Board ChessBoard;
-
-        /// <summary>
-        /// The players
-        /// </summary>
-        private Player[] Players;
+        private readonly Board ChessBoard;
 
         /// <summary>
         /// Game Settings
@@ -44,7 +40,7 @@ namespace ChessEngineClassLibrary
         /// <summary>
         /// Maximum amount of time the engine has to calculate the best move
         /// </summary>
-        private int MaxTime;
+        private readonly int MaxTime;
 
         /// <summary>
         /// Property that holds the best move
@@ -79,7 +75,6 @@ namespace ChessEngineClassLibrary
             Game = game;
             ChessBoard = chessBoard;
             MaxTime = maxTime;
-            Players = players;
         }
 
         #endregion
@@ -148,7 +143,7 @@ namespace ChessEngineClassLibrary
             // Create a loop that iterates through the depth
             for (int i = 1; i <= maxDepth; i++)
             {
-                Debug.WriteLine(i);
+                //Debug.WriteLine(i);
 
                 // Check if the thread should be terminated
                 if (terminateThread)
@@ -158,8 +153,9 @@ namespace ChessEngineClassLibrary
                 }
 
                 // Get the best move using the AlphaBeta algorithm
-                BestMove = BestMoveUsingAlphaBeta(i, (color == Piece.PColor.Black), -10_000, 10_000);
+                BestMove = BestMoveUsingAlphaBeta(i, (color == Piece.PColor.White), -10_000, 10_000);
                 Debug.Assert(BestMove != null);
+                Debug.WriteLine("Selected BestMove " + BestMove.GetUciMoveNaming());
             }
         }
 
@@ -183,61 +179,21 @@ namespace ChessEngineClassLibrary
             // Set the best move to null
             Move? bestMove = null;
 
-            // Get the length of the possible moves
-
-            /** Debug */
-            List<Move> possibleMovesDebug = ChessBoard.GetAllPossibleMoves(color);
-            //Debug.WriteLine("Nbr of possible Moves on origin board: " + possibleMovesDebug.Count);
-            //Debug.WriteLine("IterativeDeepeningSearch: " + depth);
-            //int counter = 0;
-            //foreach (Move move in possibleMovesDebug)
-            //{
-            //    Debug.WriteLine(counter++ + " Move:" + move.GetUciMoveNaming());
-            //}
-            int possibleMovesLength = ChessBoard.GetAllPossibleMoves(color).Count;
-
-            // Create a array to store the tasks
-            //Task<int>[] tasks = new Task<int>[possibleMovesLength -1]; // Why -1? Using possibleMovesLength without -1 results in an IndexOutOfRangeException
+            // Get all legal Moves
+            List<Move> legalMoves = ChessBoard.GetAllPossibleMoves(color);
+            int legalMovesLength = legalMoves.Count;
 
             // Loop through all the possible moves
-            for (int i = 0; i < possibleMovesLength /* ChessBoard.GetAllPossibleMoves(color).Count -1*/ ; i++) // Here as well
+            for (int i = 0; i < legalMovesLength; i++) 
             {
                 Board boardCopy = CopyBoard(ChessBoard);
 
                 // Get all possible moves for the current color
                 List<Move> possibleMoves = boardCopy.GetAllPossibleMoves(color);
 
-                Debug.Assert(possibleMoves.Count == possibleMovesLength, "The amount of possible moves is not the same as the length of the list");
-                
-                if(possibleMoves.Count != possibleMovesLength)
-                {
-                    ChessBoard.GetAllPossibleMoves(color);
-
-                    Debug.WriteLine("Nbr of possible Moves on copied board: " + possibleMoves.Count);
-                    int counter2 = 0;
-                    foreach (Move move in possibleMoves)
-                    {
-                        Debug.WriteLine(counter2++ + " Move:" + move.GetUciMoveNaming());
-                    }
-
-                    Debug.WriteLine("Nbr of possible Moves on origin board: " + possibleMovesDebug.Count);
-                    Debug.WriteLine("IterativeDeepeningSearch: " + depth);
-                    int counter = 0;
-                    foreach (Move move in possibleMovesDebug)
-                    {
-                        Debug.WriteLine(counter++ + " Move:" + move.GetUciMoveNaming());
-                    }
-                }
-
-                // Create a copy of the Chessboard
-                // Call the Alpha Beta thread method in a new thread and get the score
-                // ----- Important! -----
-                // Altough ChessBoard and boardCopy have the same position, their
-                // moves are not interchangeable.
-                // Even if the right ChessBoard is called, passing in the wrong
-                // move will result in the other Board being changed
+                Debug.Assert(possibleMoves.Count == legalMovesLength, "The amount of possible moves is not the same as the length of the list");
                 Debug.Assert(possibleMoves[i] != null, "The possible move is null");
-                Debug.Assert(i < possibleMovesLength, "The index is out of range");
+                Debug.Assert(i < legalMovesLength, "The index is out of range");
 
                 Move taskMove = possibleMoves[i];
                 tasks.Add( Task.Run(() => AlphaBetaThread(boardCopy, taskMove, bestMoveScore, depth, maxValuePlayer, alpha, beta))); // Can even throw an SystemOutOfRangeException when using possibleMovesLength -1
@@ -246,24 +202,65 @@ namespace ChessEngineClassLibrary
             // Wait for all the tasks to finish
             Task.WaitAll(tasks.ToArray());
 
-            // Define the score variable
-            int score;
+            // Get all Results in a List of integer
+            List<int> results = new List<int>();
+            foreach (Task<int> task in tasks)
+                results.Add(task.Result);
 
-            // Loop through all the tasks
-            for (int j = 0; j < possibleMovesLength - 1; j++)
+
+            // For Debug Reasons, write all Values 
+            //for (int x = 0; x < legalMovesLength - 1; x++)
+            //    Debug.Write(tasks[x].Result + " " + legalMoves[x].GetUciMoveNaming() + " ; ");
+            //Debug.WriteLine(" ");
+
+
+            // Get highest value for White
+            if (color == Piece.PColor.White)
             {
-                score = tasks[j].Result;
-
-                // Check if the score is better than the best move score
-                if (score > bestMoveScore)
-                {
-                    // If it is, set the best move score to the score
-                    bestMoveScore = score;
-
-                    // Set the best move to the possible move
-                    bestMove = ChessBoard.GetAllPossibleMoves(color)[j];
-                }
+                bestMove = legalMoves[results.IndexOf(results.Max())];
             }
+            else
+            {
+                bestMove = legalMoves[results.IndexOf(results.Min())];
+            }
+            //Debug.WriteLine("BestMoveUsingAlphaBeta " + bestMove.GetUciMoveNaming() + " Depth: " + depth);
+
+
+            //// Loop through all the tasks
+            //for (int j = 0; j < legalMovesLength - 1; j++)
+            //{
+            //    score = tasks[j].Result;
+            //    int testScore = 0;
+
+            //    //// Check according to the actual color (white = Max, Black = Min) the best score
+            //    if (color == Piece.PColor.White)
+            //    {
+            //        // Check if the score is better than the best move score
+            //        if (score > bestMoveScore)
+            //        {
+            //            // If it is, set the best move score to the score
+            //            bestMoveScore = score;
+
+            //            // Set the best move to the possible move
+            //            bestMove = legalMoves[j];
+            //            //bestMove = ChessBoard.GetAllPossibleMoves(color)[j];
+
+            //            Debug.WriteLine("BestMoveUsingAlphaBeta " + bestMove.GetUciMoveNaming() + " Score: " + bestMoveScore + " Depth: " + depth);
+            //        }
+            //    }
+
+            //    if(color == Piece.PColor.Black)
+            //    {
+            //        List<int> ints = new List<int>();
+            //        foreach (Task<int> task in tasks)
+            //            ints.Add(task.Result);
+
+            //        int index = ints.IndexOf(ints.Min());
+            //        bestMove = legalMoves[index];
+
+            //        Debug.WriteLine("BestMoveUsingAlphaBeta " + bestMove.GetUciMoveNaming() + " Score: " + index + " Depth: " + depth);
+            //    }
+            //}
 
             // Return the best move
             return bestMove;
@@ -306,14 +303,14 @@ namespace ChessEngineClassLibrary
                             cell.Index == 38) {
                             // If this is the case, it means that the piece is in the "outer ring" of the center
                             // Add 1 to the evaluation value
-                            evaluationValue += cell.GetPiece()!.PieceColor == Piece.PColor.White ? 0 : 0;
+                            evaluationValue += cell.GetPiece()!.PieceColor == Piece.PColor.White ? 1 : -1;
                         }
 
                         else if ((cell.Index >= 28 && cell.Index <= 29) || (cell.Index >= 36 && cell.Index <= 37))
                         {
                             // If this is the case, it means that the piece is in the "inner ring" of the center
                             // Add 2 to the evaluation value
-                            evaluationValue += cell.GetPiece()!.PieceColor == Piece.PColor.White ? 1 : -1;
+                            evaluationValue += cell.GetPiece()!.PieceColor == Piece.PColor.White ? 2 : -2;
                         }
 
                     }
@@ -343,15 +340,8 @@ namespace ChessEngineClassLibrary
 
                 default:pieceValue = 0;  break;
             }
-
-            if (Game.CurrentPlayer == Piece.PColor.White)
-            {
-                return pieceValue;
-            }
-            else
-            {
-                return -pieceValue;
-            }
+            
+            return pieceValue;
         }
 
 
@@ -362,11 +352,10 @@ namespace ChessEngineClassLibrary
         private int AlphaBetaThread(Board chessBoard, Move possibleMove, int bestMoveScore, int depth, bool maxValuePlayer, int alpha, int beta)
         {
             // Do the move on the board
-            
             chessBoard.DoMove(possibleMove);
 
             // Get the score of the move
-            int moveScore = AlphaBeta(chessBoard, depth, depth, maxValuePlayer, alpha, beta);
+            int moveScore = AlphaBeta(chessBoard, depth, depth, !maxValuePlayer, alpha, beta);
 
             // See if the score is better than the best move score
             int score = Math.Max(bestMoveScore, moveScore);
@@ -382,12 +371,12 @@ namespace ChessEngineClassLibrary
         /// <summary>
         /// The Alpha-Beta-Pruning algorithm to calculate the possible best move
         /// </summary>
-        /// <param name="maxDepth"></param>
-        /// <param name="currentDepth"></param>
-        /// <param name="maxValuePlayer"></param>
-        /// <param name="alpha"></param>
-        /// <param name="beta"></param>
-        /// <returns></returns>
+        /// <param name="maxDepth">Max Depth level according to the difficulty</param>
+        /// <param name="currentDepth">The current Level, the algorith is working on</param>
+        /// <param name="maxValuePlayer">White = true, Black = false</param>
+        /// <param name="alpha">Value for Alpha</param>
+        /// <param name="beta">Value for Beta</param>
+        /// <returns>Best Score</returns>
         private int AlphaBeta(Board chessBoard, int maxDepth, int currentDepth, bool maxValuePlayer, int alpha, int beta)
         {
             // Check if the current depth is 0
@@ -404,7 +393,7 @@ namespace ChessEngineClassLibrary
                 int bestScore = -100000;
 
                 // Loop through all the possible moves
-                foreach (Move possibleMove in chessBoard.GetAllPossibleMoves(color))
+                foreach (Move possibleMove in chessBoard.GetAllPossibleMoves(Piece.PColor.White))
                 {
                     // Do the move on the board
                     chessBoard.DoMove(possibleMove);
@@ -437,7 +426,7 @@ namespace ChessEngineClassLibrary
                 int bestScore = 100000;
 
                 // Loop through all the possible moves
-                foreach (Move possibleMove in chessBoard.GetAllPossibleMoves(color))
+                foreach (Move possibleMove in chessBoard.GetAllPossibleMoves(Piece.PColor.Black))
                 {
                     // Do the move on the board
                     chessBoard.DoMove(possibleMove);

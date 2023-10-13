@@ -1,4 +1,3 @@
-C:\Users\rolfm\source\repos\chessengine\ChessEngineClassLibrary\obj\Debug\net7.0-windows\ChessEngineClassLibrary.csproj.AssemblyReference.cache
 C:\Users\rolfm\source\repos\chessengine\ChessEngineClassLibrary\obj\Debug\net7.0-windows\ChessEngineClassLibrary.GeneratedMSBuildEditorConfig.editorconfig
 C:\Users\rolfm\source\repos\chessengine\ChessEngineClassLibrary\obj\Debug\net7.0-windows\ChessEngineClassLibrary.AssemblyInfoInputs.cache
 C:\Users\rolfm\source\repos\chessengine\ChessEngineClassLibrary\obj\Debug\net7.0-windows\ChessEngineClassLibrary.AssemblyInfo.cs

@@ -588,6 +588,11 @@ namespace ChessEngineClassLibrary
             {
                 PlayerList[(int)Piece.PColor.White].SetEndGame();
                 PlayerList[(int)Piece.PColor.Black].SetEndGame();
+
+                timer.Enabled = false;
+                ActGameState = GameState.End;
+                GameEnd = GameEndReason.Checkmate;
+                ShowGameEndDialog();
                 return;
             }
 

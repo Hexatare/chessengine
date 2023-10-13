@@ -9,7 +9,6 @@ using System;
 using System.Diagnostics;
 using System.IO;
 using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Threading;
 
@@ -202,10 +201,8 @@ namespace ChessEngine
         private void MenuItemNewGame_Click(object sender, RoutedEventArgs e)
         {
             // Ask for the End of the Game first
-            this.MenuItemEndGame_Click(sender, e);
-
-            if (game.ActGameState != GameState.None)
-                return;
+            if(game.ActGameState == GameState.Running)
+                this.MenuItemEndGame_Click(sender, e);
 
             // Command to the Board, to start a new Game
             game.SetNewGame(Resource1.DefaultFEN);
@@ -214,10 +211,13 @@ namespace ChessEngine
             this.MenuItemEndGame.IsEnabled = true;
             this.MenuItemSettings.IsEnabled = false;
 
-            this.lblActTimeW.Text = new TimeSpan(0, (int)game.CurrGameSettings.TimePlay, 0).ToString("mm\\:ss");
-            this.lblActTimeB.Text = new TimeSpan(0, (int)game.CurrGameSettings.TimePlay, 0).ToString("mm\\:ss");
+            this.lblActTimeW.Text = new TimeSpan(0, (int)game.CurrGameSettings.TimePlay, 0).ToString("hh\\:mm\\:ss");
+            this.lblActTimeB.Text = new TimeSpan(0, (int)game.CurrGameSettings.TimePlay, 0).ToString("hh\\:mm\\:ss");
             this.lblActTimeW.FontWeight = FontWeights.Bold;
             this.lblActTimeB.FontWeight = FontWeights.Light;
+
+            this.tblMoves.Text = "";
+            this.lblMoves.Text = "Spiel läuft";
         }
 
 
@@ -246,6 +246,7 @@ namespace ChessEngine
                     this.lblActTimeW.Text = "-";
                     this.lblActTimeB.Text = "-";
                     this.tblMoves.Text = "";
+                    this.lblMoves.Text = "Kein Spiel gestartet";
                 }
             }
         }
@@ -298,8 +299,8 @@ namespace ChessEngine
                         this.lblModeB.Text = TxtGameMode[0];
                     }
 
-                    this.lblActTimeW.Text = new TimeSpan(0, (int)settings.TimePlay, 0).ToString("mm\\:ss");
-                    this.lblActTimeB.Text = new TimeSpan(0, (int)settings.TimePlay, 0).ToString("mm\\:ss");
+                    this.lblActTimeW.Text = new TimeSpan(0, (int)settings.TimePlay, 0).ToString("hh\\:mm\\:ss");
+                    this.lblActTimeB.Text = new TimeSpan(0, (int)settings.TimePlay, 0).ToString("hh\\:mm\\:ss");
                     this.lblActTimeW.FontWeight = FontWeights.Light;
                     this.lblActTimeB.FontWeight = FontWeights.Light;
                 }
@@ -492,6 +493,13 @@ namespace ChessEngine
                 this.lblActTimeB.FontWeight = FontWeights.Bold;
                 this.lblActTimeW.FontWeight = FontWeights.Light;
             }
+
+            if (game.ActGameState == GameState.Running)
+                this.lblMoves.Text = "Spiel läuft";
+            else if (game.ActGameState == GameState.End)
+                this.lblMoves.Text = "Spiel beendet";
+            else if (game.ActGameState == GameState.None)
+                this.lblMoves.Text = "Kein Spiel gestartet";
         }
 
         #endregion

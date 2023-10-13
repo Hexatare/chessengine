@@ -38,10 +38,9 @@
             <Border Background="#22211f" Margin="20,50,0,50" Width="275px" DockPanel.Dock="Right">
                 <!-- Stackpanel for the Moves -->
                 <Grid DockPanel.Dock="Right" Margin="10">
-                    <TextBlock Text="Kein Spiel gestartet" FontSize="20" FontWeight="Bold" Foreground="#faffff" />
+                    <TextBlock x:Name="lblMoves" Text="Kein Spiel gestartet" FontSize="20" FontWeight="Bold" Foreground="#faffff" />
 
                     <!--- Züge-->
-                    <TextBlock x:Name="lblMoves" Text="" Foreground="#faffff" />
                     <TextBlock x:Name="tblMoves" TextWrapping="Wrap" Height="350" Foreground="#faffff" />
                     <Button x:Name="NewGameButton" Background="DarkKhaki" FontWeight="Bold" FontSize="16"  Click="MenuItemNewGame_Click" Height="40" VerticalAlignment="Bottom">Neues Spiel</Button>
                 </Grid>
@@ -50,15 +49,15 @@
             <!-- The DockPanel that wraps the Board including the two players and their time respectively -->
             <DockPanel LastChildFill="True">
                 <Grid DockPanel.Dock="Top" Height="50" Margin="0,0,20,0">
-                    <TextBlock x:Name="lblModeW" Text="Gegner" FontSize="18" FontWeight="DemiBold" HorizontalAlignment="Left" VerticalAlignment="Center" Foreground="#faffff" />
+                    <TextBlock x:Name="lblModeB" Text="Gegner" FontSize="18" FontWeight="DemiBold" HorizontalAlignment="Left" VerticalAlignment="Center" Foreground="#faffff" />
                     <Border Background="#5a5852" HorizontalAlignment="Right" VerticalAlignment="Center" MinWidth="120" >
-                        <TextBlock x:Name="lblActTimeW" Text="0:00" FontSize="20" FontWeight="DemiBold" Margin="0,8,0,8" HorizontalAlignment="Center" />
+                        <TextBlock x:Name="lblActTimeB" Text="0:00" FontSize="20" FontWeight="DemiBold" Margin="0,8,0,8" HorizontalAlignment="Center" />
                     </Border>
                 </Grid>
                 <Grid DockPanel.Dock="Bottom" Height="50" Margin="0,0,20,0">
-                    <TextBlock x:Name="lblModeB" Text="Spieler" FontSize="18" FontWeight="DemiBold" HorizontalAlignment="Left" VerticalAlignment="Center" Foreground="#faffff" />
+                    <TextBlock x:Name="lblModeW" Text="Spieler" FontSize="18" FontWeight="DemiBold" HorizontalAlignment="Left" VerticalAlignment="Center" Foreground="#faffff" />
                     <Border Background="#5a5852" HorizontalAlignment="Right" VerticalAlignment="Center" MinWidth="120" >
-                        <TextBlock x:Name="lblActTimeB" Text="0:00" FontSize="20" FontWeight="DemiBold" Margin="0,8,0,8" HorizontalAlignment="Center" />
+                        <TextBlock x:Name="lblActTimeW" Text="0:00" FontSize="20" FontWeight="DemiBold" Margin="0,8,0,8" HorizontalAlignment="Center" />
                     </Border>
                 </Grid>
                 <!-- The Dockpanel for the Letters a-h and numbers 1-8 -->
