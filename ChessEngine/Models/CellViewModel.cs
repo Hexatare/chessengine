@@ -74,9 +74,9 @@ namespace ChessEngine.Models
 
             // Set the color of the Cell
             if (cellColor == CellColor.White)
-                cellBackgroundColor = Colors.Beige;
+                cellBackgroundColor = Color.FromRgb(237, 214, 176);
             else
-                cellBackgroundColor = Colors.Brown;
+                cellBackgroundColor = Color.FromRgb(184, 135, 98);
 
             // Set the Background of the Cell
             grid.Background = new SolidColorBrush(cellBackgroundColor);

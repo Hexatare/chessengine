@@ -25,7 +25,7 @@ namespace ChessEngineClassLibrary
         /// <summary>
         /// Constant for En Passant Row where White is possible
         /// </summary>
-        private const int ENPL_ROW_WHITE = 5;
+        private const int ENP_ROW_WHITE = 5;
 
         // Number of Cells
         private const int NbrOfCells = 64;
@@ -58,8 +58,6 @@ namespace ChessEngineClassLibrary
             // Create alls Cells
             for (int i = 0; i < NbrOfCells; i++)
             {
-                int cellIndex = i + 1;
-
                 // Check if the square is light or dark
                 bool isLightSquare = (i / 8 + i % 8) % 2 == 0;
 
@@ -638,7 +636,7 @@ namespace ChessEngineClassLibrary
 
             yTargetPos = lastMove.End.Location[1] + 1;
             previousMoveOk =   (lastMove.GetYMovement() == 2) 
-                            && (lastMove.End.Location[1] == ENP_ROW_BLACK || lastMove.End.Location[1] == ENPL_ROW_WHITE);
+                            && (lastMove.End.Location[1] == ENP_ROW_BLACK || lastMove.End.Location[1] == ENP_ROW_WHITE);
 
             // if last Move was a double move and the piece is on the right colum
             if (previousMoveOk

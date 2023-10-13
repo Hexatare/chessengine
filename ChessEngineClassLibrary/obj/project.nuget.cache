@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "Ln/2B+YhlAvcEVt0GH1u2kfdkFmLfos3aNJ2NbJF+gK8v9P4uOToE9u2pTtdJTx2gXg0sM923oz8wl4RR+vwNQ==",
+  "dgSpecHash": "V4LaRBi9lZbKh8xCyQAEwnhas9zBipSF3zo3lsRAYPm+5HQUp8gZGvlvYDBwm8RHDywIgTFJ/jdmnN6g+DQ7LQ==",
   "success": true,
-  "projectFilePath": "C:\\Users\\Noël\\Source\\Repos\\Hexatare\\chessengine\\ChessEngineClassLibrary\\ChessEngineClassLibrary.csproj",
+  "projectFilePath": "C:\\Users\\rolfm\\source\\repos\\chessengine\\ChessEngineClassLibrary\\ChessEngineClassLibrary.csproj",
   "expectedPackageFiles": [],
   "logs": []
 }
