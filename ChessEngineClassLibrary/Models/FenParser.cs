@@ -10,7 +10,7 @@ namespace ChessEngineClassLibrary.Models
     /// <summary>
     /// Class to parse a FEN String and Setup a Chess Play
     /// This code was written by Alex Fredrickson and adapted for this purpose
-    /// URL: https://github.com/alexqfredrickson/FenParser/tree/master
+    /// URL: https://github.com/alexqfredrickson/FenParser
     /// </summary>
     public class FenParser
     {

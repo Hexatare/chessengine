@@ -2,10 +2,11 @@
 using ChessEngineClassLibrary.Pieces;
 using System;
 using System.Collections.Generic;
+using System.Data.SqlTypes;
 using System.Diagnostics;
 using System.Reflection;
 using System.Windows.Controls;
-using System.Windows.Threading;
+
 
 namespace ChessEngineClassLibrary
 {
@@ -24,7 +25,7 @@ namespace ChessEngineClassLibrary
         /// <summary>
         /// Constant for En Passant Row where White is possible
         /// </summary>
-        private const int ENPL_ROW_WHITE = 5;
+        private const int ENP_ROW_WHITE = 5;
 
         // Number of Cells
         private const int NbrOfCells = 64;
@@ -49,8 +50,6 @@ namespace ChessEngineClassLibrary
         /// <summary>
         /// Constructor. The constructor is what the backend uses as the chessboard. It calls the methods CreateCells and CreatePieces
         /// </summary>
-        /// <param name="chessGrid">Reference to the Main Application</param>
-        //public Board(Grid chessGrid)
         public Board()
         {
             // Create a new array with the length of 64
@@ -59,8 +58,6 @@ namespace ChessEngineClassLibrary
             // Create alls Cells
             for (int i = 0; i < NbrOfCells; i++)
             {
-                int cellIndex = i + 1;
-
                 // Check if the square is light or dark
                 bool isLightSquare = (i / 8 + i % 8) % 2 == 0;
 
@@ -97,7 +94,7 @@ namespace ChessEngineClassLibrary
         /// </summary>
         /// <param name="piece">Piece to be placed</param>
         /// <param name="arrayIndex">Array Index of the Board [0..63]</param>
-        public void PlacePlieceOnBoard(Piece piece, int arrayIndex)
+        public void PlacePieceOnBoard(Piece piece, int arrayIndex)
         {
             // Set a piece on the board
             CellsOnBoard[arrayIndex].SetPiece(piece);
@@ -197,7 +194,7 @@ namespace ChessEngineClassLibrary
         /// Moves a piece on the board, according to the Move parameter.
         /// If the move captures a piece, the piece will be removed from the board
         /// </summary>
-        /// <param name="move">The move to be done</param>
+        /// <param name="moveToDo">The move to be done</param>
         public void DoMove(Move moveToDo)
         {
             if(moveToDo != null)
@@ -211,7 +208,7 @@ namespace ChessEngineClassLibrary
                 {
                     Piece? killedPiece = moveToDo.End.GetPiece();
 
-                    if(killedPiece != null)
+                    if (killedPiece != null)
                     {
                         // Remove the capuret Piec, from Cell and List
                         moveToDo.End.RemovePiece();
@@ -222,7 +219,7 @@ namespace ChessEngineClassLibrary
                 // Move the Piece from Source to Destination
                 Piece? piece = moveToDo.Start.GetPiece();
 
-                if(piece != null) 
+                if (piece != null) 
                 {
                     moveToDo.Start.RemovePiece();
                     moveToDo.End.SetPiece(piece);
@@ -230,6 +227,7 @@ namespace ChessEngineClassLibrary
   
                 // Add the move to the List
                 allMoves.Add(moveToDo);
+
             }
 
         }
@@ -239,7 +237,7 @@ namespace ChessEngineClassLibrary
         /// Undo a move on the Board, according to the Move parameter, e.q. a invers Move.
         /// If the move to be undone involves a capture of a piece, the captured piece will be restored on the board.
         /// </summary>
-        /// <param name="move">The move to be undone</param>
+        /// <param name="moveToUndo">The move to be undone</param>
         public void UndoMove(Move moveToUndo)
         {
             if (moveToUndo != null)
@@ -453,7 +451,7 @@ namespace ChessEngineClassLibrary
                 // no InCheck, take Move back and return true
                 movePossible = !this.IsKingInCheck(piece.PieceColor);
 
-                // Perform the move on the Board
+                // Undo the move on the Board
                 UndoMove(move);
             }
             return movePossible;
@@ -516,8 +514,9 @@ namespace ChessEngineClassLibrary
 
                 foreach (Cell? targetCell in GetTargetMoveCells(move))
                 {
-                    move.End = targetCell;
-                    moves.Add(move);
+                     // Create a new Move and add it to the List of Moves
+                    Move pMove = new Move(cell, targetCell, pColor);
+                    moves.Add(pMove);
                 }
             }
             return moves;
@@ -553,6 +552,11 @@ namespace ChessEngineClassLibrary
             // a vaild King 
             if (kingInQuestion != null)
             {
+                // Check for position of the King
+                if (kingInQuestion.Location[0] != 4 && (    (kingInQuestion.Location[1] != 0 && playerColor == Piece.PColor.Black)
+                                                         || (kingInQuestion.Location[1] != 7 && playerColor == Piece.PColor.White) ))
+                    return false;
+
                 // Check the four conditions of Castling - King has not moved and is not in Check
                 if (kingInQuestion.HasMoved || IsKingInCheck(playerColor))
                     return false;
@@ -627,12 +631,12 @@ namespace ChessEngineClassLibrary
             lastMove = GetLastMove();
 
             // If no moves so far
-            if (lastMove == null)
+            if (lastMove == null || lastMove.PieceMoved.PieceType != Piece.PType.Pawn)
                 return false;
 
             yTargetPos = lastMove.End.Location[1] + 1;
             previousMoveOk =   (lastMove.GetYMovement() == 2) 
-                            && (lastMove.End.Location[1] == ENP_ROW_BLACK || lastMove.End.Location[1] == ENPL_ROW_WHITE);
+                            && (lastMove.End.Location[1] == ENP_ROW_BLACK || lastMove.End.Location[1] == ENP_ROW_WHITE);
 
             // if last Move was a double move and the piece is on the right colum
             if (previousMoveOk
@@ -643,6 +647,7 @@ namespace ChessEngineClassLibrary
 
             return false;
         }
+
     }
 
     #endregion

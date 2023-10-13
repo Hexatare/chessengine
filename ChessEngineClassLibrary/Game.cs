@@ -5,9 +5,9 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Numerics;
-using System.Threading;
 using System.Timers;
-using System.Windows.Threading;
+using System.Threading;
+
 
 namespace ChessEngineClassLibrary
 {
@@ -99,7 +99,7 @@ namespace ChessEngineClassLibrary
         private System.Timers.Timer timer;
 
         /// <summary>
-        /// Object to synchronize, e.q. make the Method ShowEndGameDialog Thread save
+        /// Object to synchronize, e.g. make the Method ShowEndGameDialog Thread save
         /// </summary>
         private Object EndGameDlgSynch = new();
 
@@ -110,10 +110,10 @@ namespace ChessEngineClassLibrary
         /// <summary>
         /// Constructor
         /// </summary>
-        /// <param name="chessBoard">Referenz to the Board</param>
+        /// <param name="chessBoard">Reference to the Board</param>
         public Game(Board chessBoard)
         {
-            // Referenz to the Chess Board
+            // Reference to the Chess Board
             ChessBoard = chessBoard;
 
             // Create Players
@@ -497,7 +497,7 @@ namespace ChessEngineClassLibrary
                     // Add Piece to the Board if not null
                     if (newPiece != null)
                     {
-                        ChessBoard.PlacePlieceOnBoard(newPiece, (row * 8) + column);
+                        ChessBoard.PlacePieceOnBoard(newPiece, (row * 8) + column);
                     }
                 }
             }
@@ -506,9 +506,16 @@ namespace ChessEngineClassLibrary
             ChessBoard.OnUpdateView();
             ActGameState = GameState.Running;
 
-            // If Game Mode Computer and Computer ist White, do the first move
+            // If Game Mode Computer and Computer is White, do the first move
             if (CurrGameSettings.Mode == GameMode.Computer && CurrGameSettings.Color == Piece.PColor.White)
-                engine.DoMove();
+            {
+                // Call the engine.DoMove Method to perform the best move
+                // Do this in a new Thread to avoid blocking the UI
+                Thread thread = new Thread(() => engine.DoMove());
+
+                // Start the Thread
+                thread.Start();
+            }
         }
 
 
@@ -524,52 +531,6 @@ namespace ChessEngineClassLibrary
             // Update the view
             ChessBoard.OnUpdateView();
         }
-
-
-        ///// <summary>
-        ///// Method to undo the players last move
-        ///// </summary>
-        //public void UndoLastMove()
-        //{
-        //    Move lastMove = GetPlayer(CurrentPlayer == Piece.PColor.White ? Piece.PColor.Black : Piece.PColor.White).GetLastMove(true);
-
-        //    // Undo the last move
-        //    if (!lastMove.End.IsEmpty)
-        //    {
-        //        // Move the Piece from Source to Destination
-        //        Piece? piece = lastMove.End.GetPiece();
-        //        lastMove.End.RemovePiece();
-        //        lastMove.Start.SetPiece(piece);
-        //    }
-
-        //    // If a Piece was captured, restore the piece
-        //    if (lastMove.PieceKilled != null)
-        //    {
-        //        lastMove.End.SetPiece(lastMove.PieceKilled);
-        //        //if (CurrentPlayer == Piece.PColor.White)
-        //        //    WhitePieces.Add(lastMove.PieceKilled);
-        //        //else
-        //        //    BlackPieces.Add(lastMove.PieceKilled);
-        //    }
-
-        //    // Decrement the half move Counter
-        //    this.HalfMoveCounter--;
-
-        //    // Change current player
-        //    if ((int)CurrentPlayer == (int)Piece.PColor.White)
-        //    {
-        //        CurrentPlayer = Piece.PColor.Black;
-        //    }
-        //    else
-        //    {
-        //        CurrentPlayer = Piece.PColor.White;
-        //        this.FullMoveNumber--;
-        //    }
-
-        //    // Start Timer of the new player, stop Timer of old Player
-        //    foreach (Player player in PlayerList)
-        //        player.SetCurrentPlayer(CurrentPlayer);
-        //}
 
 
         /// <summary>
@@ -612,7 +573,7 @@ namespace ChessEngineClassLibrary
             ChessBoard.DoMove(move);
 
             // Update the GUI
-            move.CheckMateMove = ChessBoard.IsCheckmate( (CurrentPlayer == Piece.PColor.White) ? Piece.PColor.Black : Piece.PColor.White);
+            move.CheckMateMove = ChessBoard.IsCheckmate((CurrentPlayer == Piece.PColor.White) ? Piece.PColor.Black : Piece.PColor.White);
             this.UpdateGui(move.GetUciMoveNaming());
 
             // Remove all Cell selections
@@ -627,6 +588,11 @@ namespace ChessEngineClassLibrary
             {
                 PlayerList[(int)Piece.PColor.White].SetEndGame();
                 PlayerList[(int)Piece.PColor.Black].SetEndGame();
+
+                timer.Enabled = false;
+                ActGameState = GameState.End;
+                GameEnd = GameEndReason.Checkmate;
+                ShowGameEndDialog();
                 return;
             }
 
@@ -696,7 +662,7 @@ namespace ChessEngineClassLibrary
         private void SwitchCurrentPlayer()
         {
             // Change current player
-            if ((int)CurrentPlayer == (int)Piece.PColor.White)
+            if (CurrentPlayer == (int)Piece.PColor.White)
             {
                 CurrentPlayer = Piece.PColor.Black;
             }
@@ -718,14 +684,11 @@ namespace ChessEngineClassLibrary
                 // Set Game Mode
                 ActGameState = GameState.Calculating;
 
-                // Do the calc in seprate Thread
-                Dispatcher.CurrentDispatcher.BeginInvoke(DispatcherPriority.Normal, () =>
-                {
-                    //engine.DoMove();
-                    Thread calcThread = new(() => engine.DoMove());
-                    calcThread.Name = "Engine Thread";
-                    calcThread.Start();
-                });
+                // Call the DoMove Method in a new Thread to avoid blocking the UI
+                Thread thread = new Thread(() => engine.DoMove());
+
+                // Start the Thread
+                thread.Start();
             }
         }
 

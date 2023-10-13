@@ -30,7 +30,7 @@ namespace ChessEngineClassLibrary
         /// <summary>
         /// The Piece that was moved
         /// </summary>
-        private readonly Piece? PieceMoved;
+        public readonly Piece? PieceMoved;
 
         /// <summary>
         /// The Color of the the Piece, that was moved, e.q. the Player that performed this move
@@ -133,7 +133,7 @@ namespace ChessEngineClassLibrary
             StringBuilder sb = new StringBuilder();
 
             // Test for Castling Move
-            if( this.CastlingMove && RookLoc != null)
+            if (this.CastlingMove && RookLoc != null)
             {
                 sb.Append(RookLoc.Location[0] == 0 ? "O-O-O" : "O-O");
                 return sb.ToString();

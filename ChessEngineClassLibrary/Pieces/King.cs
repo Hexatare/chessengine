@@ -81,51 +81,51 @@ namespace ChessEngineClassLibrary.Pieces
         }
 
 
-        /// <summary>
-        /// Method that implements the Castling movement of the King and the Rook
-        /// </summary>
-        /// <param name="destCell">Target Cell to move the King to</param>
-        /// <returns>TRUE if the castling was done</returns>
-        public bool KingCastlingMove(Move moveToDo)
-        {
-            Cell? rookSourceCell;
-            Cell? rookDestCell;
+        ///// <summary>
+        ///// Method that implements the Castling movement of the King and the Rook
+        ///// </summary>
+        ///// <param name="destCell">Target Cell to move the King to</param>
+        ///// <returns>TRUE if the castling was done</returns>
+        //public bool KingCastlingMove(Move moveToDo)
+        //{
+        //    Cell? rookSourceCell;
+        //    Cell? rookDestCell;
 
-            if (moveToDo.End !=  null)
-            {
-                // Perform the move and move also the Rook
-                if (moveToDo.End.Location[0] < 4)
-                {
-                    rookSourceCell = chessBoard.GetCell(0, moveToDo.End.Location[0]);
-                    rookDestCell = chessBoard.GetCell(moveToDo.End.Location[0] + 1, moveToDo.End.Location[1]);
-                }
-                else
-                {
-                    rookSourceCell = chessBoard.GetCell(7, moveToDo.End.Location[1]);
-                    rookDestCell = chessBoard.GetCell(moveToDo.End.Location[0] - 1, moveToDo.End.Location[1]);
-                }
+        //    if (moveToDo.End !=  null)
+        //    {
+        //        // Perform the move and move also the Rook
+        //        if (moveToDo.End.Location[0] < 4)
+        //        {
+        //            rookSourceCell = chessBoard.GetCell(0, moveToDo.End.Location[0]);
+        //            rookDestCell = chessBoard.GetCell(moveToDo.End.Location[0] + 1, moveToDo.End.Location[1]);
+        //        }
+        //        else
+        //        {
+        //            rookSourceCell = chessBoard.GetCell(7, moveToDo.End.Location[1]);
+        //            rookDestCell = chessBoard.GetCell(moveToDo.End.Location[0] - 1, moveToDo.End.Location[1]);
+        //        }
 
-                // Create a Move and tell the Board store it
-                Move rookMove = new(rookSourceCell, rookDestCell, this.PieceColor);
+        //        // Create a Move and tell the Board store it
+        //        Move rookMove = new(rookSourceCell, rookDestCell, this.PieceColor);
 
-                // Store Info about this castling Move in the Move Object
-                moveToDo.CastlingMove = true;
-                moveToDo.RookLoc = rookSourceCell;
+        //        // Store Info about this castling Move in the Move Object
+        //        moveToDo.CastlingMove = true;
+        //        moveToDo.RookLoc = rookSourceCell;
 
-                CanQueensideCastle = CanKingsideCastle = false;
+        //        CanQueensideCastle = CanKingsideCastle = false;
 
-                // Inform the Rook, he has been moved
-                Piece? rook = rookSourceCell.GetPiece();
-                if (rook != null )
-                    rook.HasMoved = true;
+        //        // Inform the Rook, he has been moved
+        //        Piece? rook = rookSourceCell.GetPiece();
+        //        if (rook != null )
+        //            rook.HasMoved = true;
 
-                // Tell the Bord to do the Moves
-                chessBoard.DoMove(moveToDo);
-                chessBoard.DoMove(rookMove);
-                return true;
-            }
-            return false;
-        }
+        //        // Tell the Bord to do the Moves
+        //        chessBoard.DoMove(moveToDo);
+        //        chessBoard.DoMove(rookMove);
+        //        return true;
+        //    }
+        //    return false;
+        //}
 
         #endregion
 

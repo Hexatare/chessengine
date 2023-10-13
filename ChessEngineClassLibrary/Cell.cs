@@ -91,7 +91,6 @@ namespace ChessEngineClassLibrary
         public void SetPiece(Piece piece)
         {
             PieceOnTheCell = piece;
-            //Grid.Children.Add(piece.Image);
             IsEmpty = false;
 
             piece.SetNewPosition(Index);
@@ -112,65 +111,9 @@ namespace ChessEngineClassLibrary
         /// </summary>
         public void RemovePiece()
         {
-            //// None the Cell and set internal state
-            //if (PieceOnTheCell != null)
-            //{
-            //    Grid.Children.Remove(PieceOnTheCell.Image);
-            //}
-
-            //Grid.Children.Clear();
             IsEmpty = true;
             PieceOnTheCell = null;
         }
-
-
-        ///// <summary>
-        ///// Set the Background Color of this Cell
-        ///// </summary>
-        ///// <param name="isSelected">TRUE if selected, otherwise FALS</param>
-        //public void SetSelected(bool isSelected, int? selection = 0)
-        //{   
-        //    if(isSelected)
-        //    {
-        //        // Set the Border of the Cell
-        //        if (selection == 0)
-        //            CellBorder.BorderBrush = Brushes.Yellow;
-        //        else if (selection == 1)
-        //            CellBorder.BorderBrush = Brushes.Green;
-        //        else if (selection == 2)
-        //            CellBorder.BorderBrush = Brushes.Red;
-
-        //        CellBorder.BorderThickness = new Thickness(3);
-        //    }
-        //    else
-        //    { 
-        //        // Set the Border of the Cell
-        //        CellBorder.BorderThickness = new Thickness(0);
-        //    }
-        //}
-
-
-        ///// <summary>
-        ///// Eventhandler for Cell Selection
-        ///// </summary>
-        ///// <param name="e"></param>
-        //public virtual void OnCellSelected(EventArgs e)
-        //{
-        //    CellSelected?.Invoke(this, e);
-        //}
-
-
-        ///// <summary>
-        ///// Mouse Event, wenn the Cell is clicked
-        ///// </summary>
-        ///// <param name="sender"></param>
-        ///// <param name="e"></param>
-        //private void Grid_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
-        //{
-        //    // Notify all Eventhandler on the Cell
-        //    this.OnCellSelected(e);
-
-        //}
 
         #endregion
     }

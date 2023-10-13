@@ -1,6 +1,10 @@
 {
   "ExpandedNodes": [
-    ""
+    "",
+    "\\ChessEngine",
+    "\\ChessEngineClassLibrary",
+    "\\ChessEngineClassLibrary\\Pieces"
   ],
+  "SelectedNode": "\\ChessEngine\\ChessEngine.sln",
   "PreviewInSolutionExplorer": false
 }

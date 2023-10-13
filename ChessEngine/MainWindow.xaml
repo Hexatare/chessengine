@@ -7,18 +7,17 @@
         mc:Ignorable="d"
         Loaded="ChessMainWindow_Loaded"
         Closing="ChessMainWindow_Closing"
-        Title="Chess" Height="660" Width="860" Icon="Resources\ChessLogo.jpg" WindowStartupLocation="CenterScreen" ResizeMode="NoResize">
-    
+        Title="Chess" Height="860" Width="1060" Icon="Resources\ChessLogo.jpg" WindowStartupLocation="CenterScreen" ResizeMode="NoResize">
+
     <Window.CommandBindings>
         <CommandBinding Command="New" CanExecute="CommandBindingNew_CanExecute" Executed="CommandBindingNew_Executed"/>
         <CommandBinding Command="Open" CanExecute="CommandBindingOpen_CanExecute" Executed="CommandBindingOpen_Executed"/>
         <CommandBinding Command="Save" CanExecute="CommandBindingSave_CanExecute" Executed="CommandBindingSave_Executed"/>
     </Window.CommandBindings>
 
-    <DockPanel LastChildFill="True">
-        
-        <!--- Create Menubar and Menu Items-->        
-        <Menu DockPanel.Dock="Top" Height="20" HorizontalAlignment="Left" VerticalAlignment="Top">
+    <DockPanel LastChildFill="True" Background="#2d2c29">
+        <!--- Menubar and Menu Items-->
+        <Menu DockPanel.Dock="Top" Height="20" Width="1060" HorizontalAlignment="Left" VerticalAlignment="Top">
             <MenuItem x:Name="FileMenu" Header="Datei" Height="20" Width="40">
                 <MenuItem Command="New" x:Name="MenuItemNewGame" Header="Neues Spiel" Click="MenuItemNewGame_Click"/>
                 <MenuItem Command="Open" x:Name="MenuItemLoad" Header="Spiel öffnen" />
@@ -28,8 +27,6 @@
                 <MenuItem x:Name="MenuItemQuit" Header="Beenden" HorizontalAlignment="Left" Click="MenuItemQuit_Click"/>
             </MenuItem>
             <MenuItem Header="Bearbeiten" Height="20" Width="80" >
-                <!--<MenuItem x:Name="MenuItemUndo" Header="Zug rückgängig" Click="MenuItemUndo_Click"/>
-                <Separator/>-->
                 <MenuItem x:Name="MenuItemSettings" Header="Einstellungen" Click="MenuItemSettings_Click"/>
             </MenuItem>
             <MenuItem Header="Hilfe" Height="20" Width="60" >
@@ -37,192 +34,109 @@
             </MenuItem>
         </Menu>
 
-        <Border BorderBrush="Black" BorderThickness="2" CornerRadius="5"  DockPanel.Dock="Right" Margin="0,20,5,20">
+        <DockPanel DockPanel.Dock="Bottom" Margin="20">
+            <Border Background="#22211f" Margin="20,50,0,50" Width="275px" DockPanel.Dock="Right">
+                <!-- Stackpanel for the Moves -->
+                <Grid DockPanel.Dock="Right" Margin="10">
+                    <TextBlock x:Name="lblMoves" Text="Kein Spiel gestartet" FontSize="20" FontWeight="Bold" Foreground="#faffff" />
 
-            <!-- Stackpanel for Player Information-->
-            <StackPanel DockPanel.Dock="Right" Width="180" Margin="10,10,10,15">
-
-
-                <!--- Spielinformationen-->
-                <Label x:Name="lblPlay" Content="Spielinformation" FontSize="20" FontWeight="Bold"/>
-
-                <!---Use a 2x2Grid-->
-                <Grid Margin="0,10,0,20">
-
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition/>
-                        <ColumnDefinition/>
-                    </Grid.ColumnDefinitions>
-
-                    <Grid.RowDefinitions>
-                        <RowDefinition />
-                        <RowDefinition />
-                    </Grid.RowDefinitions>
-
-                    <!--- White Player-->
-                    <TextBlock  x:Name="lblWhite" Text="Weiss:" Grid.Column="0" Grid.Row="0"  />
-                    <TextBlock  x:Name="lblTimeW" Text="Zeit:" Grid.Column="0" Grid.Row="1" />
-
-                    <TextBlock  x:Name="lblModeW" Text="-" Grid.Column="1" Grid.Row="0"  />
-                    <TextBlock  x:Name="lblActTimeW" Text="-" Grid.Column="1" Grid.Row="1"  />
-
+                    <!--- Züge-->
+                    <TextBlock x:Name="tblMoves" TextWrapping="Wrap" Height="350" Foreground="#faffff" />
+                    <Button x:Name="NewGameButton" Background="DarkKhaki" FontWeight="Bold" FontSize="16"  Click="MenuItemNewGame_Click" Height="40" VerticalAlignment="Bottom">Neues Spiel</Button>
                 </Grid>
+            </Border>
 
-                <!---Use a 2x2Grid-->
-                <Grid Margin="0,10,0,20">
-
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition/>
-                        <ColumnDefinition/>
-                    </Grid.ColumnDefinitions>
-
-                    <Grid.RowDefinitions>
-                        <RowDefinition />
-                        <RowDefinition />
-                    </Grid.RowDefinitions>
-
-                    <!--- Black Player-->
-                    <TextBlock  x:Name="lblBlack" Text="Schwarz:" Grid.Column="0" Grid.Row="0" />
-                    <TextBlock  x:Name="lblTimeB" Text="Zeit:" Grid.Column="0" Grid.Row="1" />
-
-                    <TextBlock  x:Name="lblModeB" Text="-" Grid.Column="1" Grid.Row="0"  />
-                    <TextBlock  x:Name="lblActTimeB" Text="-" Grid.Column="1" Grid.Row="1"  />
+            <!-- The DockPanel that wraps the Board including the two players and their time respectively -->
+            <DockPanel LastChildFill="True">
+                <Grid DockPanel.Dock="Top" Height="50" Margin="0,0,20,0">
+                    <TextBlock x:Name="lblModeB" Text="Gegner" FontSize="18" FontWeight="DemiBold" HorizontalAlignment="Left" VerticalAlignment="Center" Foreground="#faffff" />
+                    <Border Background="#5a5852" HorizontalAlignment="Right" VerticalAlignment="Center" MinWidth="120" >
+                        <TextBlock x:Name="lblActTimeB" Text="0:00" FontSize="20" FontWeight="DemiBold" Margin="0,8,0,8" HorizontalAlignment="Center" />
+                    </Border>
                 </Grid>
+                <Grid DockPanel.Dock="Bottom" Height="50" Margin="0,0,20,0">
+                    <TextBlock x:Name="lblModeW" Text="Spieler" FontSize="18" FontWeight="DemiBold" HorizontalAlignment="Left" VerticalAlignment="Center" Foreground="#faffff" />
+                    <Border Background="#5a5852" HorizontalAlignment="Right" VerticalAlignment="Center" MinWidth="120" >
+                        <TextBlock x:Name="lblActTimeW" Text="0:00" FontSize="20" FontWeight="DemiBold" Margin="0,8,0,8" HorizontalAlignment="Center" />
+                    </Border>
+                </Grid>
+                <!-- The Dockpanel for the Letters a-h and numbers 1-8 -->
+                <DockPanel LastChildFill="True">
+                    <!-- Letters a-h (bottom) -->
+                    <Grid Name="BottomMarker" DockPanel.Dock="Bottom" Height="20">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition/>
+                            <ColumnDefinition/>
+                            <ColumnDefinition/>
+                            <ColumnDefinition/>
+                            <ColumnDefinition/>
+                            <ColumnDefinition/>
+                            <ColumnDefinition/>
+                            <ColumnDefinition/>
+                            <ColumnDefinition Width="20"/>
+                        </Grid.ColumnDefinitions>
+                        <!-- Add TextBlocks to each column -->
+                        <TextBlock Grid.Column="0" Text="a" HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="Bold" Foreground="#d3d3d3" FontSize="16" />
+                        <TextBlock Grid.Column="1" Text="b" HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="Bold" Foreground="#d3d3d3" FontSize="16" />
+                        <TextBlock Grid.Column="2" Text="c" HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="Bold" Foreground="#d3d3d3" FontSize="16" />
+                        <TextBlock Grid.Column="3" Text="d" HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="Bold" Foreground="#d3d3d3" FontSize="16" />
+                        <TextBlock Grid.Column="4" Text="e" HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="Bold" Foreground="#d3d3d3" FontSize="16" />
+                        <TextBlock Grid.Column="5" Text="f" HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="Bold" Foreground="#d3d3d3" FontSize="16" />
+                        <TextBlock Grid.Column="6" Text="g" HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="Bold" Foreground="#d3d3d3" FontSize="16" />
+                        <TextBlock Grid.Column="7" Text="h" HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="Bold" Foreground="#d3d3d3" FontSize="16" />
+                    </Grid>
 
-                <!--- Züge-->
-                <TextBlock x:Name="lblMoves" Text="Züge:"/>
-                <TextBlock x:Name="tblMoves" TextWrapping="Wrap" Height="350"/>
+                    <!-- Numbers 1-8 (right) -->
+                    <Grid Name="RightMarker" DockPanel.Dock="Right" Width="20">
+                        <Grid.RowDefinitions>
+                            <RowDefinition/>
+                            <RowDefinition/>
+                            <RowDefinition/>
+                            <RowDefinition/>
+                            <RowDefinition/>
+                            <RowDefinition/>
+                            <RowDefinition/>
+                            <RowDefinition/>
+                        </Grid.RowDefinitions>
 
+                        <!-- Add TextBlocks to each column -->
+                        <TextBlock Grid.Row="0" Text="8" VerticalAlignment="Center" HorizontalAlignment="Center" FontWeight="Bold" Foreground="#d3d3d3" FontSize="16" />
+                        <TextBlock Grid.Row="1" Text="7" VerticalAlignment="Center" HorizontalAlignment="Center" FontWeight="Bold" Foreground="#d3d3d3" FontSize="16" />
+                        <TextBlock Grid.Row="2" Text="6" VerticalAlignment="Center" HorizontalAlignment="Center" FontWeight="Bold" Foreground="#d3d3d3" FontSize="16" />
+                        <TextBlock Grid.Row="3" Text="5" VerticalAlignment="Center" HorizontalAlignment="Center" FontWeight="Bold" Foreground="#d3d3d3" FontSize="16" />
+                        <TextBlock Grid.Row="4" Text="4" VerticalAlignment="Center" HorizontalAlignment="Center" FontWeight="Bold" Foreground="#d3d3d3" FontSize="16" />
+                        <TextBlock Grid.Row="5" Text="3" VerticalAlignment="Center" HorizontalAlignment="Center" FontWeight="Bold" Foreground="#d3d3d3" FontSize="16" />
+                        <TextBlock Grid.Row="6" Text="2" VerticalAlignment="Center" HorizontalAlignment="Center" FontWeight="Bold" Foreground="#d3d3d3" FontSize="16" />
+                        <TextBlock Grid.Row="7" Text="1" VerticalAlignment="Center" HorizontalAlignment="Center" FontWeight="Bold" Foreground="#d3d3d3" FontSize="16" />
+                    </Grid>
 
-            </StackPanel>
-        </Border>
-
-        <!--- Dockpanel for Board Markers around the Chessboard-->
-        <DockPanel LastChildFill="True">
-            <Grid Name="TopMarker" DockPanel.Dock="Top" Height="20">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="20"/>
-                    <ColumnDefinition/>
-                    <ColumnDefinition/>
-                    <ColumnDefinition/>
-                    <ColumnDefinition/>
-                    <ColumnDefinition/>
-                    <ColumnDefinition/>
-                    <ColumnDefinition/>
-                    <ColumnDefinition/>
-                    <ColumnDefinition Width="20"/>
-                </Grid.ColumnDefinitions>
-                <!-- Add TextBlocks to each column -->
-                <TextBlock Grid.Column="1" Text="a" HorizontalAlignment="Center" FontWeight="Bold"/>
-                <TextBlock Grid.Column="2" Text="b" HorizontalAlignment="Center" FontWeight="Bold"/>
-                <TextBlock Grid.Column="3" Text="c" HorizontalAlignment="Center" FontWeight="Bold"/>
-                <TextBlock Grid.Column="4" Text="d" HorizontalAlignment="Center" FontWeight="Bold"/>
-                <TextBlock Grid.Column="5" Text="e" HorizontalAlignment="Center" FontWeight="Bold"/>
-                <TextBlock Grid.Column="6" Text="f" HorizontalAlignment="Center" FontWeight="Bold"/>
-                <TextBlock Grid.Column="7" Text="g" HorizontalAlignment="Center" FontWeight="Bold"/>
-                <TextBlock Grid.Column="8" Text="h" HorizontalAlignment="Center" FontWeight="Bold"/>
-            </Grid>
-
-            <Grid Name="BottomMarker" DockPanel.Dock="Bottom" Height="20">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="20"/>
-                    <ColumnDefinition/>
-                    <ColumnDefinition/>
-                    <ColumnDefinition/>
-                    <ColumnDefinition/>
-                    <ColumnDefinition/>
-                    <ColumnDefinition/>
-                    <ColumnDefinition/>
-                    <ColumnDefinition/>
-                    <ColumnDefinition Width="20"/>
-                </Grid.ColumnDefinitions>
-                <!-- Add TextBlocks to each column -->
-                <TextBlock Grid.Column="1" Text="a" HorizontalAlignment="Center" FontWeight="Bold"/>
-                <TextBlock Grid.Column="2" Text="b" HorizontalAlignment="Center" FontWeight="Bold"/>
-                <TextBlock Grid.Column="3" Text="c" HorizontalAlignment="Center" FontWeight="Bold"/>
-                <TextBlock Grid.Column="4" Text="d" HorizontalAlignment="Center" FontWeight="Bold"/>
-                <TextBlock Grid.Column="5" Text="e" HorizontalAlignment="Center" FontWeight="Bold"/>
-                <TextBlock Grid.Column="6" Text="f" HorizontalAlignment="Center" FontWeight="Bold"/>
-                <TextBlock Grid.Column="7" Text="g" HorizontalAlignment="Center" FontWeight="Bold"/>
-                <TextBlock Grid.Column="8" Text="h" HorizontalAlignment="Center" FontWeight="Bold"/>
-            </Grid>
-
-            <Grid Name="LeftMarker" DockPanel.Dock="Left" Width="20">
-                <Grid.RowDefinitions>
-                    <RowDefinition/>
-                    <RowDefinition/>
-                    <RowDefinition/>
-                    <RowDefinition/>
-                    <RowDefinition/>
-                    <RowDefinition/>
-                    <RowDefinition/>
-                    <RowDefinition/>
-                </Grid.RowDefinitions>
-
-                <!-- Add TextBlocks to each column -->
-                <TextBlock Grid.Row="0" Text="8" VerticalAlignment="Center" HorizontalAlignment="Center" FontWeight="Bold"/>
-                <TextBlock Grid.Row="1" Text="7" VerticalAlignment="Center" HorizontalAlignment="Center" FontWeight="Bold"/>
-                <TextBlock Grid.Row="2" Text="6" VerticalAlignment="Center" HorizontalAlignment="Center" FontWeight="Bold"/>
-                <TextBlock Grid.Row="3" Text="5" VerticalAlignment="Center" HorizontalAlignment="Center" FontWeight="Bold"/>
-                <TextBlock Grid.Row="4" Text="4" VerticalAlignment="Center" HorizontalAlignment="Center" FontWeight="Bold"/>
-                <TextBlock Grid.Row="5" Text="3" VerticalAlignment="Center" HorizontalAlignment="Center" FontWeight="Bold"/>
-                <TextBlock Grid.Row="6" Text="2" VerticalAlignment="Center" HorizontalAlignment="Center" FontWeight="Bold"/>
-                <TextBlock Grid.Row="7" Text="1" VerticalAlignment="Center" HorizontalAlignment="Center" FontWeight="Bold"/>
-            </Grid>
-            
-            <Grid Name="RightMarker" DockPanel.Dock="Right" Width="20">
-                <Grid.RowDefinitions>
-                    <RowDefinition/>
-                    <RowDefinition/>
-                    <RowDefinition/>
-                    <RowDefinition/>
-                    <RowDefinition/>
-                    <RowDefinition/>
-                    <RowDefinition/>
-                    <RowDefinition/>
-                </Grid.RowDefinitions>
-
-                <!-- Add TextBlocks to each column -->
-                <TextBlock Grid.Row="0" Text="8" VerticalAlignment="Center" HorizontalAlignment="Center" FontWeight="Bold"/>
-                <TextBlock Grid.Row="1" Text="7" VerticalAlignment="Center" HorizontalAlignment="Center" FontWeight="Bold"/>
-                <TextBlock Grid.Row="2" Text="6" VerticalAlignment="Center" HorizontalAlignment="Center" FontWeight="Bold"/>
-                <TextBlock Grid.Row="3" Text="5" VerticalAlignment="Center" HorizontalAlignment="Center" FontWeight="Bold"/>
-                <TextBlock Grid.Row="4" Text="4" VerticalAlignment="Center" HorizontalAlignment="Center" FontWeight="Bold"/>
-                <TextBlock Grid.Row="5" Text="3" VerticalAlignment="Center" HorizontalAlignment="Center" FontWeight="Bold"/>
-                <TextBlock Grid.Row="6" Text="2" VerticalAlignment="Center" HorizontalAlignment="Center" FontWeight="Bold"/>
-                <TextBlock Grid.Row="7" Text="1" VerticalAlignment="Center" HorizontalAlignment="Center" FontWeight="Bold"/>
-            </Grid>
-            <Grid  Name="ChessGrid">
-
-                <!-- Create 8 Rows -->
-                <Grid.RowDefinitions>
-                    <RowDefinition />
-                    <RowDefinition />
-                    <RowDefinition />
-                    <RowDefinition />
-                    <RowDefinition />
-                    <RowDefinition />
-                    <RowDefinition />
-                    <RowDefinition />
-                </Grid.RowDefinitions>
-
-                <!-- Create 8 Columns -->
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition />
-                    <ColumnDefinition />
-                    <ColumnDefinition />
-                    <ColumnDefinition />
-                    <ColumnDefinition />
-                    <ColumnDefinition />
-                    <ColumnDefinition />
-                    <ColumnDefinition />
-                </Grid.ColumnDefinitions>
-            </Grid>
+                    <!-- The Grid where the Cells will be placed by the backend-->
+                    <Grid  Name="ChessGrid">
+                        <!-- Create 8 Rows -->
+                        <Grid.RowDefinitions>
+                            <RowDefinition />
+                            <RowDefinition />
+                            <RowDefinition />
+                            <RowDefinition />
+                            <RowDefinition />
+                            <RowDefinition />
+                            <RowDefinition />
+                            <RowDefinition />
+                        </Grid.RowDefinitions>
+                        <!-- Create 8 Columns -->
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition />
+                            <ColumnDefinition />
+                            <ColumnDefinition />
+                            <ColumnDefinition />
+                            <ColumnDefinition />
+                            <ColumnDefinition />
+                            <ColumnDefinition />
+                            <ColumnDefinition />
+                        </Grid.ColumnDefinitions>
+                    </Grid>
+                </DockPanel>
+            </DockPanel>
         </DockPanel>
-        
-
-        
-        
-        
-     </DockPanel>
+    </DockPanel>
 </Window>
