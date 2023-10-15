@@ -236,7 +236,7 @@ namespace ChessEngineClassLibrary.Pieces
                 int currColum = bishopStartCol + columInc;
                 int currRow = bishopStartRow + rowInc;
 
-                for(int i1 = 0; i1 < (bishopColDiff - 1); i1++, currColum += columInc, currRow += rowInc)
+                for (int i1 = 0; i1 < (bishopColDiff - 1); i1++, currColum += columInc, currRow += rowInc)
                 {
                     if (!chessBoard.GetCell(currColum, currRow).IsEmpty)
                     {

@@ -100,8 +100,8 @@ namespace ChessEngineClassLibrary.Models
             Fen = fen;
             ParseFenSubstrings(Fen.Split(' '));
 
-            BoardStateData = new FenModel(PiecePlacementString, ActiveColorString, 
-                                          CastlingAvailabilityString, EnPassantSquareString, 
+            BoardStateData = new FenModel(PiecePlacementString, ActiveColorString,
+                                          CastlingAvailabilityString, EnPassantSquareString,
                                           HalfmoveClockString, FullmoveNumberString);
         }
         #endregion

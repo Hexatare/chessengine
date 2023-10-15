@@ -17,7 +17,7 @@ namespace ChessEngineClassLibrary
     public class Game
     {
         #region Properties and Members
-         
+
         /// <summary>
         /// Current Player, Black or White
         /// </summary>
@@ -71,7 +71,7 @@ namespace ChessEngineClassLibrary
         /// <summary>
         /// Eventhandler to fire the End of the Game Event
         /// </summary>
-        public EventHandler? EndGameEvent; 
+        public EventHandler? EndGameEvent;
 
         /// <summary>
         /// Reference to the ChessBoard
@@ -389,7 +389,7 @@ namespace ChessEngineClassLibrary
 
             // Other members to reset
             sourceCell = null;
-            
+
             // Initalize the board
             ChessBoard.RemoveAllPieces();
 
@@ -412,7 +412,7 @@ namespace ChessEngineClassLibrary
 
             // Parse the Fen String and create the Board
             FenParser fenParser = new(fenString);
- 
+
             // Initialize the Game
             this.CurrentPlayer = fenParser.BoardStateData.ActivePlayerColor;
             this.FullMoveNumber = fenParser.BoardStateData.FullMoveNumber;
@@ -616,7 +616,7 @@ namespace ChessEngineClassLibrary
             TimeSpan maxTime = new TimeSpan(0, (int)CurrGameSettings.TimePlay, 0);
 
             // Check for Remaining Time;
-            if( GetPlayer(CurrentPlayer).TimePlayed() > maxTime)
+            if (GetPlayer(CurrentPlayer).TimePlayed() > maxTime)
             {
                 timer.Enabled = false;
                 ActGameState = GameState.End;
@@ -625,7 +625,7 @@ namespace ChessEngineClassLibrary
             }
 
             // Check for 50 Move Rule
-            if(GetPlayer(CurrentPlayer).NbrOfHalfMoves >= 49)
+            if (GetPlayer(CurrentPlayer).NbrOfHalfMoves >= 49)
             {
                 timer.Enabled = false;
                 ActGameState = GameState.End;
@@ -721,14 +721,14 @@ namespace ChessEngineClassLibrary
                 }
             }
             else
-            { 
+            {
                 gameStateEventArgs.CurrentPlayer = CurrentPlayer;
                 gameStateEventArgs.TimeLeft = (maxTime - GetPlayer(CurrentPlayer).TimePlayed()).ToString("hh\\:mm\\:ss");
 
             }
             // Fire the Event
             GameUpdateEvent?.Invoke(this, gameStateEventArgs);
-}
+        }
 
 
         /// <summary>
@@ -736,7 +736,7 @@ namespace ChessEngineClassLibrary
         /// </summary>
         private void ShowGameEndDialog()
         {
-            lock(EndGameDlgSynch)
+            lock (EndGameDlgSynch)
             {
                 // Collect the Game Information
                 GameEndEventArgs gameEndEventArgs = new();

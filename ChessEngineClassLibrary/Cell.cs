@@ -46,7 +46,7 @@ namespace ChessEngineClassLibrary
         /// Status if cell is occupied with a piece
         /// </summary>
         public bool IsEmpty { get; set; }
-      
+
         /// <summary>
         /// Chess Piece or null if cell is empty
         /// </summary>

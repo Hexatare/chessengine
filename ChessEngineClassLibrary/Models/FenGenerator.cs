@@ -84,18 +84,18 @@ namespace ChessEngineClassLibrary.Models
             StringBuilder sb = new StringBuilder();
 
             // Parse the Board for a Pieces
-            foreach(Cell? cell in ChessBoard.GetCells())
+            foreach (Cell? cell in ChessBoard.GetCells())
             {
                 if (!cell.IsEmpty)
-                { 
-                    switch( cell.GetPiece().PieceType ) 
+                {
+                    switch (cell.GetPiece().PieceType)
                     {
                         case Piece.PType.Pawn:
-                            sb.Append( cell.GetPiece().PieceColor ==  Piece.PColor.Black ? 'p' : 'P');
+                            sb.Append(cell.GetPiece().PieceColor == Piece.PColor.Black ? 'p' : 'P');
                             break;
 
                         case Piece.PType.Knight:
-                            sb.Append( cell.GetPiece().PieceColor == Piece.PColor.Black ? 'n' : 'N');
+                            sb.Append(cell.GetPiece().PieceColor == Piece.PColor.Black ? 'n' : 'N');
                             break;
 
                         case Piece.PType.Bishop:
@@ -103,11 +103,11 @@ namespace ChessEngineClassLibrary.Models
                             break;
 
                         case Piece.PType.Rook:
-                            sb.Append( cell.GetPiece().PieceColor ==  Piece.PColor.Black ? 'r' : 'R');
+                            sb.Append(cell.GetPiece().PieceColor == Piece.PColor.Black ? 'r' : 'R');
                             break;
 
                         case Piece.PType.Queen:
-                            sb.Append( cell.GetPiece().PieceColor == Piece.PColor.Black ? 'q' : 'Q');
+                            sb.Append(cell.GetPiece().PieceColor == Piece.PColor.Black ? 'q' : 'Q');
                             break;
 
                         case Piece.PType.King:
@@ -129,11 +129,11 @@ namespace ChessEngineClassLibrary.Models
             }
 
             // Now add all rows to the string
-            for(int i1 = boardRows.Length; i1 > 0; i1--)
+            for (int i1 = boardRows.Length; i1 > 0; i1--)
             {
                 sb.Append(boardRows[i1 - 1]);
 
-                if(i1 > 1)
+                if (i1 > 1)
                     sb.Append('/');
             }
             sb.Append(' ');

@@ -127,7 +127,7 @@ namespace ChessEngineClassLibrary
             // Index on the chess board, from 0 (a8) to 63 (h7)
             int index = xIndex + ((7 - (yIndex % 8)) * 8);
             Debug.Assert(index >= 0 || index <= 63);
-            return xIndex + ((7 - (yIndex % 8) ) * 8);
+            return xIndex + ((7 - (yIndex % 8)) * 8);
         }
 
 
@@ -137,7 +137,7 @@ namespace ChessEngineClassLibrary
         /// <param name="arrayIndex"></param>
         /// <returns>array with [x,y] values</returns>
         public int[] GetBoardIndex(int arrayIndex)
-        { 
+        {
             return new int[] { (arrayIndex % 8), (7 - (arrayIndex / 8)) };
         }
 
@@ -148,7 +148,7 @@ namespace ChessEngineClassLibrary
         /// <param name="xIndex">x Coordinate</param>
         /// <param name="yIndex">y Coordinate</param>
         /// <returns>the requested Cell</returns>
-        public Cell GetCell(int xIndex, int yIndex) 
+        public Cell GetCell(int xIndex, int yIndex)
         {
             return CellsOnBoard[GetArrayIndex(xIndex, yIndex)];
         }
@@ -197,14 +197,14 @@ namespace ChessEngineClassLibrary
         /// <param name="moveToDo">The move to be done</param>
         public void DoMove(Move moveToDo)
         {
-            if(moveToDo != null)
-            { 
+            if (moveToDo != null)
+            {
                 // Check that destCell not NULL
                 if (moveToDo.Start == null || moveToDo.End == null)
                     return;
 
                 // if target Cell was not empty, a kill was performed
-                if (!moveToDo.End.IsEmpty)  
+                if (!moveToDo.End.IsEmpty)
                 {
                     Piece? killedPiece = moveToDo.End.GetPiece();
 
@@ -219,12 +219,12 @@ namespace ChessEngineClassLibrary
                 // Move the Piece from Source to Destination
                 Piece? piece = moveToDo.Start.GetPiece();
 
-                if (piece != null) 
+                if (piece != null)
                 {
                     moveToDo.Start.RemovePiece();
                     moveToDo.End.SetPiece(piece);
                 }
-  
+
                 // Add the move to the List
                 allMoves.Add(moveToDo);
 
@@ -257,14 +257,14 @@ namespace ChessEngineClassLibrary
 
                 // if the move contained a killed Piece, restore the Piece
                 // in case of En Passant, get the killed Pawn location and restore there
-                if(moveToUndo.PieceKilled !=  null)
+                if (moveToUndo.PieceKilled != null)
                 {
                     int[] pLoc = moveToUndo.PieceKilled.Location;
                     this.GetCell(pLoc).SetPiece(moveToUndo.PieceKilled);
                 }
 
-                 // Remove from List
-                 allMoves.Remove(moveToUndo);
+                // Remove from List
+                allMoves.Remove(moveToUndo);
             }
         }
 
@@ -278,7 +278,7 @@ namespace ChessEngineClassLibrary
         {
             List<Piece> pieces = new();
 
-            foreach(Cell cell in CellsOnBoard)
+            foreach (Cell cell in CellsOnBoard)
             {
                 if (!cell.IsEmpty)
                 {
@@ -299,10 +299,10 @@ namespace ChessEngineClassLibrary
         /// </summary>
         public virtual void OnUpdateView()
         {
-           // Raise Event to show the Dialog
-           UpdateViewEvent?.Invoke(this, EventArgs.Empty);
+            // Raise Event to show the Dialog
+            UpdateViewEvent?.Invoke(this, EventArgs.Empty);
         }
-        
+
 
         /// <summary>
         /// Returns the last move that was performed on the Board. The move ist remains in the list
@@ -514,7 +514,7 @@ namespace ChessEngineClassLibrary
 
                 foreach (Cell? targetCell in GetTargetMoveCells(move))
                 {
-                     // Create a new Move and add it to the List of Moves
+                    // Create a new Move and add it to the List of Moves
                     Move pMove = new Move(cell, targetCell, pColor);
                     moves.Add(pMove);
                 }
@@ -553,8 +553,8 @@ namespace ChessEngineClassLibrary
             if (kingInQuestion != null)
             {
                 // Check for position of the King
-                if (kingInQuestion.Location[0] != 4 && (    (kingInQuestion.Location[1] != 0 && playerColor == Piece.PColor.Black)
-                                                         || (kingInQuestion.Location[1] != 7 && playerColor == Piece.PColor.White) ))
+                if (kingInQuestion.Location[0] != 4 && ((kingInQuestion.Location[1] != 0 && playerColor == Piece.PColor.Black)
+                                                         || (kingInQuestion.Location[1] != 7 && playerColor == Piece.PColor.White)))
                     return false;
 
                 // Check the four conditions of Castling - King has not moved and is not in Check
@@ -635,7 +635,7 @@ namespace ChessEngineClassLibrary
                 return false;
 
             yTargetPos = lastMove.End.Location[1] + 1;
-            previousMoveOk =   (lastMove.GetYMovement() == 2) 
+            previousMoveOk = (lastMove.GetYMovement() == 2)
                             && (lastMove.End.Location[1] == ENP_ROW_BLACK || lastMove.End.Location[1] == ENP_ROW_WHITE);
 
             // if last Move was a double move and the piece is on the right colum

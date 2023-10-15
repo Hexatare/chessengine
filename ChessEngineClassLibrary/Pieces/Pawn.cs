@@ -162,8 +162,8 @@ namespace ChessEngineClassLibrary.Pieces
             // Remove the Piece from the destCell and set the new created Piece there
             Piece? oldPawn = moveToDo.End.GetPiece();
 
-            if(oldPawn != null && newPiece != null)
-            { 
+            if (oldPawn != null && newPiece != null)
+            {
                 moveToDo.End.RemovePiece();
                 moveToDo.End.SetPiece(newPiece);
                 moveToDo.PromotionMove = true;

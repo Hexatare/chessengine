@@ -55,7 +55,7 @@ namespace ChessEngineClassLibrary
         /// <summary>
         /// Flag, if this was the last Move to Checkmate
         /// </summary>
-        public bool CheckMateMove { set; get; }   
+        public bool CheckMateMove { set; get; }
 
         /// <summary>
         /// Flag for castling move 
@@ -65,7 +65,7 @@ namespace ChessEngineClassLibrary
         /// <summary>
         /// Flag for Promotion move
         /// </summary>
-        public bool PromotionMove { set; get; } 
+        public bool PromotionMove { set; get; }
 
         /// <summary>
         /// In Case of a Promotion Move, the newly created Piece
@@ -76,7 +76,7 @@ namespace ChessEngineClassLibrary
         /// In case of a castling move, the old position of the rook
         /// </summary>
         public Cell? RookLoc { set; get; }
-         
+
         #endregion
 
         #region Constructor
@@ -87,13 +87,13 @@ namespace ChessEngineClassLibrary
         /// <param name="start">Start Cell of the Move</param>
         /// <param name="end">Destination Cell of the Move</param>
         public Move(Cell start, Cell end, Piece.PColor color)
-        { 
+        {
             Start = start;
             End = end;
             PColor = color;
 
             Piece? piece = start.GetPiece();
-            if(piece != null)
+            if (piece != null)
             {
                 PieceMoved = start.GetPiece();
                 PColor = piece.PieceColor;
@@ -139,29 +139,29 @@ namespace ChessEngineClassLibrary
                 return sb.ToString();
             }
 
-            if( PieceMoved != null )
+            if (PieceMoved != null)
             {
                 sb.Append(pieceTag[(int)PieceMoved.PieceType]);
             }
 
             // if cyptured piece, add x
-            if(PieceKilled != null )
+            if (PieceKilled != null)
             {
                 sb.Append('x');
             }
-            
+
             sb.Append(xCoordTag[End.Location[0]]);
             sb.Append(yCoordTag[End.Location[1]]);
 
             // If Promotion Move, add = plus the new Piece
-            if( this.PromotionMove )
+            if (this.PromotionMove)
             {
                 sb.Append('=');
                 sb.Append(pieceTag[(int)this.PromotionPiece]);
             }
 
             // If Checkmate Move
-            if( this.CheckMateMove )
+            if (this.CheckMateMove)
             {
                 sb.Append('#');
             }

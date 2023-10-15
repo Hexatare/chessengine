@@ -70,7 +70,7 @@ namespace ChessEngineClassLibrary
         /// <param name="game">Reference to the Game Class</param>
         /// <param name="chessBoard">Reference to the Chessboard</param>
         /// <param name="maxTime">Maximum amount of time the engine has to calculate the best move. Defaults to 5000ms</param>
-        public Engine(Game game, Board chessBoard, Player[] players, int maxTime=5000)
+        public Engine(Game game, Board chessBoard, Player[] players, int maxTime = 5000)
         {
             Game = game;
             ChessBoard = chessBoard;
@@ -116,18 +116,16 @@ namespace ChessEngineClassLibrary
             // Start the search
             searchThread.Start();
 
-            /*
             // Wait for 2 seconds ("Thread" in this case is the engine / main thread, not the search thread)
             Thread.Sleep(2000);
 
             // Set the terminateThread bool to true to stop the search
             terminateThread = true;
-            */
 
             // Join the search thread
             // This is necessary that the board is returned to the state before the search
             searchThread.Join();
-            
+
             // Do the best move
             Game.EngineMove(BestMove);
         }
@@ -184,7 +182,7 @@ namespace ChessEngineClassLibrary
             int legalMovesLength = legalMoves.Count;
 
             // Loop through all the possible moves
-            for (int i = 0; i < legalMovesLength; i++) 
+            for (int i = 0; i < legalMovesLength; i++)
             {
                 Board boardCopy = CopyBoard(ChessBoard);
 
@@ -196,7 +194,7 @@ namespace ChessEngineClassLibrary
                 Debug.Assert(i < legalMovesLength, "The index is out of range");
 
                 Move taskMove = possibleMoves[i];
-                tasks.Add( Task.Run(() => AlphaBetaThread(boardCopy, taskMove, bestMoveScore, depth, maxValuePlayer, alpha, beta))); // Can even throw an SystemOutOfRangeException when using possibleMovesLength -1
+                tasks.Add(Task.Run(() => AlphaBetaThread(boardCopy, taskMove, bestMoveScore, depth, maxValuePlayer, alpha, beta))); // Can even throw an SystemOutOfRangeException when using possibleMovesLength -1
             }
 
             // Wait for all the tasks to finish
@@ -207,13 +205,6 @@ namespace ChessEngineClassLibrary
             foreach (Task<int> task in tasks)
                 results.Add(task.Result);
 
-
-            // For Debug Reasons, write all Values 
-            //for (int x = 0; x < legalMovesLength - 1; x++)
-            //    Debug.Write(tasks[x].Result + " " + legalMoves[x].GetUciMoveNaming() + " ; ");
-            //Debug.WriteLine(" ");
-
-
             // Get highest value for White
             if (color == Piece.PColor.White)
             {
@@ -223,44 +214,6 @@ namespace ChessEngineClassLibrary
             {
                 bestMove = legalMoves[results.IndexOf(results.Min())];
             }
-            //Debug.WriteLine("BestMoveUsingAlphaBeta " + bestMove.GetUciMoveNaming() + " Depth: " + depth);
-
-
-            //// Loop through all the tasks
-            //for (int j = 0; j < legalMovesLength - 1; j++)
-            //{
-            //    score = tasks[j].Result;
-            //    int testScore = 0;
-
-            //    //// Check according to the actual color (white = Max, Black = Min) the best score
-            //    if (color == Piece.PColor.White)
-            //    {
-            //        // Check if the score is better than the best move score
-            //        if (score > bestMoveScore)
-            //        {
-            //            // If it is, set the best move score to the score
-            //            bestMoveScore = score;
-
-            //            // Set the best move to the possible move
-            //            bestMove = legalMoves[j];
-            //            //bestMove = ChessBoard.GetAllPossibleMoves(color)[j];
-
-            //            Debug.WriteLine("BestMoveUsingAlphaBeta " + bestMove.GetUciMoveNaming() + " Score: " + bestMoveScore + " Depth: " + depth);
-            //        }
-            //    }
-
-            //    if(color == Piece.PColor.Black)
-            //    {
-            //        List<int> ints = new List<int>();
-            //        foreach (Task<int> task in tasks)
-            //            ints.Add(task.Result);
-
-            //        int index = ints.IndexOf(ints.Min());
-            //        bestMove = legalMoves[index];
-
-            //        Debug.WriteLine("BestMoveUsingAlphaBeta " + bestMove.GetUciMoveNaming() + " Score: " + index + " Depth: " + depth);
-            //    }
-            //}
 
             // Return the best move
             return bestMove;
@@ -284,9 +237,9 @@ namespace ChessEngineClassLibrary
             {
                 // Make sure the cell is not empty
                 if (!cell.IsEmpty)
-                { 
+                {
                     // Check if the cell has a piece
-                    if (cell.GetPiece() !=  null)
+                    if (cell.GetPiece() != null)
                     {
                         // Get the value of the piece
                         int pieceValue = GetPieceValue(cell.GetPiece()!.PieceType);
@@ -297,10 +250,11 @@ namespace ChessEngineClassLibrary
                         // Additionally, favor the center of the board
                         if ((cell.Index >= 19 && cell.Index <= 22) ||
                             (cell.Index >= 43 && cell.Index <= 46) ||
-                            cell.Index == 27 || 
+                            cell.Index == 27 ||
                             cell.Index == 30 ||
                             cell.Index == 35 ||
-                            cell.Index == 38) {
+                            cell.Index == 38)
+                        {
                             // If this is the case, it means that the piece is in the "outer ring" of the center
                             // Add 1 to the evaluation value
                             evaluationValue += cell.GetPiece()!.PieceColor == Piece.PColor.White ? 1 : -1;
@@ -338,9 +292,9 @@ namespace ChessEngineClassLibrary
                 case Piece.PType.Queen: pieceValue = 90; break;
                 case Piece.PType.King: pieceValue = 900; break;
 
-                default:pieceValue = 0;  break;
+                default: pieceValue = 0; break;
             }
-            
+
             return pieceValue;
         }
 
@@ -449,7 +403,7 @@ namespace ChessEngineClassLibrary
                 return bestScore;
             }
         }
-        
+
 
         /// <summary>
         /// Method to get a copy of the current Board
@@ -464,7 +418,7 @@ namespace ChessEngineClassLibrary
             pieces.AddRange(originalBoard.GetPieces(Piece.PColor.White));
 
             // Loop through all the pieces
-            foreach(Piece piece in pieces)
+            foreach (Piece piece in pieces)
             {
                 // Create a new piece of the same type and color for the copied board
                 Piece? copiedPiece = null;
