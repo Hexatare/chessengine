@@ -57,7 +57,7 @@ namespace ChessEngineClassLibrary
         /// This is just a safety measure, theoretically the engine should
         /// never hit this because of the time limit
         /// </summary>
-        private int maxDepth = 5;
+        private int maxDepth = 10;
 
         #endregion
 
@@ -69,7 +69,7 @@ namespace ChessEngineClassLibrary
         /// <param name="game">Reference to the Game Class</param>
         /// <param name="chessBoard">Reference to the Chessboard</param>
         /// <param name="maxTime">Maximum amount of time the engine has to calculate the best move. Defaults to 5000ms</param>
-        public Engine(Game game, Board chessBoard, Player[] players, int maxTime = 2_000)
+        public Engine(Game game, Board chessBoard, Player[] players, int maxTime = 2_500)
         {
             Game = game;
             ChessBoard = chessBoard;
@@ -126,7 +126,7 @@ namespace ChessEngineClassLibrary
             searchThread.Join();
 
             // Do the best move
-            Game.EngineMove(BestMove);
+            Game.EngineMove(BestMove!);
         }
 
 
@@ -151,8 +151,6 @@ namespace ChessEngineClassLibrary
 
                 // Get the best move using the AlphaBeta algorithm
                 BestMove = BestMoveUsingAlphaBeta(i, (color == Piece.PColor.White), -10_000, 10_000);
-                Debug.Assert(BestMove != null);
-                Debug.WriteLine("Selected BestMove " + BestMove.GetUciMoveNaming());
             }
         }
 
@@ -446,8 +444,8 @@ namespace ChessEngineClassLibrary
                 }
 
                 // Set the copied piece on the corresponding cell of the copied board
-                copiedPiece.HasMoved = piece.HasMoved;
-                copiedBoard.GetCell(piece.Location).SetPiece(copiedPiece);
+                copiedPiece!.HasMoved = piece.HasMoved;
+                copiedBoard.GetCell(piece.Location!).SetPiece(copiedPiece);
             }
 
             // Return the copied board

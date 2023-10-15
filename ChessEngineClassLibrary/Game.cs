@@ -750,7 +750,7 @@ namespace ChessEngineClassLibrary
 
         #endregion
 
-        #region Bord Logic    
+        #region Board Logic    
 
         /// <summary>
         /// Test, if the Game is over
