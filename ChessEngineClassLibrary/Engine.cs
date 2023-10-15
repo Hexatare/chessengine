@@ -69,7 +69,7 @@ namespace ChessEngineClassLibrary
         /// <param name="game">Reference to the Game Class</param>
         /// <param name="chessBoard">Reference to the Chessboard</param>
         /// <param name="maxTime">Maximum amount of time the engine has to calculate the best move. Defaults to 5000ms</param>
-        public Engine(Game game, Board chessBoard, Player[] players, int maxTime = 2_500)
+        public Engine(Game game, Board chessBoard, int maxTime = 2_000)
         {
             Game = game;
             ChessBoard = chessBoard;

@@ -125,7 +125,7 @@ namespace ChessEngineClassLibrary
             PlayerList[1].Color = Piece.PColor.Black;
 
             // Create the Engine
-            engine = new Engine(this, ChessBoard, PlayerList);
+            engine = new Engine(this, ChessBoard);
 
             // Set the ActGameState
             ActGameState = GameState.None;
@@ -142,7 +142,7 @@ namespace ChessEngineClassLibrary
 
         #endregion
 
-        #region Inputmethods for Moves
+        #region Input methods for Moves
 
         /// <summary>
         /// The user has selected a Cell - Event from the GUI
@@ -753,9 +753,9 @@ namespace ChessEngineClassLibrary
         #region Board Logic    
 
         /// <summary>
-        /// Test, if the Game is over
+        /// Test if the Game is over
         /// </summary>
-        /// <returns>TRUE if Game is over</returns>
+        /// <returns>True if the Game is over</returns>
         private bool IsGameOver()
         {
             if (ChessBoard.IsCheckmate(Piece.PColor.White) || ChessBoard.IsCheckmate(Piece.PColor.Black))
