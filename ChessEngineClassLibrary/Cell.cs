@@ -1,11 +1,5 @@
 ﻿using ChessEngineClassLibrary.Models;
 using ChessEngineClassLibrary.Pieces;
-using System;
-using System.Diagnostics;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Input;
-using System.Windows.Media;
 
 namespace ChessEngineClassLibrary
 {

@@ -2,10 +2,7 @@
 using ChessEngineClassLibrary.Pieces;
 using System;
 using System.Collections.Generic;
-using System.Data.SqlTypes;
 using System.Diagnostics;
-using System.Reflection;
-using System.Windows.Controls;
 
 
 namespace ChessEngineClassLibrary

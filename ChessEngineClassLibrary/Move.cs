@@ -1,7 +1,6 @@
 ﻿using ChessEngineClassLibrary.Pieces;
 using System;
 using System.Text;
-using static ChessEngineClassLibrary.Pieces.Piece;
 
 namespace ChessEngineClassLibrary
 {

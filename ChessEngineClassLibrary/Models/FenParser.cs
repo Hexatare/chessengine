@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Markup;
-
-namespace ChessEngineClassLibrary.Models
+﻿namespace ChessEngineClassLibrary.Models
 {
     /// <summary>
     /// Class to parse a FEN String and Setup a Chess Play
