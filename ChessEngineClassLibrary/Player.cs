@@ -8,16 +8,16 @@ using static ChessEngineClassLibrary.Pieces.Piece;
 namespace ChessEngineClassLibrary
 {
     /// <summary>
-    /// Class Player implements the Functionality of one Player
+    /// The player class implements the functionality of a Player
     /// </summary>
     public class Player
     {
         #region Properties and Members        
 
         /// <summary>
-        /// Referenz to the Game Object
+        /// A reference to the game
         /// </summary>
-        private Game Game; 
+        private Game Game;
 
         /// <summary>
         /// Timer for the total time played 
@@ -25,22 +25,22 @@ namespace ChessEngineClassLibrary
         private Stopwatch Stopwatch;
 
         /// <summary>
-        /// List of all performed Moves in the current game, by this player
+        /// List of all the performed moves in the current game made by this player
         /// </summary>
         private List<Move> Moves;
 
         /// <summary>
-        /// Name of the player
+        /// The name of this player
         /// </summary>
         public string Name { set; get; } = string.Empty;
 
         /// <summary>
-        /// Color of this player (White or Black)
+        /// Color of this player (either White or Black)
         /// </summary>
         public Piece.PColor Color { get; set; }
 
         /// <summary>
-        /// Actual Counter of Halfmoves of the Player
+        /// Count of Half-Moves made by the Player
         /// </summary>
         public int NbrOfHalfMoves { get; set; }
 
@@ -49,18 +49,13 @@ namespace ChessEngineClassLibrary
         #region Constructor
 
         /// <summary>
-        /// Constructor
+        /// The construtor for the player
         /// </summary>
-        /// <param name="game">Referenz to the Game Object</param>
-        public Player(Game game) 
+        /// <param name="game">Reference to the Game Object</param>
+        public Player(Game game)
         {
-            // Referenz to the Game Class
             Game = game;
-
-            // Liste of all Moves
             Moves = new List<Move>();
-            
-            // Create a timer with an interval of 1000 milliseconds (1 second)
             Stopwatch = new Stopwatch();
         }
 
@@ -69,11 +64,11 @@ namespace ChessEngineClassLibrary
         #region Methods
 
         /// <summary>
-        /// Start a new Game
+        /// Method to start a new Game
         /// </summary>
-        /// <param name="color">Color of this Player</param>
+        /// <param name="color">The color of the Player</param>
         public void NewGame(Piece.PColor color)
-        { 
+        {
             // Clear the List of all Moves
             Moves.Clear();
 
@@ -93,10 +88,10 @@ namespace ChessEngineClassLibrary
 
 
         /// <summary>
-        /// Returns the last Move from this Player and removes this Move from the History
+        /// Returns the last Move from this Player and removes it from the History
         /// </summary>
-        /// <param name="remove">if TRUE, the move is deleted from the History</param>
-        /// <returns>Last Move</returns>
+        /// <param name="remove">Boolean indicating whether the move should be removed from the history</param>
+        /// <returns>The last Move</returns>
         public Move GetLastMove(bool remove)
         {
             if (Moves.Count == 0)
@@ -104,9 +99,9 @@ namespace ChessEngineClassLibrary
 
             Move lastMove = Moves.Last();
 
-            if(remove)
+            if (remove)
                 Moves.RemoveAt(Moves.Count - 1);
-            
+
             return lastMove;
         }
 
@@ -114,7 +109,7 @@ namespace ChessEngineClassLibrary
         /// <summary>
         /// Returns the Number of Moves of this Player
         /// </summary>
-        /// <returns></returns>
+        /// <returns>The number of moves</returns>
         public int GetNbrOfMoves()
         {
             return Moves.Count;
@@ -124,37 +119,35 @@ namespace ChessEngineClassLibrary
         /// <summary>
         /// Returns a List of all captures Pieces in the corresponding sequence
         /// </summary>
-        /// <returns></returns>
+        /// <returns>A list of all captured pieces</returns>
         public List<string> GetAllCapturedPieces()
         {
             List<string> pieces = new List<string>();
 
             foreach (Move move in Moves)
             {
-                if(move.PieceKilled!=null)
+                if (move.PieceKilled != null)
                 {
-                    pieces.Add("Zug: " + move.GetUciMoveNaming() + " - " 
+                    pieces.Add("Zug: " + move.GetUciMoveNaming() + " - "
                         + Enum.GetName(typeof(PType), (int)move.PieceKilled.PieceType));
                 }
             }
             return pieces;
         }
-        
+
 
         /// <summary>
         /// Sets this Player as the current Player to make a move. This starts the Timer
         /// </summary>
         /// <param name="color">Color of the Player with the next move</param>
         public void SetCurrentPlayer(Piece.PColor color)
-        { 
-            if(color.Equals(Color)) 
+        {
+            if (color.Equals(Color))
             {
-                // Start the Timer
                 Stopwatch.Start();
             }
             else
             {
-                // Stop the Timer
                 Stopwatch.Stop();
             }
         }
@@ -166,7 +159,6 @@ namespace ChessEngineClassLibrary
         /// <returns>Total Time in Hours, Minutes and Seconds</returns>
         public TimeSpan TimePlayed()
         {
-            //return string.Format("{0:hh\\:mm\\:ss}", Stopwatch.Elapsed);
             return Stopwatch.Elapsed;
         }
 

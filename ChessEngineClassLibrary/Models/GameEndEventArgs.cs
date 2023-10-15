@@ -29,7 +29,7 @@ namespace ChessEngineClassLibrary.Models
         /// Time the Winner played
         /// </summary>
         public string TimePlayed { get; set; } = "";
-       
+
         /// <summary>
         /// Number of Pieces the Winner captured
         /// </summary>

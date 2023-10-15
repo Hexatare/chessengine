@@ -336,6 +336,6 @@ namespace ChessEngineClassLibrary.Models
 
         #endregion
 
-     
+
     }
 }

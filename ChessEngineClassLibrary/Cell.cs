@@ -1,11 +1,5 @@
 ﻿using ChessEngineClassLibrary.Models;
 using ChessEngineClassLibrary.Pieces;
-using System;
-using System.Diagnostics;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Input;
-using System.Windows.Media;
 
 namespace ChessEngineClassLibrary
 {
@@ -46,7 +40,7 @@ namespace ChessEngineClassLibrary
         /// Status if cell is occupied with a piece
         /// </summary>
         public bool IsEmpty { get; set; }
-      
+
         /// <summary>
         /// Chess Piece or null if cell is empty
         /// </summary>

@@ -1,17 +1,5 @@
 ﻿using ChessEngineClassLibrary.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
 
 namespace ChessEngine.Dialogs
 {
@@ -31,7 +19,7 @@ namespace ChessEngine.Dialogs
         /// Texts for Game End Reason
         /// </summary>
         private readonly string[] TxtGameEndReason = { "Nichts", "Aufgabe", "Patt", "Zeit abgelaufen", "Übereinkunft", 
-                                                    "50 Zug Regel", "Zuwenig Figuren", "Zuwenig Figuren und Timeout", 
+                                                    "50 Zug Regel", "Zu wenig Figuren", "Zu wenig Figuren und Timeout", 
                                                     "Schachmatt"};
 
         /// <summary>
