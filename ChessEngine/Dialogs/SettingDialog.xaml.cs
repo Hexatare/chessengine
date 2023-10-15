@@ -78,12 +78,10 @@ namespace ChessEngine
 
             CboMode.ItemsSource = modeTxt;
             CboColor.ItemsSource = colorTxt;
-            CboDiff.ItemsSource = diffTxt;
             CboTime.ItemsSource = timeTxt;
 
             CboMode.SelectedIndex = Array.IndexOf(Enum.GetValues(typeof(GameMode)), currSettings.Mode);
             CboColor.SelectedIndex = Array.IndexOf(Enum.GetValues(typeof(Piece.PColor)), currSettings.Color);
-            CboDiff.SelectedIndex = Array.IndexOf(Enum.GetValues(typeof(Difficulty)), currSettings.Difficulty);
             CboTime.SelectedIndex = Array.IndexOf(Enum.GetValues(typeof(GameTime)), currSettings.TimePlay);
         }
 
@@ -98,7 +96,6 @@ namespace ChessEngine
             // Retreive the selected values
             Settings.Mode = Enum.GetValues<GameMode>()[CboMode.SelectedIndex];
             Settings.Color = Enum.GetValues<Piece.PColor>()[CboColor.SelectedIndex];
-            Settings.Difficulty = Enum.GetValues<Difficulty>()[CboDiff.SelectedIndex];
             Settings.TimePlay = Enum.GetValues<GameTime>()[CboTime.SelectedIndex];
 
             // Return Result == true

@@ -1,10 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "aOmPG6rwwFKU3S1SnQDcal/ZHvLCLOAOaUxENfpg0F8uCRqlu9Ug3ippS/3/j8x9nNt8LfckYsdUdXxefhlMRQ==",
+  "dgSpecHash": "1AR00BhxjAlHElxpNRI/3ovmVcENT+9BLoMXUMTgojll8lZWqBe5Ec2mHxsSmdxeAtEAQlKjQZ/15+3scPlW9A==",
   "success": true,
-  "projectFilePath": "/home/hexatare/Documents/Coding/chessengine/ChessEngineClassLibrary/ChessEngineClassLibrary.csproj",
-  "expectedPackageFiles": [
-    "/home/hexatare/.nuget/packages/microsoft.aspnetcore.app.ref/7.0.11/microsoft.aspnetcore.app.ref.7.0.11.nupkg.sha512"
-  ],
+  "projectFilePath": "C:\\Users\\Noël\\Source\\Repos\\Hexatare\\chessengine\\ChessEngineClassLibrary\\ChessEngineClassLibrary.csproj",
+  "expectedPackageFiles": [],
   "logs": []
 }

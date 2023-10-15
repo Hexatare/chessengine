@@ -1,25 +1,27 @@
 {
   "format": 1,
   "restore": {
-    "/home/hexatare/Documents/Coding/chessengine/ChessEngineClassLibrary/ChessEngineClassLibrary.csproj": {}
+    "C:\\Users\\Noël\\Source\\Repos\\Hexatare\\chessengine\\ChessEngineClassLibrary\\ChessEngineClassLibrary.csproj": {}
   },
   "projects": {
-    "/home/hexatare/Documents/Coding/chessengine/ChessEngineClassLibrary/ChessEngineClassLibrary.csproj": {
+    "C:\\Users\\Noël\\Source\\Repos\\Hexatare\\chessengine\\ChessEngineClassLibrary\\ChessEngineClassLibrary.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/home/hexatare/Documents/Coding/chessengine/ChessEngineClassLibrary/ChessEngineClassLibrary.csproj",
+        "projectUniqueName": "C:\\Users\\Noël\\Source\\Repos\\Hexatare\\chessengine\\ChessEngineClassLibrary\\ChessEngineClassLibrary.csproj",
         "projectName": "ChessEngineClassLibrary",
-        "projectPath": "/home/hexatare/Documents/Coding/chessengine/ChessEngineClassLibrary/ChessEngineClassLibrary.csproj",
-        "packagesPath": "/home/hexatare/.nuget/packages/",
-        "outputPath": "/home/hexatare/Documents/Coding/chessengine/ChessEngineClassLibrary/obj/",
+        "projectPath": "C:\\Users\\Noël\\Source\\Repos\\Hexatare\\chessengine\\ChessEngineClassLibrary\\ChessEngineClassLibrary.csproj",
+        "packagesPath": "C:\\Users\\Noël\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\Noël\\Source\\Repos\\Hexatare\\chessengine\\ChessEngineClassLibrary\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "/home/hexatare/.nuget/NuGet/NuGet.Config"
+          "C:\\Users\\Noël\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
           "net7.0-windows"
         ],
         "sources": {
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
@@ -48,18 +50,15 @@
           ],
           "assetTargetFallback": true,
           "warn": true,
-          "downloadDependencies": [
-            {
-              "name": "Microsoft.AspNetCore.App.Ref",
-              "version": "[7.0.11, 7.0.11]"
-            }
-          ],
           "frameworkReferences": {
             "Microsoft.NETCore.App": {
               "privateAssets": "all"
+            },
+            "Microsoft.WindowsDesktop.App.WPF": {
+              "privateAssets": "none"
             }
           },
-          "runtimeIdentifierGraphPath": "/usr/share/dotnet/sdk/7.0.111/RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.402\\RuntimeIdentifierGraph.json"
         }
       }
     }

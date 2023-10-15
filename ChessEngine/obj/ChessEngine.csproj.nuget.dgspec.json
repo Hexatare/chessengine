@@ -1,88 +1,27 @@
 {
   "format": 1,
   "restore": {
-    "/home/hexatare/Documents/Coding/chessengine/ChessEngine/ChessEngine.csproj": {}
+    "C:\\Users\\Noël\\Source\\Repos\\Hexatare\\chessengine\\ChessEngine\\ChessEngine.csproj": {}
   },
   "projects": {
-    "/home/hexatare/Documents/Coding/chessengine/ChessEngine/ChessEngine.csproj": {
+    "C:\\Users\\Noël\\Source\\Repos\\Hexatare\\chessengine\\ChessEngineClassLibrary\\ChessEngineClassLibrary.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/home/hexatare/Documents/Coding/chessengine/ChessEngine/ChessEngine.csproj",
-        "projectName": "ChessEngine",
-        "projectPath": "/home/hexatare/Documents/Coding/chessengine/ChessEngine/ChessEngine.csproj",
-        "packagesPath": "/home/hexatare/.nuget/packages/",
-        "outputPath": "/home/hexatare/Documents/Coding/chessengine/ChessEngine/obj/",
-        "projectStyle": "PackageReference",
-        "configFilePaths": [
-          "/home/hexatare/.nuget/NuGet/NuGet.Config"
-        ],
-        "originalTargetFrameworks": [
-          "net7.0-windows"
-        ],
-        "sources": {
-          "https://api.nuget.org/v3/index.json": {}
-        },
-        "frameworks": {
-          "net7.0-windows7.0": {
-            "targetAlias": "net7.0-windows",
-            "projectReferences": {
-              "/home/hexatare/Documents/Coding/chessengine/ChessEngineClassLibrary/ChessEngineClassLibrary.csproj": {
-                "projectPath": "/home/hexatare/Documents/Coding/chessengine/ChessEngineClassLibrary/ChessEngineClassLibrary.csproj"
-              }
-            }
-          }
-        },
-        "warningProperties": {
-          "warnAsError": [
-            "NU1605"
-          ]
-        }
-      },
-      "frameworks": {
-        "net7.0-windows7.0": {
-          "targetAlias": "net7.0-windows",
-          "imports": [
-            "net461",
-            "net462",
-            "net47",
-            "net471",
-            "net472",
-            "net48",
-            "net481"
-          ],
-          "assetTargetFallback": true,
-          "warn": true,
-          "downloadDependencies": [
-            {
-              "name": "Microsoft.AspNetCore.App.Ref",
-              "version": "[7.0.11, 7.0.11]"
-            }
-          ],
-          "frameworkReferences": {
-            "Microsoft.NETCore.App": {
-              "privateAssets": "all"
-            }
-          },
-          "runtimeIdentifierGraphPath": "/usr/share/dotnet/sdk/7.0.111/RuntimeIdentifierGraph.json"
-        }
-      }
-    },
-    "/home/hexatare/Documents/Coding/chessengine/ChessEngineClassLibrary/ChessEngineClassLibrary.csproj": {
-      "version": "1.0.0",
-      "restore": {
-        "projectUniqueName": "/home/hexatare/Documents/Coding/chessengine/ChessEngineClassLibrary/ChessEngineClassLibrary.csproj",
+        "projectUniqueName": "C:\\Users\\Noël\\Source\\Repos\\Hexatare\\chessengine\\ChessEngineClassLibrary\\ChessEngineClassLibrary.csproj",
         "projectName": "ChessEngineClassLibrary",
-        "projectPath": "/home/hexatare/Documents/Coding/chessengine/ChessEngineClassLibrary/ChessEngineClassLibrary.csproj",
-        "packagesPath": "/home/hexatare/.nuget/packages/",
-        "outputPath": "/home/hexatare/Documents/Coding/chessengine/ChessEngineClassLibrary/obj/",
+        "projectPath": "C:\\Users\\Noël\\Source\\Repos\\Hexatare\\chessengine\\ChessEngineClassLibrary\\ChessEngineClassLibrary.csproj",
+        "packagesPath": "C:\\Users\\Noël\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\Noël\\Source\\Repos\\Hexatare\\chessengine\\ChessEngineClassLibrary\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "/home/hexatare/.nuget/NuGet/NuGet.Config"
+          "C:\\Users\\Noël\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
           "net7.0-windows"
         ],
         "sources": {
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
@@ -111,18 +50,77 @@
           ],
           "assetTargetFallback": true,
           "warn": true,
-          "downloadDependencies": [
-            {
-              "name": "Microsoft.AspNetCore.App.Ref",
-              "version": "[7.0.11, 7.0.11]"
-            }
-          ],
           "frameworkReferences": {
             "Microsoft.NETCore.App": {
               "privateAssets": "all"
+            },
+            "Microsoft.WindowsDesktop.App.WPF": {
+              "privateAssets": "none"
             }
           },
-          "runtimeIdentifierGraphPath": "/usr/share/dotnet/sdk/7.0.111/RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.402\\RuntimeIdentifierGraph.json"
+        }
+      }
+    },
+    "C:\\Users\\Noël\\Source\\Repos\\Hexatare\\chessengine\\ChessEngine\\ChessEngine.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "C:\\Users\\Noël\\Source\\Repos\\Hexatare\\chessengine\\ChessEngine\\ChessEngine.csproj",
+        "projectName": "ChessEngine",
+        "projectPath": "C:\\Users\\Noël\\Source\\Repos\\Hexatare\\chessengine\\ChessEngine\\ChessEngine.csproj",
+        "packagesPath": "C:\\Users\\Noël\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\Noël\\Source\\Repos\\Hexatare\\chessengine\\ChessEngine\\obj\\",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "C:\\Users\\Noël\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+        ],
+        "originalTargetFrameworks": [
+          "net7.0-windows"
+        ],
+        "sources": {
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net7.0-windows7.0": {
+            "targetAlias": "net7.0-windows",
+            "projectReferences": {
+              "C:\\Users\\Noël\\Source\\Repos\\Hexatare\\chessengine\\ChessEngineClassLibrary\\ChessEngineClassLibrary.csproj": {
+                "projectPath": "C:\\Users\\Noël\\Source\\Repos\\Hexatare\\chessengine\\ChessEngineClassLibrary\\ChessEngineClassLibrary.csproj"
+              }
+            }
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        }
+      },
+      "frameworks": {
+        "net7.0-windows7.0": {
+          "targetAlias": "net7.0-windows",
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48",
+            "net481"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            },
+            "Microsoft.WindowsDesktop.App.WPF": {
+              "privateAssets": "none"
+            }
+          },
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.402\\RuntimeIdentifierGraph.json"
         }
       }
     }

@@ -58,7 +58,7 @@ namespace ChessEngineClassLibrary
         /// This is just a safety measure, theoretically the engine should
         /// never hit this because of the time limit
         /// </summary>
-        private int maxDepth = 3;
+        private int maxDepth = 5;
 
         #endregion
 
@@ -70,7 +70,7 @@ namespace ChessEngineClassLibrary
         /// <param name="game">Reference to the Game Class</param>
         /// <param name="chessBoard">Reference to the Chessboard</param>
         /// <param name="maxTime">Maximum amount of time the engine has to calculate the best move. Defaults to 5000ms</param>
-        public Engine(Game game, Board chessBoard, Player[] players, int maxTime = 5000)
+        public Engine(Game game, Board chessBoard, Player[] players, int maxTime = 2_000)
         {
             Game = game;
             ChessBoard = chessBoard;
@@ -117,7 +117,7 @@ namespace ChessEngineClassLibrary
             searchThread.Start();
 
             // Wait for 2 seconds ("Thread" in this case is the engine / main thread, not the search thread)
-            Thread.Sleep(2000);
+            Thread.Sleep(MaxTime);
 
             // Set the terminateThread bool to true to stop the search
             terminateThread = true;

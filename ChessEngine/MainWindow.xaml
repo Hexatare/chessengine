@@ -7,7 +7,7 @@
         mc:Ignorable="d"
         Loaded="ChessMainWindow_Loaded"
         Closing="ChessMainWindow_Closing"
-        Title="Chess" Height="860" Width="1060" Icon="Resources\ChessLogo.jpg" WindowStartupLocation="CenterScreen" ResizeMode="NoResize">
+        Title="Chess" Height="825" Width="1005" Icon="Resources\ChessLogo.jpg" WindowStartupLocation="CenterScreen" ResizeMode="NoResize">
 
     <Window.CommandBindings>
         <CommandBinding Command="New" CanExecute="CommandBindingNew_CanExecute" Executed="CommandBindingNew_Executed"/>
@@ -17,7 +17,7 @@
 
     <DockPanel LastChildFill="True" Background="#2d2c29">
         <!--- Menubar and Menu Items-->
-        <Menu DockPanel.Dock="Top" Height="20" Width="1060" HorizontalAlignment="Left" VerticalAlignment="Top">
+        <Menu DockPanel.Dock="Top" Height="20" Width="990" HorizontalAlignment="Left" VerticalAlignment="Top">
             <MenuItem x:Name="FileMenu" Header="Datei" Height="20" Width="40">
                 <MenuItem Command="New" x:Name="MenuItemNewGame" Header="Neues Spiel" Click="MenuItemNewGame_Click"/>
                 <MenuItem Command="Open" x:Name="MenuItemLoad" Header="Spiel öffnen" />
@@ -34,36 +34,34 @@
             </MenuItem>
         </Menu>
 
-        <DockPanel DockPanel.Dock="Bottom" Margin="20">
-            <Border Background="#22211f" Margin="20,50,0,50" Width="275px" DockPanel.Dock="Right">
+        <DockPanel DockPanel.Dock="Bottom" Margin="20" Height="730" Width="950">
+            <Border Background="#22211f" Margin="20,50,0,50" Width="300px" Height="630" DockPanel.Dock="Right">
                 <!-- Stackpanel for the Moves -->
-                <Grid DockPanel.Dock="Right" Margin="10">
+                <Grid DockPanel.Dock="Right" Margin="10" Width="280">
                     <TextBlock x:Name="lblMoves" Text="Kein Spiel gestartet" FontSize="20" FontWeight="Bold" Foreground="#faffff" />
-
-                    <!--- Züge-->
                     <TextBlock x:Name="tblMoves" TextWrapping="Wrap" Height="350" Foreground="#faffff" />
-                    <Button x:Name="NewGameButton" Background="DarkKhaki" FontWeight="Bold" FontSize="16"  Click="MenuItemNewGame_Click" Height="40" VerticalAlignment="Bottom">Neues Spiel</Button>
+                    <Button x:Name="NewGameButton" Background="DarkKhaki" FontWeight="Bold" FontSize="16"  Click="MenuItemNewGame_Click" Height="40" Width="280" VerticalAlignment="Bottom">Neues Spiel</Button>
                 </Grid>
             </Border>
 
             <!-- The DockPanel that wraps the Board including the two players and their time respectively -->
-            <DockPanel LastChildFill="True">
-                <Grid DockPanel.Dock="Top" Height="50" Margin="0,0,20,0">
+            <DockPanel LastChildFill="True" Height="730" Width="630">
+                <Grid DockPanel.Dock="Top" Height="50" Margin="0,0,30,0" Width="600">
                     <TextBlock x:Name="lblModeB" Text="Gegner" FontSize="18" FontWeight="DemiBold" HorizontalAlignment="Left" VerticalAlignment="Center" Foreground="#faffff" />
-                    <Border Background="#5a5852" HorizontalAlignment="Right" VerticalAlignment="Center" MinWidth="120" >
+                    <Border Background="#faffff" HorizontalAlignment="Right" VerticalAlignment="Center" MinWidth="120" >
                         <TextBlock x:Name="lblActTimeB" Text="0:00" FontSize="20" FontWeight="DemiBold" Margin="0,8,0,8" HorizontalAlignment="Center" />
                     </Border>
                 </Grid>
-                <Grid DockPanel.Dock="Bottom" Height="50" Margin="0,0,20,0">
+                <Grid DockPanel.Dock="Bottom" Height="50" Margin="0,0,30,0" Width="600">
                     <TextBlock x:Name="lblModeW" Text="Spieler" FontSize="18" FontWeight="DemiBold" HorizontalAlignment="Left" VerticalAlignment="Center" Foreground="#faffff" />
-                    <Border Background="#5a5852" HorizontalAlignment="Right" VerticalAlignment="Center" MinWidth="120" >
+                    <Border Background="#faffff" HorizontalAlignment="Right" VerticalAlignment="Center" MinWidth="120" >
                         <TextBlock x:Name="lblActTimeW" Text="0:00" FontSize="20" FontWeight="DemiBold" Margin="0,8,0,8" HorizontalAlignment="Center" />
                     </Border>
                 </Grid>
                 <!-- The Dockpanel for the Letters a-h and numbers 1-8 -->
-                <DockPanel LastChildFill="True">
+                <DockPanel LastChildFill="True" Height="630" Width="630">
                     <!-- Letters a-h (bottom) -->
-                    <Grid Name="BottomMarker" DockPanel.Dock="Bottom" Height="20">
+                    <Grid Name="BottomMarker" DockPanel.Dock="Bottom" Height="30">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition/>
                             <ColumnDefinition/>
@@ -73,7 +71,7 @@
                             <ColumnDefinition/>
                             <ColumnDefinition/>
                             <ColumnDefinition/>
-                            <ColumnDefinition Width="20"/>
+                            <ColumnDefinition Width="30"/>
                         </Grid.ColumnDefinitions>
                         <!-- Add TextBlocks to each column -->
                         <TextBlock Grid.Column="0" Text="a" HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="Bold" Foreground="#d3d3d3" FontSize="16" />
@@ -87,7 +85,7 @@
                     </Grid>
 
                     <!-- Numbers 1-8 (right) -->
-                    <Grid Name="RightMarker" DockPanel.Dock="Right" Width="20">
+                    <Grid Name="RightMarker" DockPanel.Dock="Right" Width="30">
                         <Grid.RowDefinitions>
                             <RowDefinition/>
                             <RowDefinition/>
@@ -111,7 +109,7 @@
                     </Grid>
 
                     <!-- The Grid where the Cells will be placed by the backend-->
-                    <Grid  Name="ChessGrid">
+                    <Grid Name="ChessGrid" Width="600px" Height="600px">
                         <!-- Create 8 Rows -->
                         <Grid.RowDefinitions>
                             <RowDefinition />
